@@ -1897,6 +1897,7 @@
 .footerLink:visited {
   display: block;
   font-size: var(--font-paragraph-small-font-size);
+  font-weight: 400;
   color: var(--color-text-sub-500);
   text-decoration: none;
   margin-bottom: 0.625rem;
