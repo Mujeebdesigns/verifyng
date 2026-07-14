@@ -492,7 +492,8 @@
   margin-bottom: 1rem;
 }
 
-.footerLink {
+.footerLink,
+.footerLink:visited {
   display: block;
   font-size: var(--font-paragraph-small-font-size);
   color: var(--color-text-sub-500);
