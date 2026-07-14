@@ -245,6 +245,10 @@ export const Support: React.FC = () => {
         </section>
       </main>
 
+      <footer className={styles.footer}>
+        <p>© {new Date().getFullYear()} VerifyNG. Built to foster safe commerce in Nigeria.</p>
+      </footer>
+
       {/* ── COMMAND PALETTE SEARCH MODAL ── */}
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>

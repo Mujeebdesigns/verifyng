@@ -488,6 +488,14 @@
   font-size: 0.9375rem;
 }
 
+.footer {
+  border-top: 0.0625rem solid var(--color-stroke-soft-200);
+  color: var(--color-text-soft-400);
+  padding: 1.5rem 0;
+  text-align: center;
+  font-size: var(--font-paragraph-small-font-size);
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 56.25rem) {
   .grid {
