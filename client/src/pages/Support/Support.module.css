@@ -276,43 +276,6 @@
   border-color: var(--color-text-soft-400);
 }
 
-/* ── COMPLIANCE TAGS ── */
-.complianceRow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2.5rem;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.securityNote {
-  font-size: 0.8125rem;
-  color: var(--color-text-soft-400);
-}
-
-.securityLink {
-  color: var(--color-primary-primary-base);
-  text-decoration: none;
-}
-
-.securityLink:hover {
-  text-decoration: underline;
-}
-
-.complianceBadge {
-  font-size: 0.8125rem;
-  color: var(--color-text-sub-500);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.badgeCheck {
-  color: var(--color-primary-primary-base);
-  font-weight: 500;
-}
-
 /* ── COMMAND PALETTE SEARCH MODAL ── */
 .modalOverlay {
   position: fixed;
@@ -489,11 +452,105 @@
 }
 
 .footer {
+  background: var(--color-bg-white-0);
   border-top: 0.0625rem solid var(--color-stroke-soft-200);
-  color: var(--color-text-soft-400);
-  padding: 1.5rem 0;
-  text-align: center;
+  padding: 3.75rem 3rem 2.25rem;
+}
+
+.footerInner {
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+.footerTop {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.footerLogo {
+  height: 1.75rem;
+  width: auto;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.footerBrandDesc {
   font-size: var(--font-paragraph-small-font-size);
+  color: var(--color-text-soft-400);
+  line-height: 1.7;
+  max-width: 13.75rem;
+}
+
+.footerColHead {
+  font-size: var(--font-subheading-x-small-font-size);
+  font-weight: 500;
+  letter-spacing: var(--font-subheading-x-small-letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-text-soft-400);
+  margin-bottom: 1rem;
+}
+
+.footerLink {
+  display: block;
+  font-size: var(--font-paragraph-small-font-size);
+  color: var(--color-text-sub-500);
+  text-decoration: none;
+  margin-bottom: 0.625rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.footerLink:hover {
+  color: var(--color-text-main-900);
+}
+
+.footerBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.75rem;
+  border-top: 0.0625rem solid var(--color-stroke-soft-200);
+}
+
+.footerCopy {
+  font-size: var(--font-paragraph-x-small-font-size);
+  color: var(--color-text-soft-400);
+}
+
+.footerCopy strong {
+  color: var(--color-primary-primary-base);
+  font-weight: 500;
+}
+
+.footerSocials {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.footerSocial {
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-soft-400);
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.footerSocial:hover {
+  border-color: var(--color-primary-primary-base);
+  color: var(--color-primary-primary-base);
+  background: var(--color-primary-primary-lighter);
 }
 
 /* ── RESPONSIVE ── */
@@ -505,6 +562,10 @@
   .bottomBanner {
     padding: 2.5rem;
     gap: 1.5rem;
+  }
+  .footerTop {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
   }
 }
 
@@ -529,5 +590,16 @@
   .primaryActionBtn,
   .secondaryActionBtn {
     width: 100%;
+  }
+  .footer {
+    padding: 3rem 1.25rem 1.75rem;
+  }
+  .footerTop {
+    grid-template-columns: 1fr;
+  }
+  .footerBottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
   }
 }
