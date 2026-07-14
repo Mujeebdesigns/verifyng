@@ -7,7 +7,6 @@ This file defines the code style and conventions for the VerifyNG codebase. Appl
 ## Language
 
 - TypeScript is used for all files in `client/src/` and `server/src/`
-- The `landing/` folder uses plain JavaScript — no TypeScript
 - All TypeScript must compile without errors — never use `// @ts-ignore` or `// @ts-nocheck`
 - Never use `any` as a type without a comment explaining why it cannot be avoided
 

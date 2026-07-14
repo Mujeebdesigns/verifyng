@@ -6,13 +6,14 @@ This file defines the architecture rules for the VerifyNG codebase. Read this be
 
 ## Overview
 
-VerifyNG is split into three independent units that live in the same monorepo:
+VerifyNG is split into two independent units that live in the same monorepo:
 
 - `client/` — React 18 frontend (TypeScript)
 - `server/` — Node.js backend with TypeScript (no Express)
-- `landing/` — Static HTML/CSS/JS marketing page
 
-These three units are **never mixed**. No server code imports from `client/`. No client code imports from `server/`. The landing page has no dependency on either.
+These two units are **never mixed**. No server code imports from `client/`. No client code imports from `server/`.
+
+There used to be a third unit, `landing/`, a static HTML/CSS/JS marketing page that duplicated the client's `Home` page. It was retired — `client/src/pages/Home` is now the single homepage, avoiding two parallel implementations of the same marketing content drifting out of sync.
 
 ---
 
@@ -50,8 +51,7 @@ verifyng/
 │   ├── grid-tokens.json
 │   └── tokens.css
 ├── client/                        ← React frontend
-├── server/                        ← Node.js backend
-└── landing/                       ← Static marketing page
+└── server/                        ← Node.js backend
 ```
 
 Each of `client/` and `server/` has its own `package.json`. They are independent Node packages. Do not create a root-level `package.json` that merges them.
@@ -87,7 +87,7 @@ client/
 
 - **Components** live in `components/`. Each component gets its own folder with `index.tsx` and a CSS module file.
 - **Pages** live in `pages/`. Each page maps to one application route:
-  - `/` — Home (Public search and landing redirect)
+  - `/` — Home (Public search, hero, and marketing content)
   - `/vendors/:id` — Vendor Profile Page (Public lookup with trust signals and contact links)
   - `/directory` — Vendor Directory Page (Public discover flow with state/category filters)
   - `/login` & `/register` — Authentication Pages (Select role: VENDOR or BUYER on signup)
@@ -298,22 +298,6 @@ return {
   pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
 };
 ```
-
----
-
-## Landing Page Architecture (`landing/`)
-
-```
-landing/
-├── index.html
-├── style.css
-└── main.js
-```
-
-- Plain HTML, CSS, and JavaScript only — no frameworks, no TypeScript, no build step
-- Deployed as a static site to Vercel separately from the React app
-- Has no dependency on `client/` or `server/`
-- The landing page links to the main app via the app's deployed URL
 
 ---
 

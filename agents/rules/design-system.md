@@ -49,7 +49,7 @@ Use these token names for text styles. Full values are in `tokens/tokens.css`.
 
 | Token Name | Size | Weight | Use |
 |---|---|---|---|---|
-| `--font-title-h1-title-*` | 64px | 500 | Hero headings on landing page |
+| `--font-title-h1-title-*` | 64px | 500 | Hero headings on the Home page |
 | `--font-title-h2-title-*` | 48px | 500 | Section headings |
 | `--font-title-h3-title-*` | 40px | 400 | Page headings |
 | `--font-title-h4-title-*` | 32px | 500 | Card headings, modal titles |

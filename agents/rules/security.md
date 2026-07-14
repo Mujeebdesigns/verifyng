@@ -223,7 +223,7 @@ for (const key of required) {
 
 VerifyNG collects personal data and is subject to the Nigerian Data Protection Regulation (NDPR).
 
-- A privacy policy must be linked from the landing page and the main app before launch
+- A privacy policy must be linked from the app before launch
 - Users must explicitly consent to data collection during registration
 - Users have the right to request deletion of their account and associated reviews
 - Phone numbers and bank account details used for vendor search are search keys only — they are not linked to user accounts

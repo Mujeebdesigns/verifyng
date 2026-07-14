@@ -97,7 +97,7 @@ GET /api/vendors?category=Fashion&state=Lagos&claimStatus=CLAIMED&trustScoreMin=
 GET /api/vendors/featured
 ```
 
-**Behavior:** Fetches top 3 vendors with `featured: true` ordered by `trustScore DESC` for display on the static landing page.
+**Behavior:** Fetches top 3 vendors with `featured: true` ordered by `trustScore DESC` for display on the Home page.
 
 ---
 
@@ -261,7 +261,7 @@ export async function listDirectory(params: DirectoryParams) {
 }
 
 /**
- * Featured vendors for the landing page.
+ * Featured vendors for the Home page.
  * Returns top 3 vendors with featured: true.
  */
 export async function getFeaturedVendors() {

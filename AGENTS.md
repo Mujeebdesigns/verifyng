@@ -87,10 +87,6 @@ verifyng/
 │   │   ├── schema.prisma
 │   │   └── migrations/            ← Never edit migration files manually
 │   └── package.json
-└── landing/                       ← Static marketing page (plain HTML/CSS/JS — not TypeScript)
-    ├── index.html
-    ├── style.css
-    └── main.js
 ```
 
 ---
@@ -141,7 +137,7 @@ verifyng/
 |---|---|---|---|
 | GET | /api/vendors/search?q= | No | Search vendors |
 | GET | /api/vendors | No | List directory with page, limit, state, and category filters |
-| GET | /api/vendors/featured | No | Fetch featured vendors for the landing page |
+| GET | /api/vendors/featured | No | Fetch featured vendors for the Home page |
 | GET | /api/vendors/:id | No | Get vendor profile details |
 | GET | /api/vendors/:id/reviews | No | Get vendor reviews |
 | GET | /api/vendors/:id/summary | No | Get vendor AI summary |
@@ -205,7 +201,7 @@ Always use CSS variables from `tokens/tokens.css`. Never hardcode hex values in 
 ### Always
 - Read the relevant file in `agents/rules/` before starting any task
 - Read the relevant skill file in `agents/skills/` before working on auth, AI integration, database migrations, vendor search and directory, vendor onboarding, or admin dashboard
-- Use TypeScript for all frontend and backend files — no plain `.js` files in `client/src/` or `server/src/`. Exception: the `landing/` folder uses plain HTML, CSS, and JavaScript — do not convert it to TypeScript
+- Use TypeScript for all frontend and backend files — no plain `.js` files in `client/src/` or `server/src/`
 - Use CSS variables from `tokens/tokens.css` for all style values
 - Use Prisma for all database access — no raw SQL except where Prisma does not support the operation (e.g. full-text search)
 - Validate all user inputs at the API layer before they reach the database
