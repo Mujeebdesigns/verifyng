@@ -2307,6 +2307,34 @@
   background: linear-gradient(135deg, #3D1A0A 0%, #C2410C 50%, #FB923C 100%);
 }
 
+/* Loading skeleton — shown while featured vendors are being fetched, so the
+   section never just disappears while waiting on a slow/cold-starting API */
+.fvSkeleton {
+  position: relative;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  height: 26.25rem;
+  background: var(--color-bg-soft-200);
+}
+
+.fvSkeletonShimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    var(--color-bg-white-0) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: fvShimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes fvShimmer {
+  0% { background-position: 150% 0; }
+  100% { background-position: -50% 0; }
+}
+
 /* Large faint initials shown when no image uploaded */
 .fvInitials {
   position: absolute;

@@ -327,6 +327,7 @@ export const Home: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [searchPlaceholder, setSearchPlaceholder] = useState('Search by name, instagram, phone, or bank...');
   const [featuredVendors, setFeaturedVendors] = useState<VendorSearchResult[]>([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
   const initialized = useRef(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -343,15 +344,33 @@ export const Home: React.FC = () => {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // Fetch featured vendors
+  // Fetch featured vendors — retries with backoff so a slow/cold-starting API
+  // (free-tier hosts spin down after inactivity) doesn't make this section
+  // silently vanish; it stays in a loading state until it truly gives up.
   useEffect(() => {
-    vendorService.getFeaturedVendors()
-      .then(vendors => {
-        setFeaturedVendors(vendors);
-      })
-      .catch(err => {
-        console.error('Failed to load featured vendors:', err);
-      });
+    let cancelled = false;
+    const retryDelaysMs = [5000, 10000, 15000, 20000];
+
+    const attempt = (attemptIndex: number) => {
+      vendorService.getFeaturedVendors()
+        .then(vendors => {
+          if (cancelled) return;
+          setFeaturedVendors(vendors);
+          setLoadingFeatured(false);
+        })
+        .catch(err => {
+          if (cancelled) return;
+          if (attemptIndex < retryDelaysMs.length) {
+            setTimeout(() => attempt(attemptIndex + 1), retryDelaysMs[attemptIndex]);
+          } else {
+            console.error('Failed to load featured vendors:', err);
+            setLoadingFeatured(false);
+          }
+        });
+    };
+
+    attempt(0);
+    return () => { cancelled = true; };
   }, []);
 
   // Read ?q= from URL (supports shareable, deep-linked search URLs)
@@ -516,7 +535,7 @@ export const Home: React.FC = () => {
       </div>
 
       {/* ── FEATURED VENDORS ── */}
-      {featuredVendors && featuredVendors.length > 0 && (
+      {(loadingFeatured || featuredVendors.length > 0) && (
         <section id="featured-vendors-section" className={styles.featuredOuter}>
           <div className={styles.featuredInner}>
             <div className={styles.featuredHeader}>
@@ -536,6 +555,15 @@ export const Home: React.FC = () => {
               </Link>
             </div>
 
+            {loadingFeatured ? (
+              <div className={styles.featuredGrid}>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className={styles.fvSkeleton}>
+                    <div className={styles.fvSkeletonShimmer} />
+                  </div>
+                ))}
+              </div>
+            ) : (
             <div className={styles.featuredGrid}>
               {featuredVendors.map((v, index) => {
                 const category = v.category || 'Retail store';
@@ -597,6 +625,7 @@ export const Home: React.FC = () => {
                 );
               })}
             </div>
+            )}
           </div>
         </section>
       )}
