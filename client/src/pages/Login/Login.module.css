@@ -1,0 +1,58 @@
+.vendorLogin {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-bg-white-0);
+  color: var(--color-text-main-900);
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* ── Left: form ── */
+.formSection {
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 2.5rem;
+}
+
+.topBar {
+  display: flex;
+}
+
+.formCenter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 26.25rem; /* 420px */
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+/* ── Right: decoration ── */
+.visualSection {
+  min-width: 0;
+}
+
+@media (max-width: 48rem) {
+  .vendorLogin {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .visualSection {
+    display: none;
+  }
+
+  .formSection {
+    padding: 1.5rem;
+  }
+}

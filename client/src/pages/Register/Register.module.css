@@ -1,0 +1,57 @@
+.vendorRegister {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-bg-white-0);
+  color: var(--color-text-main-900);
+  font-family: inherit;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.formColumn {
+  min-width: 0;
+  min-height: 100vh;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background: var(--color-bg-white-0);
+}
+
+.topBar {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar {
+  min-width: 0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (max-width: 48rem) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .formColumn {
+    padding: 1.5rem 1.25rem;
+  }
+}

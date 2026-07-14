@@ -1,0 +1,216 @@
+// server/prisma/schema.prisma
+// VerifyNG MVP — Full database schema
+// Source: agents/skills/db-migration-runner/SKILL.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  BUYER
+  VENDOR
+  ADMIN
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  role         UserRole  @default(BUYER)
+  isVerified   Boolean   @default(false)
+  isBanned     Boolean   @default(false)
+  tokenVersion Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  reviews            Review[]
+  reports            Report[]
+  verificationTokens VerificationToken[]
+  ownedVendors       Vendor[]         @relation("VendorOwner")
+  auditLogs          AuditLog[]       @relation("AuditLogActor")
+}
+
+enum VerificationTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+model VerificationToken {
+  id        String                @id @default(cuid())
+  userId    String
+  token     String                @unique
+  type      VerificationTokenType
+  expiresAt DateTime
+  createdAt DateTime              @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+enum ClaimStatus {
+  UNCLAIMED
+  PENDING_APPROVAL
+  CLAIMED
+}
+
+model Vendor {
+  id               String      @id @default(cuid())
+  businessName     String?
+  instagramHandle  String?
+  phoneNumber      String?
+  bankAccountLast4 String?     @db.VarChar(4)
+  ownerId          String?
+  claimStatus      ClaimStatus @default(UNCLAIMED)
+  claimedAt        DateTime?
+  state            String?
+  city             String?
+  category         String?
+  description      String?
+  whatsappUrl      String?
+  tiktokUrl        String?
+  facebookUrl      String?
+  linkedinUrl      String?
+  featured         Boolean     @default(false)
+  trustScore       Float       @default(0.0)
+  trustLabel       String      @default("Unrated")
+  reviewCount      Int         @default(0)
+  scamFlag         Boolean     @default(false)
+  moderationFlag   Boolean     @default(false)
+  coverImage       String?
+  logoImage        String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  reviews Review[]
+  reports Report[]
+  summary VendorSummary?
+  owner   User?          @relation("VendorOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([businessName])
+  @@index([instagramHandle])
+  @@index([phoneNumber])
+  @@index([bankAccountLast4])
+  @@index([state])
+  @@index([category])
+  @@index([claimStatus])
+}
+
+model Review {
+  id                 String   @id @default(cuid())
+  vendorId           String
+  userId             String
+  rating             Int
+  reviewText         String
+  transactionChannel String?
+  orderDate          DateTime?
+  verifiedBuyer      Boolean  @default(false)
+  isFlagged          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, userId])
+  @@index([vendorId])
+  @@index([userId])
+}
+
+model VendorSummary {
+  id                      String   @id @default(cuid())
+  vendorId                String   @unique
+  summaryText             String?
+  deliveryReliability     String?
+  customerSatisfaction    String?
+  recurringComplaints     Json     @default("[]")
+  trustPatterns           String?
+  scamReason              String?
+  generatedAt             DateTime @default(now())
+  reviewCountAtGeneration Int      @default(0)
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  vendorId    String
+  userId      String
+  reason      String
+  description String?
+  status      ReportStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([vendorId])
+  @@index([userId])
+  @@index([status])
+}
+
+enum ContactMessageStatus {
+  PENDING
+  RESOLVED
+}
+
+model ContactMessage {
+  id        String               @id @default(cuid())
+  name      String               @db.VarChar(100)
+  email     String               @db.VarChar(255)
+  subject   String               @db.VarChar(200)
+  message   String               @db.VarChar(5000)
+  status    ContactMessageStatus @default(PENDING)
+  createdAt DateTime             @default(now())
+}
+
+model BlacklistedToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model RateLimit {
+  key       String   @id
+  count     Int
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([resetAt])
+}
+
+/// Records every sensitive admin action (ban, promote, delete, claim decisions, etc.)
+/// so a compromised or malicious admin credential leaves a trace. targetType/targetId
+/// are stored as plain strings (not a real FK) since the target varies by action
+/// (User, Vendor, Report).
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}

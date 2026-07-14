@@ -1,0 +1,41 @@
+.banner {
+  background-color: var(--color-state-error);
+  color: var(--color-neutral-0);
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  box-shadow: var(--effect-regular-shadow-medium);
+  animation: shake 0.5s ease-in-out;
+}
+
+.icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.content {
+  text-align: left;
+}
+
+.title {
+  font-size: var(--font-label-large-font-size);
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.0312rem;
+}
+
+.message {
+  font-size: var(--font-paragraph-small-font-size);
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-0.25rem); }
+  75% { transform: translateX(0.25rem); }
+}

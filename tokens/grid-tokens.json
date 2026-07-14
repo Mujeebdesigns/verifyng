@@ -1,0 +1,171 @@
+{
+    "grid": {
+        "sidebar expanded (1440)": {
+            "0": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 272,
+                    "gutterSize": 24,
+                    "alignment": "min",
+                    "count": 1,
+                    "offset": 0
+                }
+            },
+            "1": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 70,
+                    "gutterSize": 24,
+                    "alignment": "min",
+                    "count": 12,
+                    "offset": 304
+                }
+            },
+            "2": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "grid",
+                    "sectionSize": 4
+                }
+            },
+            "description": null,
+            "extensions": {
+                "org.lukasoppermann.figmaDesignTokens": {
+                    "styleId": "S:7cae0b9bfd578cd96b2494090deb342885ec4d26,",
+                    "exportKey": "grid"
+                }
+            }
+        },
+        "sidebar collapsed (1440)": {
+            "0": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 80,
+                    "gutterSize": 24,
+                    "alignment": "min",
+                    "count": 1,
+                    "offset": 0
+                }
+            },
+            "1": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 86,
+                    "gutterSize": 24,
+                    "alignment": "min",
+                    "count": 12,
+                    "offset": 112
+                }
+            },
+            "2": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "grid",
+                    "sectionSize": 4
+                }
+            },
+            "description": null,
+            "extensions": {
+                "org.lukasoppermann.figmaDesignTokens": {
+                    "styleId": "S:ac6173051cc9ca0d0ab238a1391a4ce1eb716132,",
+                    "exportKey": "grid"
+                }
+            }
+        },
+        "sidebar & submenu (1440)": {
+            "0": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 344,
+                    "gutterSize": 24,
+                    "alignment": "min",
+                    "count": 1,
+                    "offset": 0
+                }
+            },
+            "1": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 64,
+                    "gutterSize": 24,
+                    "alignment": "min",
+                    "count": 12,
+                    "offset": 376
+                }
+            },
+            "2": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "grid",
+                    "sectionSize": 4
+                }
+            },
+            "description": null,
+            "extensions": {
+                "org.lukasoppermann.figmaDesignTokens": {
+                    "styleId": "S:830bdba8f0c28a17ff314117d9552baa0dc37e0b,",
+                    "exportKey": "grid"
+                }
+            }
+        },
+        "topbar (1440)": {
+            "0": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "gutterSize": 0,
+                    "alignment": "stretch",
+                    "count": 2,
+                    "offset": 44
+                }
+            },
+            "1": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "columns",
+                    "sectionSize": 80,
+                    "gutterSize": 24,
+                    "alignment": "center",
+                    "count": 12
+                }
+            },
+            "2": {
+                "type": "custom-grid",
+                "value": {
+                    "pattern": "grid",
+                    "sectionSize": 4
+                }
+            },
+            "description": null,
+            "extensions": {
+                "org.lukasoppermann.figmaDesignTokens": {
+                    "styleId": "S:5577bd1364fc747ccc8142adcc7fa8ea0f26f5b6,",
+                    "exportKey": "grid"
+                }
+            }
+        },
+        "mobile": {
+            "description": null,
+            "type": "custom-grid",
+            "value": {
+                "pattern": "columns",
+                "gutterSize": 20,
+                "alignment": "stretch",
+                "count": 4,
+                "offset": 24
+            },
+            "extensions": {
+                "org.lukasoppermann.figmaDesignTokens": {
+                    "styleId": "S:99f1c8d2d1d988449d8c618fa113177d918c976a,",
+                    "exportKey": "grid"
+                }
+            }
+        }
+    }
+}

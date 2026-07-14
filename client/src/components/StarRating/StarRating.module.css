@@ -1,0 +1,32 @@
+.container {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.star {
+  font-size: 1.25rem;
+  color: var(--color-text-disabled-300);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  line-height: 1;
+}
+
+.interactive .star {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+  min-height: 2.75rem; /* Touch target */
+  min-width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interactive .star:hover {
+  transform: scale(1.15);
+}
+
+.filled {
+  color: #fbbf24; /* Yellow gold */
+}

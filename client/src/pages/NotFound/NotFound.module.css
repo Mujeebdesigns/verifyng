@@ -1,0 +1,51 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--color-bg-white-0);
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1.25rem 4rem;
+}
+
+.code {
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-primary-base, #16a662);
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.03em;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-main-900);
+  margin: 0 0 0.5rem;
+}
+
+.message {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-sub-500);
+  margin: 0 0 2rem;
+  max-width: 26rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.actions a {
+  text-decoration: none;
+}

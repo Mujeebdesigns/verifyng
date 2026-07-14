@@ -1,0 +1,331 @@
+.card {
+  background: var(--color-bg-white-0);
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--effect-regular-shadow-small);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  position: relative;
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--color-primary-primary-base) 22%, var(--color-stroke-soft-200));
+  box-shadow: var(--effect-regular-shadow-medium);
+  transform: translateY(-0.25rem);
+}
+
+/* ── Cover ── */
+.cover {
+  height: 10rem;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Branded gradient placeholder — shown when no cover image is present */
+  background: linear-gradient(135deg, var(--color-state-success) 0%, var(--color-primary-primary-base) 100%);
+}
+
+/* Scam-flagged vendors never wear the brand gradient — calm neutral-dark instead */
+.coverScam {
+  background: linear-gradient(135deg, var(--color-bg-surface-700) 0%, var(--color-bg-strong-900) 100%);
+}
+
+.coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Faint monogram over the brand gradient — mirrors the profile-preview card */
+.avatarMono {
+  font-size: 2.75rem;
+  font-weight: 500;
+  letter-spacing: 0.0625rem;
+  color: color-mix(in srgb, var(--color-text-white-0) 26%, transparent);
+  user-select: none;
+}
+
+/* ── Score tag — neutral white chip, no tier colour ── */
+.scoreBadge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.125rem;
+  padding: 0.25rem 0.4375rem;
+  border-radius: 0.4375rem;
+  background: var(--color-bg-white-0);
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  box-shadow: var(--effect-regular-shadow-x-small);
+  z-index: 2;
+}
+
+.scoreBadgeNum {
+  font-size: var(--font-label-small-font-size);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-main-900);
+}
+
+.numHigh {
+  color: var(--color-primary-primary-dark);
+}
+
+.numCaution {
+  color: color-mix(in srgb, var(--color-state-away) 80%, var(--color-neutral-900));
+}
+
+.numMid {
+  color: var(--color-state-warning);
+}
+
+.numLow {
+  color: var(--color-state-error);
+}
+
+.scoreBadgeDen {
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-soft-400);
+}
+
+/* ── Scam Strip — the one intentionally loud element (safety) ── */
+.scamStrip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-state-error);
+  padding: 0.375rem 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: var(--font-label-x-small-font-size);
+  font-weight: 700;
+  line-height: var(--font-label-x-small-line-height);
+  letter-spacing: 0.0156rem;
+  text-transform: uppercase;
+  color: var(--color-text-white-0);
+  z-index: 2;
+}
+
+/* ── Card Body ── */
+.body {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.top {
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--font-label-large-font-size);
+  font-weight: var(--font-label-large-font-weight);
+  line-height: 1.35;
+  letter-spacing: var(--font-label-large-letter-spacing);
+  color: var(--color-text-main-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.verifiedMark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--color-primary-primary-base);
+  color: var(--color-text-white-0);
+}
+
+.category {
+  font-size: var(--font-subheading-2x-small-font-size);
+  font-weight: var(--font-subheading-2x-small-font-weight);
+  line-height: var(--font-subheading-2x-small-line-height);
+  letter-spacing: var(--font-subheading-2x-small-letter-spacing);
+  text-transform: var(--font-subheading-2x-small-text-transform);
+  color: var(--color-text-soft-400);
+  margin-top: 0.375rem;
+}
+
+/* ── Identity row — trust pill (the one chip) + quiet handle text ── */
+.identityRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* ── Trust pill — airy tint, medium weight, deep refined text colour ── */
+.trustPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.25rem 0.6875rem 0.25rem 0.5625rem;
+  border-radius: 6.25rem;
+  font-size: var(--font-label-x-small-font-size);
+  font-weight: var(--font-label-x-small-font-weight);
+  line-height: var(--font-label-x-small-line-height);
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.trustDot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pillHigh {
+  background: color-mix(in srgb, var(--color-primary-primary-base) 8%, transparent);
+  color: var(--color-primary-primary-dark);
+}
+
+.dotHigh {
+  background: var(--color-primary-primary-base);
+}
+
+.pillCaution {
+  background: color-mix(in srgb, var(--color-state-away) 11%, transparent);
+  color: color-mix(in srgb, var(--color-state-away) 48%, var(--color-neutral-900));
+}
+
+.dotCaution {
+  background: var(--color-state-away);
+}
+
+.pillMid {
+  background: color-mix(in srgb, var(--color-state-warning) 9%, transparent);
+  color: color-mix(in srgb, var(--color-state-warning) 62%, var(--color-neutral-900));
+}
+
+.dotMid {
+  background: var(--color-state-warning);
+}
+
+.pillLow {
+  background: color-mix(in srgb, var(--color-state-error) 7%, transparent);
+  color: color-mix(in srgb, var(--color-state-error) 82%, var(--color-neutral-900));
+}
+
+.dotLow {
+  background: var(--color-state-error);
+}
+
+/* ── Handle — quiet metadata text, no capsule; the pill stays the only chip ── */
+.handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: var(--font-label-x-small-font-size);
+  font-weight: var(--font-label-x-small-font-weight);
+  line-height: var(--font-label-x-small-line-height);
+  color: var(--color-text-sub-500);
+  min-width: 0;
+}
+
+.handle svg {
+  flex-shrink: 0;
+  color: var(--color-icon-soft-400);
+}
+
+.handle span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Meta — supporting facts (location), plain text with icon ── */
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-paragraph-x-small-font-size);
+  font-weight: var(--font-paragraph-x-small-font-weight);
+  line-height: var(--font-paragraph-x-small-line-height);
+  color: var(--color-text-sub-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaItem svg {
+  flex-shrink: 0;
+  display: block;
+  color: var(--color-icon-soft-400);
+}
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-top: 0.0625rem solid var(--color-stroke-soft-200);
+  flex-shrink: 0;
+}
+
+.reviewCount {
+  display: flex;
+  align-items: center;
+  gap: 0.3125rem;
+  font-size: var(--font-label-x-small-font-size);
+  font-weight: var(--font-label-x-small-font-weight);
+  line-height: var(--font-label-x-small-line-height);
+  color: var(--color-text-soft-400);
+}
+
+.reviewCount svg {
+  display: block;
+  color: var(--color-icon-soft-400);
+}
+
+.viewProfile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  font-size: var(--font-label-x-small-font-size);
+  font-weight: 600;
+  line-height: var(--font-label-x-small-line-height);
+  color: var(--color-text-sub-500);
+  text-decoration: none;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+
+.card:hover .viewProfile {
+  color: var(--color-primary-primary-base);
+  gap: 0.4375rem;
+}

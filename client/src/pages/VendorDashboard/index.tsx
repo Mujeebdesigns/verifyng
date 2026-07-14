@@ -1,0 +1,811 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth.js';
+import { Navbar } from '../../components/Navbar/index.js';
+import { vendorService } from '../../services/vendor.service.js';
+import { Button } from '../../components/Button/index.js';
+import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
+import { ErrorMessage } from '../../components/ErrorMessage/index.js';
+import type { VendorDetail } from '../../types/vendor.js';
+import type { ReviewResponse } from '../../types/review.js';
+import { ROUTES } from '../../utils/constants.js';
+import styles from './VendorDashboard.module.css';
+
+const CATEGORIES = [
+  'Fashion & Apparel',
+  'Electronics & Gadgets',
+  'Beauty & Cosmetics',
+  'Food & Groceries',
+  'Home & Kitchen',
+  'Services',
+  'Health & Wellness',
+  'Other',
+];
+
+const STATES = [
+  'Lagos',
+  'Abuja (FCT)',
+  'Rivers',
+  'Oyo',
+  'Kaduna',
+  'Kano',
+  'Enugu',
+  'Edo',
+  'Ogun',
+  'Anambra',
+];
+
+type TabType = 'overview' | 'edit';
+
+export const VendorDashboard: React.FC = () => {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [vendor, setVendor] = useState<VendorDetail | null>(null);
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Profile Form States
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [stateName, setStateName] = useState('');
+  const [cityName, setCityName] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [tiktok, setTiktok] = useState('');
+  const [facebook, setFacebook] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  
+  // Onboarding Form (New Profile)
+  const [bizName, setBizName] = useState('');
+  const [acctLast4, setAcctLast4] = useState('');
+  const [phone, setPhone] = useState('');
+
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const [coverImage, setCoverImage] = useState('');
+  const [coverImageError, setCoverImageError] = useState<string | null>(null);
+  const [logoImage, setLogoImage] = useState('');
+  const [logoImageError, setLogoImageError] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCoverImageError(null);
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      if (img.width < 800 || img.height < 600) {
+        setCoverImageError(`Image is too small (${img.width}x${img.height}px). Minimum required is 800x600px.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      setCoverImageError('Invalid image file.');
+    };
+
+    img.src = objectUrl;
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLogoImageError(null);
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      if (img.width < 200 || img.height < 200) {
+        setLogoImageError(`Image is too small (${img.width}x${img.height}px). Minimum required is 200x200px.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      setLogoImageError('Invalid image file.');
+    };
+
+    img.src = objectUrl;
+  };
+
+  const fetchProfileAndReviews = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await vendorService.getMyVendorProfile();
+      setVendor(data);
+
+      // Prepopulate form fields
+      setDescription(data.description || '');
+      setCategory(data.category || '');
+      setStateName(data.state || '');
+      setCityName(data.city || '');
+      setInstagram(data.instagramHandle || '');
+      setWhatsapp(data.whatsappUrl || '');
+      setTiktok(data.tiktokUrl || '');
+      setFacebook(data.facebookUrl || '');
+      setLinkedin(data.linkedinUrl || '');
+      setCoverImage(data.coverImage || '');
+      setLogoImage(data.logoImage || '');
+
+      // Load reviews
+      const reviewsRes = await vendorService.getReviews(data.id, 1, 50);
+      setReviews(reviewsRes.data);
+    } catch (err: unknown) {
+      const error = err as { statusCode?: number; message?: string };
+      if (error.statusCode === 404) {
+        setVendor(null);
+      } else {
+        setError(error.message || 'Failed to load vendor profile');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
+    if (user?.role !== 'VENDOR' && user?.role !== 'ADMIN') {
+      navigate(ROUTES.HOME);
+      return;
+    }
+    fetchProfileAndReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  const handleCreateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+
+    if (!bizName || !category || !stateName || !cityName || !description) {
+      setError('Please fill in all required fields.');
+      setSaving(false);
+      return;
+    }
+
+    if (!coverImage) {
+      setError('Please upload a product cover image.');
+      setSaving(false);
+      return;
+    }
+
+    if (coverImageError) {
+      setError('Please resolve image validation errors first.');
+      setSaving(false);
+      return;
+    }
+
+    const payload = {
+      businessName: bizName.trim(),
+      category,
+      state: stateName,
+      city: cityName.trim(),
+      description: description.trim(),
+      instagramHandle: instagram || undefined,
+      phoneNumber: phone || undefined,
+      whatsappUrl: whatsapp || undefined,
+      tiktokUrl: tiktok || undefined,
+      facebookUrl: facebook || undefined,
+      linkedinUrl: linkedin || undefined,
+      bankAccountLast4: acctLast4 || undefined,
+      coverImage: coverImage || undefined,
+      logoImage: logoImage || undefined,
+    };
+
+    try {
+      await vendorService.createVendorProfile(payload);
+      fetchProfileAndReviews();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create vendor profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!vendor) return;
+
+    setError(null);
+    setSaving(true);
+    setSaveSuccess(false);
+
+    if (coverImageError || logoImageError) {
+      setError('Please resolve image validation errors first.');
+      setSaving(false);
+      return;
+    }
+
+    try {
+      await vendorService.updateVendorProfile(vendor.id, {
+        description,
+        category,
+        state: stateName,
+        city: cityName,
+        instagramHandle: instagram,
+        whatsappUrl: whatsapp,
+        tiktokUrl: tiktok,
+        facebookUrl: facebook,
+        linkedinUrl: linkedin,
+        coverImage: coverImage || undefined,
+        logoImage: logoImage || undefined,
+      });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 5000);
+      fetchProfileAndReviews();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const copyTrustLink = () => {
+    if (!vendor) return;
+    const link = `${window.location.origin}/vendors/${vendor.id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 3000);
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.centerLoading}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      <Navbar />
+
+      {/* Sidebar Layout */}
+      <div className={styles.dashboardContainer}>
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarProfile}>
+            <h3 className={styles.sidebarName}>{vendor?.businessName || user?.displayName}</h3>
+            <span className={styles.sidebarRoleBadge}>Vendor Account</span>
+          </div>
+
+          {vendor && (
+            <nav className={styles.sidebarMenu}>
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`${styles.menuItem} ${activeTab === 'overview' ? styles.menuItemActive : ''}`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.menuIcon}>
+                  <rect x="3" y="3" width="7" height="9" />
+                  <rect x="14" y="3" width="7" height="5" />
+                  <rect x="14" y="12" width="7" height="9" />
+                  <rect x="3" y="16" width="7" height="5" />
+                </svg>
+                Overview
+              </button>
+
+              <button
+                onClick={() => setActiveTab('edit')}
+                className={`${styles.menuItem} ${activeTab === 'edit' ? styles.menuItemActive : ''}`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.menuIcon}>
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Edit Business Details
+              </button>
+            </nav>
+          )}
+        </aside>
+
+        {/* Content Area */}
+        <main className={styles.content}>
+          <div className={styles.contentHeader}>
+            <Link to={ROUTES.HOME} className={styles.backLink}>
+              ← Back to Search
+            </Link>
+            <h1 className={styles.pageTitle}>Vendor Dashboard</h1>
+            <p className={styles.pageSubtitle}>
+              {vendor ? 'Manage your credentials, verify reviews, and update your business bio.' : 'Publish your business page to start collecting reviews.'}
+            </p>
+          </div>
+
+          <div className={styles.contentBody}>
+            <ErrorMessage message={error} />
+
+            {!vendor ? (
+              /* ONBOARDING FLOW: CREATE PROFILE FORM */
+              <div className={styles.panel}>
+                <h2 className={styles.panelTitle}>Publish Your Business Profile</h2>
+                <p className={styles.panelSubtitle}>Complete the setup to publish your public rating profile on VerifyNG.</p>
+
+                <form onSubmit={handleCreateProfile}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="bizName">Business Name *</label>
+                      <input
+                        id="bizName"
+                        type="text"
+                        required
+                        placeholder="e.g. Trendy Fits"
+                        value={bizName}
+                        onChange={(e) => setBizName(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="categorySelect">Category *</label>
+                      <select
+                        id="categorySelect"
+                        required
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                      >
+                        <option value="">Select Category</option>
+                        {CATEGORIES.map((cat) => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="stateSelect">State *</label>
+                      <select
+                        id="stateSelect"
+                        required
+                        value={stateName}
+                        onChange={(e) => setStateName(e.target.value)}
+                      >
+                        <option value="">Select State</option>
+                        {STATES.map((st) => (
+                          <option key={st} value={st}>{st}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="cityName">City *</label>
+                      <input
+                        id="cityName"
+                        type="text"
+                        required
+                        placeholder="e.g. Ikeja"
+                        value={cityName}
+                        onChange={(e) => setCityName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="phone">Phone Number</label>
+                      <input
+                        id="phone"
+                        type="tel"
+                        placeholder="e.g. 08012345678"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="acctLast4">Bank Account (Last 4 Digits)</label>
+                      <input
+                        id="acctLast4"
+                        type="text"
+                        maxLength={4}
+                        placeholder="e.g. 4321"
+                        value={acctLast4}
+                        onChange={(e) => setAcctLast4(e.target.value.replace(/[^0-9]/g, ''))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={`${styles.formGroup} ${styles.formGroupTight}`}>
+                    <label className={styles.formLabel} htmlFor="desc">Business Bio *</label>
+                    <textarea
+                      id="desc"
+                      required
+                      rows={4}
+                      maxLength={500}
+                      placeholder="Describe your business and services (max 500 characters)"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+
+                  <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
+                    <label className={styles.formLabel} htmlFor="coverImageInput">Product Cover Image *</label>
+                    <div>
+                      <input
+                        id="coverImageInput"
+                        type="file"
+                        accept="image/*"
+                        required
+                        onChange={handleImageChange}
+                        className={styles.fileInput}
+                      />
+                      <p className={styles.fileHint}>
+                        Add a product photo that represents your business best — this is what buyers see first. Minimum size 800×37.5rem.
+                      </p>
+                      {coverImageError && (
+                        <div className={styles.fileError}>
+                          ⚠️ {coverImageError}
+                        </div>
+                      )}
+                      {coverImage && !coverImageError && (
+                        <div className={styles.coverPreview}>
+                          <img src={coverImage} alt="Cover Preview" className={styles.previewImg} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
+                    <label className={styles.formLabel} htmlFor="logoImageInput">Logo / Profile Picture</label>
+                    <div>
+                      <input
+                        id="logoImageInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        className={styles.fileInput}
+                      />
+                      <p className={styles.fileHint}>
+                        Add a logo or profile picture for your business. Minimum size 200×12.5rem.
+                      </p>
+                      {logoImageError && (
+                        <div className={styles.fileError}>
+                          ⚠️ {logoImageError}
+                        </div>
+                      )}
+                      {logoImage && !logoImageError && (
+                        <div className={styles.logoPreview}>
+                          <img src={logoImage} alt="Logo Preview" className={styles.previewImg} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <h3 className={styles.sectionTitle}>Social Profiles</h3>
+                  <div className={`${styles.formGrid} ${styles.formGroupLoose}`}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="instagram">Instagram Handle</label>
+                      <input
+                        id="instagram"
+                        type="text"
+                        placeholder="e.g. trendy_fits"
+                        value={instagram}
+                        onChange={(e) => setInstagram(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.formLabel} htmlFor="whatsapp">WhatsApp Link or Number</label>
+                      <input
+                        id="whatsapp"
+                        type="text"
+                        placeholder="e.g. https://wa.me/2348012345678"
+                        value={whatsapp}
+                        onChange={(e) => setWhatsapp(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit" disabled={saving} fullWidth={true}>
+                    {saving ? 'Creating Profile...' : 'Save & Publish Profile'}
+                  </Button>
+                </form>
+              </div>
+            ) : (
+              /* ACTIVE DASHBOARD TABS */
+              <div className={styles.tabContent}>
+                
+                {/* OVERVIEW TAB */}
+                {activeTab === 'overview' && (
+                  <>
+                    {/* Claims Alert Banner */}
+                    {vendor.claimStatus === 'PENDING_APPROVAL' && (
+                      <div className={`${styles.alertBox} ${styles.alertBoxWarning}`}>
+                        <span>⏳</span>
+                        <span>Your claim request is currently pending administrator verification. Some features may be hidden on your public page until approved.</span>
+                      </div>
+                    )}
+
+                    {/* Stats scorecard */}
+                    <div className={styles.statsGrid}>
+                      <div className={styles.statCard}>
+                        <span className={styles.statLabel}>Trust Rating</span>
+                        <div className={styles.statValue}>
+                          {vendor.trustScore.toFixed(1)} <span className={styles.statValueUnit}>/10</span>
+                        </div>
+                        <span className={styles.badge}>{vendor.trustLabel}</span>
+                      </div>
+
+                      <div className={styles.statCard}>
+                        <span className={styles.statLabel}>Total Reviews</span>
+                        <div className={styles.statValue}>{vendor.reviewCount}</div>
+                        <span className={styles.statSubtext}>Submitted by community</span>
+                      </div>
+
+                      <div className={styles.statCard}>
+                        <span className={styles.statLabel}>Status</span>
+                        <div className={styles.statValueSecondary}>
+                          {vendor.claimStatus === 'CLAIMED' ? '✓ Verified' : '⏳ Pending Approval'}
+                        </div>
+                        <span className={styles.statSubtext}>Claim confirmation state</span>
+                      </div>
+                    </div>
+
+                    {/* Link share box and recent review log split */}
+                    <div className={styles.splitRow}>
+                      <div className={styles.splitCol}>
+                        <div className={styles.shareWidget}>
+                          <h3 className={styles.shareWidgetTitle}>Collect Rating Reviews</h3>
+                          <p className={styles.shareWidgetDesc}>Share your VerifyNG profile link to gather verified feedback and build reputation.</p>
+                          <div className={styles.shareInputGroup}>
+                            <input
+                              type="text"
+                              readOnly
+                              value={`${window.location.origin}/vendors/${vendor.id}`}
+                              className={styles.shareInput}
+                            />
+                            <Button onClick={copyTrustLink} variant="primary">
+                              {copySuccess ? 'Copied!' : 'Copy Link'}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={`${styles.panel} ${styles.feedPanel}`}>
+                        <h3 className={`${styles.panelTitle} ${styles.panelTitleSpaced}`}>Recent Customer Feedback</h3>
+                        {reviews.length === 0 ? (
+                          <p className={styles.emptyFeedNote}>
+                            No reviews submitted yet. Use the share link to collect customer ratings.
+                          </p>
+                        ) : (
+                          <div className={styles.reviewsFeed}>
+                            {reviews.map((rev) => (
+                              <div key={rev.id} className={styles.reviewItemCard}>
+                                <div className={styles.reviewItemHeader}>
+                                  <span className={styles.reviewAuthor}>{rev.user?.displayName || 'Buyer'}</span>
+                                  <span className={styles.reviewStars}>★ {rev.rating}/5</span>
+                                </div>
+                                <p className={styles.reviewText}>{rev.reviewText}</p>
+                                {rev.verifiedBuyer && <span className={styles.purchaseBadge}>Verified Purchase</span>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* EDIT TAB */}
+                {activeTab === 'edit' && (
+                  <div className={styles.panel}>
+                    <h3 className={`${styles.panelTitle} ${styles.panelTitleSpacedLg}`}>Update Business Profile</h3>
+                    {saveSuccess && (
+                      <div className={styles.saveSuccessNote}>
+                        ✓ Profile details updated successfully.
+                      </div>
+                    )}
+
+                    <form onSubmit={handleUpdateProfile}>
+                      <div className={styles.formGrid}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editCategory">Category</label>
+                          <select
+                            id="editCategory"
+                            className={styles.formSelect}
+                            required
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                          >
+                            {CATEGORIES.map((cat) => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel}>Business Name</label>
+                          <input
+                            type="text"
+                            className={`${styles.formInput} ${styles.disabledInput}`}
+                            disabled
+                            value={vendor.businessName || ''}
+                          />
+                        </div>
+                      </div>
+
+                      <div className={styles.formGrid}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editState">State</label>
+                          <select
+                            id="editState"
+                            className={styles.formSelect}
+                            required
+                            value={stateName}
+                            onChange={(e) => setStateName(e.target.value)}
+                          >
+                            {STATES.map((st) => (
+                              <option key={st} value={st}>{st}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editCity">City</label>
+                          <input
+                            id="editCity"
+                            className={styles.formInput}
+                            type="text"
+                            required
+                            value={cityName}
+                            onChange={(e) => setCityName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className={`${styles.formGroup} ${styles.formGroupTight}`}>
+                        <label className={styles.formLabel} htmlFor="editDesc">Business Description (max 500 characters)</label>
+                        <textarea
+                          id="editDesc"
+                          className={styles.formTextarea}
+                          required
+                          rows={4}
+                          maxLength={500}
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                        />
+                      </div>
+
+                      <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
+                        <label className={styles.formLabel} htmlFor="editCoverImageInput">Product Cover Image</label>
+                        <div>
+                          <input
+                            id="editCoverImageInput"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className={styles.fileInput}
+                          />
+                          <p className={styles.fileHint}>
+                            Add a product photo that represents your business best — this is what buyers see first. Minimum size 800×37.5rem.
+                          </p>
+                          {coverImageError && (
+                            <div className={styles.fileError}>
+                              ⚠️ {coverImageError}
+                            </div>
+                          )}
+                          {coverImage && !coverImageError && (
+                            <div className={styles.coverPreview}>
+                              <img src={coverImage} alt="Cover Preview" className={styles.previewImg} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
+                        <label className={styles.formLabel} htmlFor="editLogoImageInput">Logo / Profile Picture</label>
+                        <div>
+                          <input
+                            id="editLogoImageInput"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoChange}
+                            className={styles.fileInput}
+                          />
+                          <p className={styles.fileHint}>
+                            Add a logo or profile picture for your business. Minimum size 200×12.5rem.
+                          </p>
+                          {logoImageError && (
+                            <div className={styles.fileError}>
+                              ⚠️ {logoImageError}
+                            </div>
+                          )}
+                          {logoImage && !logoImageError && (
+                            <div className={styles.logoPreview}>
+                              <img src={logoImage} alt="Logo Preview" className={styles.previewImg} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <h4 className={styles.sectionTitle}>Contact & Social Channels</h4>
+                      <div className={`${styles.formGrid} ${styles.formGroupTight}`}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editInstagram">Instagram Handle</label>
+                          <input
+                            id="editInstagram"
+                            className={styles.formInput}
+                            type="text"
+                            value={instagram}
+                            onChange={(e) => setInstagram(e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editWhatsapp">WhatsApp Link</label>
+                          <input
+                            id="editWhatsapp"
+                            className={styles.formInput}
+                            type="text"
+                            value={whatsapp}
+                            onChange={(e) => setWhatsapp(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className={`${styles.formGrid} ${styles.formGroupLoose}`}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editTiktok">TikTok URL</label>
+                          <input
+                            id="editTiktok"
+                            className={styles.formInput}
+                            type="text"
+                            value={tiktok}
+                            onChange={(e) => setTiktok(e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.formLabel} htmlFor="editFacebook">Facebook URL</label>
+                          <input
+                            id="editFacebook"
+                            className={styles.formInput}
+                            type="text"
+                            value={facebook}
+                            onChange={(e) => setFacebook(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <Button type="submit" disabled={saving} fullWidth={true}>
+                        {saving ? 'Saving...' : 'Update Details'}
+                      </Button>
+                    </form>
+                  </div>
+                )}
+
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+
+      {/* Footer */}
+      <footer className={styles.dashboardFooter}>
+        <p>© {new Date().getFullYear()} VerifyNG Vendor Portal. Building verified reputations.</p>
+      </footer>
+    </div>
+  );
+};
+
+export default VendorDashboard;

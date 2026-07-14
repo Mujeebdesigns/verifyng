@@ -1,0 +1,31 @@
+/* Quiet decorative panel for the vendor auth pages. A calm, solid dark
+   surface that never competes with the form for attention — this is also the
+   container the Spline 3D scene renders into (full-bleed). */
+
+.panel {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  /* Neutral dark placeholder only — shown briefly before the Spline scene
+     mounts, and as the fallback if WebGL is unavailable. Deliberately NOT
+     pinned to the scene's exact colour, so edits made in the Spline editor
+     are free to change without this needing to be kept in sync. */
+  background: var(--color-bg-strong-900);
+}
+
+/* Spline scene fills the panel edge to edge. pointer-events:none makes it
+   purely decorative — no scroll-zoom, no drag, no cursor-follow; all mouse
+   and scroll input passes straight through to the page. */
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scene canvas {
+  pointer-events: none !important;
+}

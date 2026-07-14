@@ -1,0 +1,114 @@
+{
+    "effect": {
+        "regular-shadow": {
+            "x-small": {
+                "description": null,
+                "type": "custom-shadow",
+                "value": {
+                    "shadowType": "dropShadow",
+                    "radius": 2,
+                    "color": "#e4e5e73d",
+                    "offsetX": 0,
+                    "offsetY": 1,
+                    "spread": 0
+                },
+                "extensions": {
+                    "org.lukasoppermann.figmaDesignTokens": {
+                        "styleId": "S:b1188a826d0dcf34445bd296d362400d61e30d5d,",
+                        "exportKey": "effect"
+                    }
+                }
+            },
+            "small": {
+                "description": null,
+                "type": "custom-shadow",
+                "value": {
+                    "shadowType": "dropShadow",
+                    "radius": 4,
+                    "color": "#1b1c1d0a",
+                    "offsetX": 0,
+                    "offsetY": 2,
+                    "spread": 0
+                },
+                "extensions": {
+                    "org.lukasoppermann.figmaDesignTokens": {
+                        "styleId": "S:fd6e61e50f56af10efd1cb3a98d76b136e034bda,",
+                        "exportKey": "effect"
+                    }
+                }
+            },
+            "medium": {
+                "description": null,
+                "type": "custom-shadow",
+                "value": {
+                    "shadowType": "dropShadow",
+                    "radius": 32,
+                    "color": "#585c5f1a",
+                    "offsetX": 0,
+                    "offsetY": 16,
+                    "spread": -12
+                },
+                "extensions": {
+                    "org.lukasoppermann.figmaDesignTokens": {
+                        "styleId": "S:1ce2f38cba9951d4e80d9670804e8c88447f2f8e,",
+                        "exportKey": "effect"
+                    }
+                }
+            },
+            "large": {
+                "description": null,
+                "type": "custom-shadow",
+                "value": {
+                    "shadowType": "dropShadow",
+                    "radius": 40,
+                    "color": "#585c5f29",
+                    "offsetX": 0,
+                    "offsetY": 16,
+                    "spread": -8
+                },
+                "extensions": {
+                    "org.lukasoppermann.figmaDesignTokens": {
+                        "styleId": "S:74d0f79486aeacd44ae1dd11e251af31b6d80951,",
+                        "exportKey": "effect"
+                    }
+                }
+            },
+            "x-large": {
+                "description": null,
+                "type": "custom-shadow",
+                "value": {
+                    "shadowType": "dropShadow",
+                    "radius": 56,
+                    "color": "#585c5f29",
+                    "offsetX": 0,
+                    "offsetY": 24,
+                    "spread": -4
+                },
+                "extensions": {
+                    "org.lukasoppermann.figmaDesignTokens": {
+                        "styleId": "S:ad72ebf14c455a4d7552e80fcdfd7973c273b61c,",
+                        "exportKey": "effect"
+                    }
+                }
+            },
+            "2x-large": {
+                "description": null,
+                "type": "custom-shadow",
+                "value": {
+                    "shadowType": "dropShadow",
+                    "radius": 96,
+                    "color": "#585c5f33",
+                    "offsetX": 0,
+                    "offsetY": 40,
+                    "spread": -8
+                },
+                "extensions": {
+                    "org.lukasoppermann.figmaDesignTokens": {
+                        "styleId": "S:ebd5d4f1fff067040e0179e9f87d4455327ed0a5,",
+                        "exportKey": "effect"
+                    }
+                }
+            }
+        }
+    }
+}

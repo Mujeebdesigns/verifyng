@@ -1,0 +1,14 @@
+node_modules/
+# DO NOT COMMIT OR PUSH .env FILES TO GITHUB (Contains sensitive API keys & credentials)
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+dist/
+build/
+.next/
+*.tsbuildinfo
+
+# Design-reference material, not app code
+docs/archive/

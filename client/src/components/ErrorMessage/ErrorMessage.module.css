@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  background-color: #fef2f2;
+  border: 0.0625rem solid #fee2e2;
+  border-radius: 0.5rem;
+  color: var(--color-state-error);
+  font-size: var(--font-paragraph-small-font-size);
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.icon {
+  margin-right: 0.5rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.message {
+  line-height: 1.4;
+}

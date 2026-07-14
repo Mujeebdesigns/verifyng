@@ -1,0 +1,181 @@
+/* SearchResultItem.module.css
+ * Matches the calm, simple row style used in the Home page preview mock.
+ * All values use design tokens from tokens/tokens.css.
+ */
+
+/* ── Row ── */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-white-0);
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.item:hover {
+  border-color: color-mix(in srgb, var(--color-primary-primary-base) 30%, transparent);
+  box-shadow: var(--effect-regular-shadow-small);
+  transform: translateX(0.1875rem);
+}
+
+.item:focus-visible {
+  outline: 0.125rem solid var(--color-primary-primary-base);
+  outline-offset: 0.125rem;
+  border-radius: 0.75rem;
+}
+
+/* ── Score box ── */
+.score {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.625rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.scoreNum {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.0312rem;
+  font-family: var(--font-paragraph-small-font-family);
+}
+
+.scoreDenom {
+  font-size: 0.5625rem;
+  font-weight: 400;
+  opacity: 0.65;
+  font-family: var(--font-paragraph-small-font-family);
+}
+
+.scoreHigh {
+  background: var(--color-primary-primary-lighter);
+}
+.scoreHigh .scoreNum,
+.scoreHigh .scoreDenom {
+  color: var(--color-primary-primary-base);
+}
+
+.scoreCaution {
+  background: color-mix(in srgb, var(--color-state-away) 12%, transparent);
+}
+.scoreCaution .scoreNum,
+.scoreCaution .scoreDenom {
+  color: var(--color-state-away);
+}
+
+.scoreMid {
+  background: color-mix(in srgb, var(--color-state-warning) 10%, transparent);
+}
+.scoreMid .scoreNum,
+.scoreMid .scoreDenom {
+  color: var(--color-state-warning);
+}
+
+.scoreLow {
+  background: color-mix(in srgb, var(--color-state-error) 10%, transparent);
+}
+.scoreLow .scoreNum,
+.scoreLow .scoreDenom {
+  color: var(--color-state-error);
+}
+
+/* ── Info ── */
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--font-paragraph-small-font-size);
+  font-weight: 500;
+  line-height: 1.4;
+  font-family: var(--font-paragraph-small-font-family);
+  color: var(--color-text-main-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  font-size: var(--font-paragraph-x-small-font-size);
+  font-weight: var(--font-paragraph-x-small-font-weight);
+  line-height: 1.4;
+  font-family: var(--font-paragraph-x-small-font-family);
+  color: var(--color-text-soft-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.125rem;
+}
+
+/* ── Right side: badge ── */
+.right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.trustBadge {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-family: var(--font-paragraph-x-small-font-family);
+  padding: 0.1875rem 0.625rem;
+  border-radius: 6.25rem;
+  white-space: nowrap;
+}
+
+.badgeHigh {
+  background: var(--color-primary-primary-lighter);
+  color: var(--color-primary-primary-dark);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-primary-primary-base) 20%, transparent);
+}
+
+.badgeCaution {
+  background: color-mix(in srgb, var(--color-state-away) 12%, transparent);
+  color: color-mix(in srgb, var(--color-state-away) 75%, black);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-state-away) 25%, transparent);
+}
+
+.badgeMid {
+  background: color-mix(in srgb, var(--color-state-warning) 10%, transparent);
+  color: color-mix(in srgb, var(--color-state-warning) 70%, black);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-state-warning) 25%, transparent);
+}
+
+.badgeLow {
+  background: color-mix(in srgb, var(--color-state-error) 8%, transparent);
+  color: var(--color-state-error);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-state-error) 20%, transparent);
+}
+
+
+
+/* ── Scam badge ── */
+.scamBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--color-state-error) 8%, transparent);
+  color: var(--color-state-error);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border: 0.0625rem solid color-mix(in srgb, var(--color-state-error) 18%, transparent);
+}
+
+.scamBadge svg {
+  flex-shrink: 0;
+}

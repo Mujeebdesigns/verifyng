@@ -1,0 +1,81 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background-color: var(--color-bg-white-0);
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  border-radius: 0.5rem;
+  max-width: 26.25rem;
+  margin: 1.5rem auto;
+  position: relative; /* Support absolute positioned close button */
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-soft-400);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: var(--color-bg-weak-100);
+  color: var(--color-text-main-900);
+}
+
+.iconContainer {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  background-color: var(--color-bg-weak-100);
+  color: var(--color-text-soft-400);
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.container:hover .iconCircle {
+  transform: translateY(-0.0625rem);
+  border-color: var(--color-primary-primary-light);
+  color: var(--color-primary-primary-base);
+}
+
+.emojiIcon {
+  font-size: 2rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
+  color: var(--color-text-main-900);
+  letter-spacing: -0.0125rem;
+}
+
+.message {
+  margin-bottom: 1.25rem;
+  color: var(--color-text-soft-400);
+  font-size: 0.8125rem;
+  max-width: 20rem;
+  line-height: 1.5;
+}

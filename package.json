@@ -1,0 +1,18 @@
+{
+  "name": "verifyng-root",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev": "npm run dev:server & npm run dev:client",
+    "build:server": "npm run build --prefix server",
+    "build:client": "npm run build --prefix client",
+    "sync-types": "node sync-types.js",
+    "build": "npm run sync-types && npm run build:server && npm run build:client"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-code": "^2.1.203"
+  }
+}

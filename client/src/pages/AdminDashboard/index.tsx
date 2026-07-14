@@ -1,0 +1,524 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth.js';
+import { Navbar } from '../../components/Navbar/index.js';
+import { adminService, type AdminStats, type AdminClaim, type AdminReport, type AdminUser, type FlaggedReviewResponse } from '../../services/admin.service.js';
+import { reviewService } from '../../services/review.service.js';
+import { Button } from '../../components/Button/index.js';
+import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
+import { ErrorMessage } from '../../components/ErrorMessage/index.js';
+import { ROUTES } from '../../utils/constants.js';
+import styles from './AdminDashboard.module.css';
+
+type TabType = 'claims' | 'reports' | 'flagged' | 'users';
+
+export const AdminDashboard: React.FC = () => {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState<TabType>('claims');
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Tab Data States
+  const [claims, setClaims] = useState<AdminClaim[]>([]);
+  const [reports, setReports] = useState<AdminReport[]>([]);
+  const [flaggedReviews, setFlaggedReviews] = useState<FlaggedReviewResponse[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
+
+  // Pagination States
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const loadStats = async () => {
+    try {
+      const data = await adminService.getStats();
+      setStats(data);
+    } catch (err) {
+      console.error('Failed to load stats:', err);
+    }
+  };
+
+  const loadTabData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (activeTab === 'claims') {
+        const res = await adminService.getClaims(page, 10);
+        setClaims(res.data);
+        setTotalPages(res.pagination.totalPages);
+      } else if (activeTab === 'reports') {
+        const res = await adminService.getReports(page, 10);
+        setReports(res.data);
+        setTotalPages(res.pagination.totalPages);
+      } else if (activeTab === 'flagged') {
+        const res = await adminService.getFlaggedReviews(page, 10);
+        setFlaggedReviews(res.data);
+        setTotalPages(res.pagination.totalPages);
+      } else if (activeTab === 'users') {
+        const res = await adminService.getUsers(page, 10);
+        setUsers(res.data);
+        setTotalPages(res.pagination.totalPages);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
+    if (user?.role !== 'ADMIN') {
+      navigate(ROUTES.HOME);
+      return;
+    }
+    loadStats();
+    loadTabData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, activeTab, page]);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setPage(1);
+  };
+
+  // Claim actions
+  const handleClaimApproval = async (vendorId: string, approve: boolean) => {
+    try {
+      setError(null);
+      if (approve) {
+        await adminService.approveClaim(vendorId);
+      } else {
+        await adminService.rejectClaim(vendorId);
+      }
+      loadStats();
+      loadTabData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  // Report actions
+  const handleResolveReport = async (reportId: string, status: 'REVIEWED' | 'DISMISSED') => {
+    try {
+      setError(null);
+      await adminService.resolveReport(reportId, status);
+      loadStats();
+      loadTabData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  // Review actions
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!window.confirm('Are you sure you want to delete this flagged review?')) return;
+    try {
+      setError(null);
+      await reviewService.deleteReview(reviewId);
+      loadStats();
+      loadTabData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  // User actions
+  const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'delete' | 'promote') => {
+    if (action === 'delete' && !window.confirm('Delete this user? All reviews and reports from this user will be deleted too.')) return;
+    try {
+      setError(null);
+      if (action === 'ban') {
+        await adminService.banUser(userId);
+      } else if (action === 'unban') {
+        await adminService.unbanUser(userId);
+      } else if (action === 'promote') {
+        await adminService.promoteUser(userId);
+      } else if (action === 'delete') {
+        await adminService.deleteUser(userId);
+      }
+      loadStats();
+      loadTabData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  return (
+    <div className={styles.page} style={{ paddingTop: '4.25rem' }}>
+      <Navbar />
+
+      {/* Main Admin Content Container */}
+      <div className={styles.dashboardContainer}>
+        {/* Sidebar Nav */}
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarProfile}>
+            <div className={styles.sidebarAvatar}>
+              {user?.displayName?.charAt(0).toUpperCase() || 'A'}
+            </div>
+            <div className={styles.sidebarProfileInfo}>
+              <h3 className={styles.sidebarName}>{user?.displayName}</h3>
+              <span className={styles.sidebarRoleBadge}>Admin Suite</span>
+            </div>
+          </div>
+
+          <nav className={styles.sidebarMenu}>
+            <button
+              onClick={() => handleTabChange('claims')}
+              className={`${styles.menuItem} ${activeTab === 'claims' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              Claims
+              {stats?.pendingClaimsCount !== undefined && stats.pendingClaimsCount > 0 && (
+                <span className={styles.menuBadge}>{stats.pendingClaimsCount}</span>
+              )}
+            </button>
+
+            <button
+              onClick={() => handleTabChange('reports')}
+              className={`${styles.menuItem} ${activeTab === 'reports' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Disputes
+              {stats?.pendingReportsCount !== undefined && stats.pendingReportsCount > 0 && (
+                <span className={styles.menuBadge}>{stats.pendingReportsCount}</span>
+              )}
+            </button>
+
+            <button
+              onClick={() => handleTabChange('flagged')}
+              className={`${styles.menuItem} ${activeTab === 'flagged' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              Flagged Reviews
+            </button>
+
+            <button
+              onClick={() => handleTabChange('users')}
+              className={`${styles.menuItem} ${activeTab === 'users' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              User List
+            </button>
+          </nav>
+        </aside>
+
+        {/* Content Area */}
+        <main className={styles.content}>
+          <div className={styles.contentHeader}>
+            <h1 className={styles.pageTitle}>Admin Moderation Panel</h1>
+            <p className={styles.pageSubtitle}>Review vendor claims, scam reports, and moderate reviews</p>
+          </div>
+
+          {/* Stats Row */}
+          {stats && (
+            <div className={styles.statsGrid}>
+              <div className={styles.statCard}>
+                <span className={styles.statLabel}>Total Users</span>
+                <div className={styles.statValue}>{stats.usersCount}</div>
+              </div>
+              <div className={styles.statCard}>
+                <span className={styles.statLabel}>Total Vendors</span>
+                <div className={styles.statValue}>{stats.vendorsCount}</div>
+              </div>
+              <div className={styles.statCard}>
+                <span className={styles.statLabel}>Pending Claims</span>
+                <div className={styles.statValueWarning}>{stats.pendingClaimsCount}</div>
+              </div>
+              <div className={styles.statCard}>
+                <span className={styles.statLabel}>Pending Reports</span>
+                <div className={styles.statValueDanger}>{stats.pendingReportsCount}</div>
+              </div>
+            </div>
+          )}
+
+          <ErrorMessage message={error} />
+
+          {loading ? (
+            <div style={{ display: 'flex', padding: '4rem', justifyContent: 'center' }}>
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <div className={styles.panel}>
+              
+              {/* CLAIMS TAB */}
+              {activeTab === 'claims' && (
+                <div>
+                  <h3 className={styles.panelTitle}>Pending Profile Claims</h3>
+                  <p className={styles.panelSubtitle}>Verify and approve vendor ownership claims for their business pages.</p>
+                  
+                  {claims.length === 0 ? (
+                    <p className={styles.emptyText}>No pending vendor claims at this time.</p>
+                  ) : (
+                    <div className={styles.tableWrapper}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th>Business Details</th>
+                            <th>Claimant User</th>
+                            <th>Location / Category</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {claims.map((c) => (
+                            <tr key={c.id} className={styles.trHover}>
+                              <td>
+                                <strong>{c.businessName}</strong>
+                                <div className={styles.businessMeta}>
+                                  📸 @{c.instagramHandle} | 📞 {c.phoneNumber}
+                                </div>
+                              </td>
+                              <td>
+                                {c.owner?.displayName}
+                                <div className={styles.businessMeta}>{c.owner?.email}</div>
+                              </td>
+                              <td>
+                                {c.category}
+                                <div className={styles.businessMeta}>{c.state}</div>
+                              </td>
+                              <td>
+                                <div className={styles.buttonGroup}>
+                                  <Button onClick={() => handleClaimApproval(c.id, true)} style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Approve</Button>
+                                  <Button onClick={() => handleClaimApproval(c.id, false)} variant="secondary" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Reject</Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* REPORTS TAB */}
+              {activeTab === 'reports' && (
+                <div>
+                  <h3 className={styles.panelTitle}>Scam & Moderation Reports</h3>
+                  <p className={styles.panelSubtitle}>Investigate customer reports regarding online vendor fraud or bad conducts.</p>
+                  
+                  {reports.length === 0 ? (
+                    <p className={styles.emptyText}>No pending reports.</p>
+                  ) : (
+                    <div className={styles.tableWrapper}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th>Reported Vendor</th>
+                            <th>Reporter User</th>
+                            <th>Reason & Description</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reports.map((r) => (
+                            <tr key={r.id} className={styles.trHover}>
+                              <td>
+                                <strong>{r.vendor.businessName}</strong>
+                                <div className={styles.businessMeta}>@{r.vendor.instagramHandle}</div>
+                              </td>
+                              <td>
+                                {r.user.displayName}
+                                <div className={styles.businessMeta}>{r.user.email}</div>
+                              </td>
+                              <td>
+                                <span className={styles.badgeDanger}>{r.reason}</span>
+                                <p className={styles.reporterText}>{r.description}</p>
+                              </td>
+                              <td>
+                                <div className={styles.buttonGroup}>
+                                  <Button onClick={() => handleResolveReport(r.id, 'REVIEWED')} style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Resolve</Button>
+                                  <Button onClick={() => handleResolveReport(r.id, 'DISMISSED')} variant="secondary" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Dismiss</Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* FLAG REVIEWS TAB */}
+              {activeTab === 'flagged' && (
+                <div>
+                  <h3 className={styles.panelTitle}>Flagged Review Moderation</h3>
+                  <p className={styles.panelSubtitle}>Manage reviews that have been flagged as spam, suspicious, or inappropriate.</p>
+                  
+                  {flaggedReviews.length === 0 ? (
+                    <p className={styles.emptyText}>No flagged reviews right now.</p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                      {flaggedReviews.map((rev) => (
+                        <div key={rev.id} className={styles.flaggedReviewCard}>
+                          <div className={styles.flaggedReviewHeader}>
+                            <div className={styles.flaggedReviewInfo}>
+                              <span>
+                                <strong>{rev.user?.displayName || 'Buyer'}</strong> reviewed <strong>{rev.vendor?.businessName}</strong>
+                              </span>
+                              <span className={styles.businessMeta}>Rating: ★ {rev.rating}/5</span>
+                            </div>
+                            <Button onClick={() => handleDeleteReview(rev.id)} variant="danger" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>
+                              Delete Review
+                            </Button>
+                          </div>
+                          <p className={styles.flaggedReviewBody}>
+                            "{rev.reviewText}"
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* USERS TAB */}
+              {activeTab === 'users' && (
+                <div>
+                  <h3 className={styles.panelTitle}>User Access Control</h3>
+                  <p className={styles.panelSubtitle}>Ban, promote, or remove accounts across the platform.</p>
+                  
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th>Name / Email</th>
+                          <th>Role</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {users.map((u) => (
+                          <tr key={u.id} className={styles.trHover}>
+                            <td>
+                              <strong>{u.displayName}</strong>
+                              <div className={styles.businessMeta}>{u.email}</div>
+                            </td>
+                            <td>
+                              <span className={
+                                u.role === 'ADMIN' ? styles.badgeDanger :
+                                u.role === 'VENDOR' ? styles.badgeSuccess :
+                                styles.badgeNeutral
+                              }>
+                                {u.role}
+                              </span>
+                            </td>
+                            <td>
+                              {u.isBanned ? (
+                                <span className={styles.badgeDanger} style={{ textTransform: 'none' }}>Banned</span>
+                              ) : u.isVerified ? (
+                                <span className={styles.badgeSuccess} style={{ textTransform: 'none' }}>Active</span>
+                              ) : (
+                                <span className={styles.badgeNeutral} style={{ textTransform: 'none' }}>Unverified</span>
+                              )}
+                            </td>
+                            <td>
+                              <div className={styles.buttonGroup}>
+                                {u.role !== 'ADMIN' && (
+                                  <button
+                                    onClick={() => handleUserAction(u.id, 'promote')}
+                                    className={styles.btnPromote}
+                                  >
+                                    Make Admin
+                                  </button>
+                                )}
+                                {u.role !== 'ADMIN' && (
+                                  u.isBanned ? (
+                                    <button
+                                      onClick={() => handleUserAction(u.id, 'unban')}
+                                      className={styles.btnPromote}
+                                    >
+                                      Unban
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleUserAction(u.id, 'ban')}
+                                      className={styles.btnBan}
+                                    >
+                                      Ban
+                                    </button>
+                                  )
+                                )}
+                                {u.role !== 'ADMIN' && (
+                                  <button
+                                    onClick={() => handleUserAction(u.id, 'delete')}
+                                    className={styles.btnDelete}
+                                  >
+                                    Delete
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Pagination controls */}
+              {totalPages > 1 && (
+                <div className={styles.pagination}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className={styles.paginationText}>
+                    Page {page} of {totalPages}
+                  </span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Footer */}
+      <footer className={styles.footer}>
+        <div className="container">
+          <p>© {new Date().getFullYear()} VerifyNG Admin Suite. Secure administrative portal.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default AdminDashboard;
+
