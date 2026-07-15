@@ -102,11 +102,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
     'Verify Email Address',
   );
 
-  if (env.RESEND_API_KEY) {
-    await resendEmail(to, subject, html);
-  } else {
-    await smtpEmail(to, subject, html);
-  }
+  await dispatchEmail(to, subject, html);
 }
 
 export async function sendPasswordResetEmail(to: string, token: string, role: UserRole): Promise<void> {
@@ -124,11 +120,7 @@ export async function sendPasswordResetEmail(to: string, token: string, role: Us
     'Reset Password',
   );
 
-  if (env.RESEND_API_KEY) {
-    await resendEmail(to, subject, html);
-  } else {
-    await smtpEmail(to, subject, html);
-  }
+  await dispatchEmail(to, subject, html);
 }
 
 export async function sendAdminNotification(payload: {
@@ -153,20 +145,50 @@ export async function sendAdminNotification(payload: {
 
   const fullHtml = emailTemplate('New Support Message Received', htmlContent);
 
-  if (env.RESEND_API_KEY) {
-    const adminEmail = process.env.SMTP_USER || env.RESEND_FROM;
-    if (!adminEmail) {
-      logger.error('Cannot send admin notification: no admin email configured (set SMTP_USER or RESEND_FROM)');
-      return;
-    }
-    await resendEmail(adminEmail, `[VerifyNG Support Request]: ${subject}`, fullHtml);
+  const adminEmail = process.env.SMTP_USER || env.BREVO_FROM || env.RESEND_FROM;
+  if (!adminEmail) {
+    logger.error('Cannot send admin notification: no admin email configured (set SMTP_USER, BREVO_FROM, or RESEND_FROM)');
+    return;
+  }
+  await dispatchEmail(adminEmail, `[VerifyNG Support Request]: ${subject}`, fullHtml);
+}
+
+/**
+ * Send via whichever provider is configured, in priority order:
+ * Brevo (HTTPS API — works on hosts that block outbound SMTP, like Render's
+ * free tier) → Resend (needs a verified sending domain) → raw SMTP (fine
+ * locally, but unreachable in production on Render).
+ */
+async function dispatchEmail(to: string, subject: string, html: string): Promise<void> {
+  if (env.BREVO_API_KEY) {
+    await brevoEmail(to, subject, html);
+  } else if (env.RESEND_API_KEY) {
+    await resendEmail(to, subject, html);
   } else {
-    const adminEmail = process.env.SMTP_USER;
-    if (!adminEmail) {
-      logger.error('Cannot send admin notification: SMTP_USER not configured');
-      return;
-    }
-    await smtpEmail(adminEmail, `[VerifyNG Support Request]: ${subject}`, fullHtml);
+    await smtpEmail(to, subject, html);
+  }
+}
+
+async function brevoEmail(to: string, subject: string, html: string): Promise<void> {
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': env.BREVO_API_KEY!,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: { name: 'VerifyNG', email: env.BREVO_FROM },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    logger.error('Brevo error', errorText);
+    throw new Error(`Brevo: ${response.status} ${errorText}`);
   }
 }
 

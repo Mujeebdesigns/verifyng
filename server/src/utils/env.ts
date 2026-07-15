@@ -38,7 +38,11 @@ export const env = {
   AI_TIMEOUT: int('AI_TIMEOUT', 15000),
   AI_TEMPERATURE: parseFloat(process.env.AI_TEMPERATURE ?? '0.3'),
 
-  // Email (Resend preferred over SMTP for deliverability)
+  // Email — Brevo preferred (works over HTTPS; SMTP ports are blocked on
+  // Render's free tier), Resend once a verified sending domain exists,
+  // SMTP as a last resort (fine locally, not reachable in production).
+  BREVO_API_KEY: process.env.BREVO_API_KEY,
+  BREVO_FROM: process.env.BREVO_FROM ?? 'qozeemmujeeb20@gmail.com',
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   RESEND_FROM: process.env.RESEND_FROM ?? 'VerifyNG <verifyng@your-domain.com>',
 
