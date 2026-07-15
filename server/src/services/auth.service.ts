@@ -321,6 +321,49 @@ export async function forgotPassword(payload: ForgotPasswordPayload): Promise<{ 
 }
 
 /**
+ * Resend the email verification link.
+ * Always returns 200 regardless of whether the email exists or is already
+ * verified (prevents enumeration) — mirrors forgotPassword.
+ */
+export async function resendVerificationEmail(payload: ForgotPasswordPayload): Promise<{ message: string }> {
+  const { email } = payload;
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (user && !user.isVerified) {
+    // Delete any existing verification tokens for this user — the raw
+    // token from the original email can never be recovered since only
+    // its hash is stored, so a fresh one is issued in its place.
+    await prisma.verificationToken.deleteMany({
+      where: { userId: user.id, type: 'EMAIL_VERIFICATION' },
+    });
+
+    const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto.createHash('sha256').update(rawVerificationToken).digest('hex');
+    const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+
+    await prisma.verificationToken.create({
+      data: {
+        userId: user.id,
+        token: hashedVerificationToken,
+        type: 'EMAIL_VERIFICATION',
+        expiresAt,
+      },
+    });
+
+    sendVerificationEmail(email, rawVerificationToken).catch((error) => {
+      logger.error('Failed to resend verification email', error);
+    });
+  } else {
+    // Artificial delay to prevent timing-based email enumeration
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+
+  // Always return generic response to prevent email enumeration
+  return { message: 'If an account with that email exists and is unverified, a new verification link has been sent.' };
+}
+
+/**
  * Reset password using a valid reset token.
  * Also verifies the user's email (if a user resets password, they own the email).
  */

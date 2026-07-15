@@ -246,6 +246,27 @@ export async function handleForgotPassword(req: IncomingMessage, res: ServerResp
   }
 }
 
+export async function handleResendVerification(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const body = await parseBody<ForgotPasswordPayload>(req);
+
+    if (!body.email) {
+      sendError(res, 400, 'Email is required');
+      return;
+    }
+
+    const result = await authService.resendVerificationEmail(body);
+    sendJson(res, 200, result);
+  } catch (error) {
+    if (error instanceof AppError) {
+      logger.warn('ResendVerification AppError', { message: error.message });
+    } else {
+      logger.error('ResendVerification unexpected error', error);
+    }
+    sendJson(res, 200, { message: 'If an account with that email exists and is unverified, a new verification link has been sent.' });
+  }
+}
+
 export async function handleResetPassword(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
     const body = await parseBody<ResetPasswordPayload>(req);
