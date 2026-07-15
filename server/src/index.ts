@@ -5,6 +5,14 @@
  * Environment validation runs on import of env.ts (fails fast on missing vars).
  */
 
+// Some hosting providers (e.g. Render) resolve dual-stack hosts like
+// smtp.gmail.com to an IPv6 address that DNS returns but the container
+// can't actually route to, failing with ENETUNREACH. Preferring IPv4
+// when both are available avoids this for every outbound connection —
+// nodemailer's SMTP calls in particular were failing silently this way.
+import dns from 'node:dns';
+dns.setDefaultResultOrder('ipv4first');
+
 // Validate environment variables first — throws before anything else runs
 import './utils/env.js';
 
