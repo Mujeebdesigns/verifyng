@@ -5,12 +5,17 @@ const COOKIE_NAME = '__Host-token';
 const COOKIE_OPTIONS: Readonly<Record<string, string>> = {
   httpOnly: 'HttpOnly',
   secure: 'Secure',
-  sameSiteLax: 'SameSite=Lax',
+  // SameSite=None (not Lax) — the client (Vercel) and API (Render) are on
+  // different sites by design, and Lax cookies are never sent on the
+  // cross-site fetch() calls the SPA makes after the initial login redirect.
+  // None requires Secure, which is already set; the strict CORS allowlist
+  // in cors.middleware.ts is what actually guards against cross-site abuse.
+  sameSiteNone: 'SameSite=None',
   path: 'Path=/',
 };
 
 /**
- * Set an httpOnly, Secure, SameSite=Lax session cookie on the response.
+ * Set an httpOnly, Secure, SameSite=None session cookie on the response.
  * Uses __Host- prefix to enforce Secure + Path=/ at the browser level.
  * Call this BEFORE sendJson / writeHead to ensure the header is included.
  */
@@ -19,7 +24,7 @@ export function setTokenCookie(res: ServerResponse, token: string, maxAgeSeconds
     `${COOKIE_NAME}=${token}`,
     COOKIE_OPTIONS.httpOnly,
     COOKIE_OPTIONS.secure,
-    COOKIE_OPTIONS.sameSiteLax,
+    COOKIE_OPTIONS.sameSiteNone,
     COOKIE_OPTIONS.path,
     `Max-Age=${maxAgeSeconds}`,
   ].join('; ');
@@ -37,7 +42,7 @@ export function clearTokenCookie(res: ServerResponse): void {
       `${COOKIE_NAME}=`,
       COOKIE_OPTIONS.httpOnly,
       COOKIE_OPTIONS.secure,
-      COOKIE_OPTIONS.sameSiteLax,
+      COOKIE_OPTIONS.sameSiteNone,
       COOKIE_OPTIONS.path,
       'Max-Age=0',
     ].join('; '),
