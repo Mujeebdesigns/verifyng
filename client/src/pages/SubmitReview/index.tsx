@@ -65,10 +65,8 @@ export const SubmitReview: React.FC = () => {
   };
 
   const handleCancel = () => {
-    if (isEdit) {
-      navigate(ROUTES.DASHBOARD);
-    } else if (vendorId) {
-      navigate(`/vendors/${vendorId}`);
+    if (isEdit || vendorId) {
+      navigate(-1);
     } else {
       navigate(ROUTES.HOME);
     }
