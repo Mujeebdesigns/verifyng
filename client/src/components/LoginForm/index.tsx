@@ -112,7 +112,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
         } else if (res.user.role === 'VENDOR') {
           navigate(ROUTES.VENDOR_DASHBOARD);
         } else {
-          navigate(ROUTES.DASHBOARD);
+          navigate(ROUTES.HOME);
         }
       }
     } catch (err) {
