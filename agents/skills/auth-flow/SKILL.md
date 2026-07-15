@@ -19,7 +19,7 @@ VerifyNG uses **JWT (jsonwebtoken) + bcrypt** for authentication. There is no th
 |---|---|
 | Password hashing | bcrypt (cost factor: 12) |
 | Token generation and verification | jsonwebtoken |
-| Email verification | Resend or Nodemailer (token sent via email) |
+| Email verification | Brevo HTTPS API (token sent via email — see `server/src/utils/email.ts`) |
 | Session model | Stateless JWT — token stored client-side |
 
 ---
@@ -395,7 +395,7 @@ export async function resetPassword(payload: ResetPasswordPayload) {
 
 ## Email Utilities
 
-Used by both registration (verification email) and forgot-password (reset email). Choose either **Resend** or **Nodemailer** — both follow the same function signatures below.
+Used by both registration (verification email) and forgot-password (reset email). The real implementation (`server/src/utils/email.ts`) sends via **Brevo's HTTPS API** as the primary provider — SMTP is blocked on Render's free tier, so any raw-SMTP provider (Nodemailer, etc.) only works for local development. The example below illustrates the general shape; treat the actual file as the source of truth.
 
 ```typescript
 // server/src/utils/email.ts

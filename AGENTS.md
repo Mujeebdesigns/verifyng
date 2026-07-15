@@ -23,10 +23,10 @@ This is a **full web application**. AI is one feature within the platform — no
 | Database | PostgreSQL |
 | Authentication | JWT (jsonwebtoken) + bcrypt |
 | AI Feature | Provider-agnostic (see `agents/skills/ai-integration/SKILL.md`) |
-| Email | Resend or Nodemailer |
+| Email | Brevo (primary — HTTPS API), Resend (once a verified domain exists), SMTP (local-dev fallback only) |
 | Frontend Hosting | Vercel |
-| Backend + DB Hosting | Railway or Render |
-| Marketing / Landing Page | HTML, CSS, JavaScript (static — separate from React app) |
+| Backend Hosting | Render |
+| Database Hosting | Supabase (Postgres) |
 
 ---
 
@@ -234,8 +234,8 @@ DATABASE_URL=
 JWT_SECRET=
 JWT_EXPIRES_IN=
 
-# Email (optional — registration fails at point of use if unset)
-RESEND_API_KEY=
+# Email (optional — degrades gracefully at point of use if unset)
+BREVO_API_KEY=
 
 # AI Feature (optional — summarization degrades gracefully if unset)
 AI_API_KEY=
