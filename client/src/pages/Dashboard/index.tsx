@@ -422,7 +422,7 @@ export const Dashboard: React.FC = () => {
                   <div className={styles.quickActionContent}>
                     <h4 className={styles.quickActionTitle}>Protect the community</h4>
                     <p className={styles.quickActionText}>
-                      Haven't bought from a vendor recently? Leave a review and help others make safer decisions.
+                      Bought from a vendor recently? Leave a review and help others make safer decisions.
                     </p>
                   </div>
                   <form
