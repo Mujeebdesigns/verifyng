@@ -65,8 +65,19 @@ export const SubmitReview: React.FC = () => {
   };
 
   const handleCancel = () => {
-    if (isEdit || vendorId) {
+    // location.key is 'default' only when this page was the first thing loaded
+    // in the tab (direct link/refresh) — there's nowhere real to go "back" to.
+    // Otherwise, browser history is the only thing that actually knows where
+    // the user came from; a hardcoded destination is just a guess and breaks
+    // as soon as a new entry point to this page is added.
+    if (location.key !== 'default') {
       navigate(-1);
+      return;
+    }
+    if (isEdit) {
+      navigate(ROUTES.DASHBOARD);
+    } else if (vendorId) {
+      navigate(`/vendors/${vendorId}`);
     } else {
       navigate(ROUTES.HOME);
     }
