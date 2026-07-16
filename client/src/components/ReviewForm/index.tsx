@@ -15,10 +15,21 @@ interface ReviewFormProps {
   onDelete?: () => void;
 }
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function daysInMonth(month: string, year: string): number {
+  if (!month) return 31;
+  const y = year ? parseInt(year, 10) : new Date().getFullYear();
+  return new Date(y, parseInt(month, 10), 0).getDate();
+}
+
 export const ReviewForm: React.FC<ReviewFormProps> = ({
   vendorId,
   isEdit = false,
-  initialRating = 5,
+  initialRating = 0,
   initialText = '',
   onSubmit,
   onCancel,
@@ -27,7 +38,23 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const [rating, setRating] = useState(initialRating);
   const [reviewText, setReviewText] = useState(initialText);
   const [transactionChannel, setTransactionChannel] = useState('');
-  const [orderDate, setOrderDate] = useState('');
+  const [orderDay, setOrderDay] = useState('');
+  const [orderMonth, setOrderMonth] = useState('');
+  const [orderYear, setOrderYear] = useState('');
+
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
+  useEffect(() => {
+    const maxDay = daysInMonth(orderMonth, orderYear);
+    if (orderDay && parseInt(orderDay, 10) > maxDay) {
+      setOrderDay(String(maxDay));
+    }
+  }, [orderMonth, orderYear, orderDay]);
+
+  const orderDate = orderDay && orderMonth && orderYear
+    ? `${orderYear}-${orderMonth.padStart(2, '0')}-${orderDay.padStart(2, '0')}`
+    : '';
 
   // Vendor auto-creation fields (only if not editing and vendorId is not provided)
   const [businessName, setBusinessName] = useState('');
@@ -51,6 +78,10 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
     setValidationError(null);
 
     // Validation checks
+    if (rating < 1) {
+      setValidationError('Please select a star rating.');
+      return;
+    }
     if (reviewText.trim().length < 30) {
       setValidationError('Review text must be at least 30 characters.');
       return;
@@ -188,7 +219,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
         <label className={styles.label}>Your Rating</label>
         <div className={styles.ratingWrapper}>
           <StarRating rating={rating} interactive={true} onChange={setRating} />
-          <span>({rating} out of 5 stars)</span>
+          <span>{rating > 0 ? `(${rating} out of 5 stars)` : 'Select a rating'}</span>
         </div>
       </div>
 
@@ -221,6 +252,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                 <option value="">Select Channel...</option>
                 <option value="Instagram">Instagram DMs</option>
                 <option value="WhatsApp">WhatsApp</option>
+                <option value="TikTok">TikTok</option>
                 <option value="Website">Website Checkout</option>
                 <option value="Physical Store">Physical Store</option>
                 <option value="Twitter">Twitter/X DMs</option>
@@ -228,14 +260,43 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
               </select>
             </div>
             <div className={styles.group}>
-              <label className={styles.label} htmlFor="orderDate">Order Date *</label>
-              <input
-                id="orderDate"
-                type="date"
-                value={orderDate}
-                onChange={(e) => setOrderDate(e.target.value)}
-                required
-              />
+              <label className={styles.label} htmlFor="orderDay">Order Date *</label>
+              <div className={styles.dateRow}>
+                <select
+                  id="orderDay"
+                  aria-label="Day"
+                  value={orderDay}
+                  onChange={(e) => setOrderDay(e.target.value)}
+                  required
+                >
+                  <option value="">Day</option>
+                  {Array.from({ length: daysInMonth(orderMonth, orderYear) }, (_, i) => i + 1).map((day) => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+                <select
+                  aria-label="Month"
+                  value={orderMonth}
+                  onChange={(e) => setOrderMonth(e.target.value)}
+                  required
+                >
+                  <option value="">Month</option>
+                  {MONTHS.map((month, i) => (
+                    <option key={month} value={i + 1}>{month}</option>
+                  ))}
+                </select>
+                <select
+                  aria-label="Year"
+                  value={orderYear}
+                  onChange={(e) => setOrderYear(e.target.value)}
+                  required
+                >
+                  <option value="">Year</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </>

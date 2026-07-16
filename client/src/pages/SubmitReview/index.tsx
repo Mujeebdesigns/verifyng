@@ -26,7 +26,7 @@ export const SubmitReview: React.FC = () => {
 
   const isEdit = editState?.isEdit || false;
   const reviewId = editState?.reviewId;
-  const initialRating = editState?.initialRating || 5;
+  const initialRating = editState?.initialRating || 0;
   const initialText = editState?.initialText || '';
 
   const vendorId = editState?.vendorId || searchParams.get('vendorId') || undefined;
