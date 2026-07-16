@@ -2,9 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { reviewService } from '../../services/review.service.js';
+import { authService } from '../../services/auth.service.js';
 import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
+import { ConfirmModal } from '../../components/ConfirmModal/index.js';
+import { PasswordRequirements } from '../../components/PasswordRequirements/index.js';
+import { getPasswordPolicyError } from '../../utils/passwordPolicy.js';
 import type { MyReviewResponse } from '../../types/review.js';
 import { ROUTES, REVIEW_EDIT_WINDOW_HOURS, REVIEW_UNDER_REVIEW_HOURS } from '../../utils/constants.js';
 import styles from './Dashboard.module.css';
@@ -84,6 +88,62 @@ export const Dashboard: React.FC = () => {
   const [reviewsRating, setReviewsRating] = useState('');
   const [reviewsChannel, setReviewsChannel] = useState('');
   const [reviewsSortBy, setReviewsSortBy] = useState('desc');
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [newPasswordFocused, setNewPasswordFocused] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState(false);
+
+  const [showLogoutOthersConfirm, setShowLogoutOthersConfirm] = useState(false);
+  const [logoutOthersLoading, setLogoutOthersLoading] = useState(false);
+  const [logoutOthersError, setLogoutOthersError] = useState<string | null>(null);
+  const [logoutOthersSuccess, setLogoutOthersSuccess] = useState(false);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError(null);
+    setPwSuccess(false);
+
+    const policyError = getPasswordPolicyError(newPassword);
+    if (policyError) {
+      setPwError(policyError);
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPwError('New passwords do not match.');
+      return;
+    }
+
+    setPwLoading(true);
+    try {
+      await authService.changePassword({ currentPassword, newPassword });
+      setPwSuccess(true);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (err) {
+      setPwError(err instanceof Error ? err.message : 'Failed to change password.');
+    } finally {
+      setPwLoading(false);
+    }
+  };
+
+  const handleLogoutOtherSessions = async () => {
+    setLogoutOthersLoading(true);
+    setLogoutOthersError(null);
+    try {
+      await authService.logoutOtherSessions();
+      setShowLogoutOthersConfirm(false);
+      setLogoutOthersSuccess(true);
+    } catch (err) {
+      setLogoutOthersError(err instanceof Error ? err.message : 'Failed to log out other sessions.');
+    } finally {
+      setLogoutOthersLoading(false);
+    }
+  };
 
   const fetchReviews = useCallback(async (
     p: number,
@@ -634,12 +694,92 @@ export const Dashboard: React.FC = () => {
                   </div>
 
                   <div className={styles.securitySection}>
-                    <h3 className={styles.securityTitle}>Password & Guidelines</h3>
-                    <p className={styles.securityText}>
-                      To change your password, please logout and use the "Forgot Password" option on the Login screen. VerifyNG will send a password reset token to your registered email address.
+                    <h3 className={styles.securityTitle}>Change Password</h3>
+                    <p className={styles.securityText} style={{ marginBottom: '1rem' }}>
+                      Update the password used to sign in to your account.
                     </p>
+
+                    <ErrorMessage message={pwError} />
+                    {pwSuccess && (
+                      <div className={styles.securitySuccessMsg}>Password changed successfully.</div>
+                    )}
+
+                    <form onSubmit={handleChangePassword} className={styles.securityForm}>
+                      <div className={styles.securityFormGroup}>
+                        <label className={styles.securityLabel} htmlFor="currentPassword">Current Password</label>
+                        <input
+                          id="currentPassword"
+                          type="password"
+                          autoComplete="current-password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className={styles.securityFormGroup}>
+                        <label className={styles.securityLabel} htmlFor="newPassword">New Password</label>
+                        <input
+                          id="newPassword"
+                          type="password"
+                          autoComplete="new-password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          onFocus={() => setNewPasswordFocused(true)}
+                          onBlur={() => setNewPasswordFocused(false)}
+                          required
+                        />
+                        <PasswordRequirements password={newPassword} visible={newPasswordFocused} />
+                      </div>
+
+                      <div className={styles.securityFormGroup}>
+                        <label className={styles.securityLabel} htmlFor="confirmNewPassword">Confirm New Password</label>
+                        <input
+                          id="confirmNewPassword"
+                          type="password"
+                          autoComplete="new-password"
+                          value={confirmNewPassword}
+                          onChange={(e) => setConfirmNewPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <Button type="submit" variant="primary" disabled={pwLoading} className={styles.securitySubmitBtn}>
+                        {pwLoading ? 'Updating...' : 'Update Password'}
+                      </Button>
+                    </form>
+                  </div>
+
+                  <div className={styles.securitySection}>
+                    <h3 className={styles.securityTitle}>Active Sessions</h3>
+                    <p className={styles.securityText} style={{ marginBottom: '1rem' }}>
+                      If you suspect your account is signed in somewhere you don't recognize, you can log out every other active session. This device stays signed in.
+                    </p>
+
+                    <ErrorMessage message={logoutOthersError} />
+                    {logoutOthersSuccess && (
+                      <div className={styles.securitySuccessMsg}>All other sessions have been logged out.</div>
+                    )}
+
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setShowLogoutOthersConfirm(true)}
+                    >
+                      Log out of all other devices
+                    </Button>
                   </div>
                 </div>
+
+                <ConfirmModal
+                  isOpen={showLogoutOthersConfirm}
+                  title="Log out of all other devices?"
+                  message="This will immediately sign out every other browser or device currently logged into your account. This device will remain signed in."
+                  confirmLabel="Log out others"
+                  onConfirm={handleLogoutOtherSessions}
+                  onCancel={() => setShowLogoutOthersConfirm(false)}
+                  loading={logoutOthersLoading}
+                />
               </div>
             )}
           </div>

@@ -15,6 +15,7 @@ import type {
   VerifyEmailPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
   AuthResponse,
   UserProfile,
 } from '../types/auth.js';
@@ -407,6 +408,77 @@ export async function resetPassword(payload: ResetPasswordPayload): Promise<{ me
   });
 
   return { message: 'Password reset successfully' };
+}
+
+/**
+ * Change password for an authenticated user (requires the current password).
+ * Bumps tokenVersion to invalidate every other outstanding session, then
+ * issues a fresh token carrying the new version so the session making this
+ * request isn't logged out by its own request.
+ */
+export async function changePassword(userId: string, payload: ChangePasswordPayload): Promise<{ token: string }> {
+  const { currentPassword, newPassword } = payload;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { passwordHash: true, displayName: true, role: true },
+  });
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  const passwordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!passwordValid) {
+    throw new AppError('Current password is incorrect', 401);
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash, tokenVersion: { increment: 1 } },
+    select: { tokenVersion: true },
+  });
+
+  const token = generateToken({
+    userId,
+    displayName: user.displayName,
+    role: user.role,
+    tokenVersion: updated.tokenVersion,
+  });
+
+  return { token };
+}
+
+/**
+ * Invalidate every other active session by bumping tokenVersion, then issue
+ * a fresh token for the current session so it stays signed in.
+ */
+export async function logoutOtherSessions(userId: string): Promise<{ token: string }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { displayName: true, role: true },
+  });
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { tokenVersion: { increment: 1 } },
+    select: { tokenVersion: true },
+  });
+
+  const token = generateToken({
+    userId,
+    displayName: user.displayName,
+    role: user.role,
+    tokenVersion: updated.tokenVersion,
+  });
+
+  return { token };
 }
 
 /**

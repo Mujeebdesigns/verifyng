@@ -10,6 +10,8 @@ import {
   handleForgotPassword,
   handleResetPassword,
   handleResendVerification,
+  handleChangePassword,
+  handleLogoutOtherSessions,
 } from '../controllers/auth.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { loginRateLimit } from '../middleware/rateLimit.middleware.js';
@@ -67,5 +69,17 @@ export function registerAuthRoutes(router: ReturnType<typeof createRouter>): voi
   router.post('/api/auth/reset-password', async (req, res) => {
     if (!(await actionRateLimit(req, res))) return;
     return handleResetPassword(req, res);
+  });
+
+  router.post('/api/auth/change-password', async (req, res) => {
+    if (!(await actionRateLimit(req, res))) return;
+    if (!(await authMiddleware(req, res))) return;
+    return handleChangePassword(req, res);
+  });
+
+  router.post('/api/auth/logout-other-sessions', async (req, res) => {
+    if (!(await actionRateLimit(req, res))) return;
+    if (!(await authMiddleware(req, res))) return;
+    return handleLogoutOtherSessions(req, res);
   });
 }

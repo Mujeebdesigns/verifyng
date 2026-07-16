@@ -56,6 +56,12 @@ export interface ResetPasswordPayload {
   newPassword: string;
 }
 
+/** POST /api/auth/change-password request body */
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
 /** Authenticated user profile returned by GET /api/auth/me */
 export interface UserProfile {
   id: string;

@@ -28,6 +28,7 @@ import type {
   VerifyEmailPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from '../types/auth.js';
 
 export async function handleRegister(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -282,5 +283,36 @@ export async function handleResetPassword(req: IncomingMessage, res: ServerRespo
     sendJson(res, 200, result);
   } catch (error) {
     handleControllerError(res, error, 'ResetPassword');
+  }
+}
+
+export async function handleChangePassword(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const body = await parseBody<ChangePasswordPayload>(req);
+
+    if (!body.currentPassword || !body.newPassword) {
+      sendError(res, 400, 'Current password and new password are required');
+      return;
+    }
+
+    if (!validatePassword(body.newPassword, res)) return;
+
+    const result = await authService.changePassword(authReq.userId, body);
+    setTokenCookie(res, result.token, env.COOKIE_MAX_AGE_SECONDS);
+    sendJson(res, 200, { message: 'Password changed successfully' });
+  } catch (error) {
+    handleControllerError(res, error, 'ChangePassword');
+  }
+}
+
+export async function handleLogoutOtherSessions(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const result = await authService.logoutOtherSessions(authReq.userId);
+    setTokenCookie(res, result.token, env.COOKIE_MAX_AGE_SECONDS);
+    sendJson(res, 200, { message: 'Logged out of all other devices' });
+  } catch (error) {
+    handleControllerError(res, error, 'LogoutOtherSessions');
   }
 }

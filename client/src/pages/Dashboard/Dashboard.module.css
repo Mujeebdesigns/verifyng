@@ -1134,6 +1134,39 @@
   margin: 0;
 }
 
+.securityForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 26rem;
+}
+
+.securityFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.securityLabel {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-sub-500);
+}
+
+.securitySubmitBtn {
+  align-self: flex-start;
+}
+
+.securitySuccessMsg {
+  background-color: color-mix(in srgb, var(--color-primary-primary-base) 8%, transparent);
+  border: 0.0625rem solid var(--color-primary-primary-light);
+  color: var(--color-primary-primary-dark);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 62rem) {
   .projectGrid {
     grid-template-columns: 1fr;

@@ -6,6 +6,7 @@ import type {
   AuthResponse,
   UserProfile,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from '../types/auth.js';
 
 export const authService = {
@@ -43,5 +44,13 @@ export const authService = {
 
   async resetPassword(payload: ResetPasswordPayload): Promise<{ message: string }> {
     return api.post<{ message: string }>('/auth/reset-password', payload);
+  },
+
+  async changePassword(payload: ChangePasswordPayload): Promise<{ message: string }> {
+    return api.post<{ message: string }>('/auth/change-password', payload);
+  },
+
+  async logoutOtherSessions(): Promise<{ message: string }> {
+    return api.post<{ message: string }>('/auth/logout-other-sessions');
   },
 };
