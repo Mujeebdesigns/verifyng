@@ -45,17 +45,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <div className={styles.userInfo}>
-          <span className={styles.displayName}>
-            {reviewUser?.displayName || 'Anonymous User'}
-          </span>
-          <div className={styles.meta}>
-            <span>{formatDate(createdAt)}</span>
-            {orderDate && <span>• Order Date: {formatDate(orderDate)}</span>}
-          </div>
-        </div>
-        <div className={styles.ratingRow}>
-          <StarRating rating={rating} />
+        <div className={styles.nameGroup}>
           {verifiedBuyer && (
             <span className={styles.verifiedBuyer} title="Verified purchase" aria-label="Verified purchase">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -63,7 +53,18 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               </svg>
             </span>
           )}
+          <span className={styles.displayName}>
+            {reviewUser?.displayName || 'Anonymous User'}
+          </span>
         </div>
+        <div className={styles.ratingRow}>
+          <StarRating rating={rating} />
+        </div>
+      </div>
+
+      <div className={styles.meta}>
+        <span>{formatDate(createdAt)}</span>
+        {orderDate && <span>• Order Date: {formatDate(orderDate)}</span>}
       </div>
 
       <p className={[styles.text, isFlagged ? styles.flaggedText : ''].join(' ')}>
