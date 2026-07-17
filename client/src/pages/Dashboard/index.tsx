@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { reviewService } from '../../services/review.service.js';
 import { authService } from '../../services/auth.service.js';
+import { setStoredToken } from '../../utils/tokenStorage.js';
 import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
@@ -119,7 +120,8 @@ export const Dashboard: React.FC = () => {
 
     setPwLoading(true);
     try {
-      await authService.changePassword({ currentPassword, newPassword });
+      const res = await authService.changePassword({ currentPassword, newPassword });
+      setStoredToken(res.token);
       setPwSuccess(true);
       setCurrentPassword('');
       setNewPassword('');
@@ -135,7 +137,8 @@ export const Dashboard: React.FC = () => {
     setLogoutOthersLoading(true);
     setLogoutOthersError(null);
     try {
-      await authService.logoutOtherSessions();
+      const res = await authService.logoutOtherSessions();
+      setStoredToken(res.token);
       setShowLogoutOthersConfirm(false);
       setLogoutOthersSuccess(true);
     } catch (err) {

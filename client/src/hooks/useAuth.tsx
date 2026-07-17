@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/auth.service.js';
+import { setStoredToken, clearStoredToken } from '../utils/tokenStorage.js';
 import type { UserProfile, LoginPayload, RegisterPayload, RegisterVendorPayload } from '../types/auth.js';
 
 interface AuthContextType {
@@ -39,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const res = await authService.login(payload);
+      setStoredToken(res.token);
       setUser(res.user);
     } finally {
       setLoading(false);
@@ -49,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const res = await authService.register(payload);
+      setStoredToken(res.token);
       setUser(res.user);
     } finally {
       setLoading(false);
@@ -59,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const res = await authService.registerVendor(payload);
+      setStoredToken(res.token);
       setUser(res.user);
     } finally {
       setLoading(false);
@@ -72,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      clearStoredToken();
       setUser(null);
       setLoading(false);
     }

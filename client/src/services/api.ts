@@ -1,4 +1,5 @@
 import { API_BASE_URL, API_PREFIX } from '../utils/config.js';
+import { getStoredToken } from '../utils/tokenStorage.js';
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
@@ -30,6 +31,11 @@ async function handleResponse(response: Response): Promise<unknown> {
 export async function request(path: string, options: RequestOptions = {}): Promise<unknown> {
   const headers = new Headers(options.headers);
   const { body, ...restOptions } = options;
+
+  const token = getStoredToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
   let fetchBody: BodyInit | null | undefined = undefined;
 

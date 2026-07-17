@@ -8,6 +8,7 @@ import styles from '../AuthCard/AuthCard.module.css';
 import flatStyles from './LoginForm.module.css';
 
 import { authService } from '../../services/auth.service.js';
+import { setStoredToken, clearStoredToken } from '../../utils/tokenStorage.js';
 
 interface LoginFormProps {
   role?: 'BUYER' | 'VENDOR' | 'ADMIN';
@@ -93,8 +94,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
         res = await authService.login({ email, password });
       }
 
+      setStoredToken(res.token);
+
       if (role && res.user.role !== role) {
         await authService.logout();
+        clearStoredToken();
         const roleLabel = role === 'BUYER' ? 'shoppers' : role === 'VENDOR' ? 'merchants' : 'admins';
         setError(`This login page is for ${roleLabel} only.`);
         setLoading(false);

@@ -46,11 +46,11 @@ export const authService = {
     return api.post<{ message: string }>('/auth/reset-password', payload);
   },
 
-  async changePassword(payload: ChangePasswordPayload): Promise<{ message: string }> {
-    return api.post<{ message: string }>('/auth/change-password', payload);
+  async changePassword(payload: ChangePasswordPayload): Promise<{ message: string; token: string }> {
+    return api.post<{ message: string; token: string }>('/auth/change-password', payload);
   },
 
-  async logoutOtherSessions(): Promise<{ message: string }> {
-    return api.post<{ message: string }>('/auth/logout-other-sessions');
+  async logoutOtherSessions(): Promise<{ message: string; token: string }> {
+    return api.post<{ message: string; token: string }>('/auth/logout-other-sessions');
   },
 };

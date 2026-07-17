@@ -300,7 +300,7 @@ export async function handleChangePassword(req: IncomingMessage, res: ServerResp
 
     const result = await authService.changePassword(authReq.userId, body);
     setTokenCookie(res, result.token, env.COOKIE_MAX_AGE_SECONDS);
-    sendJson(res, 200, { message: 'Password changed successfully' });
+    sendJson(res, 200, { message: 'Password changed successfully', token: result.token });
   } catch (error) {
     handleControllerError(res, error, 'ChangePassword');
   }
@@ -311,7 +311,7 @@ export async function handleLogoutOtherSessions(req: IncomingMessage, res: Serve
     const authReq = req as AuthenticatedRequest;
     const result = await authService.logoutOtherSessions(authReq.userId);
     setTokenCookie(res, result.token, env.COOKIE_MAX_AGE_SECONDS);
-    sendJson(res, 200, { message: 'Logged out of all other devices' });
+    sendJson(res, 200, { message: 'Logged out of all other devices', token: result.token });
   } catch (error) {
     handleControllerError(res, error, 'LogoutOtherSessions');
   }
