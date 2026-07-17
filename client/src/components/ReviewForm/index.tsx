@@ -219,7 +219,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
         <label className={styles.label}>Your Rating</label>
         <div className={styles.ratingWrapper}>
           <StarRating rating={rating} interactive={true} onChange={setRating} />
-          <span>{rating > 0 ? `(${rating} out of 5 stars)` : 'Select a rating'}</span>
+          <span className={styles.ratingText}>{rating > 0 ? `(${rating} out of 5 stars)` : 'Select a rating'}</span>
         </div>
       </div>
 

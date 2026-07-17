@@ -42,7 +42,13 @@
 .ratingWrapper {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.ratingText {
+  white-space: nowrap;
+  color: var(--color-text-sub-500);
 }
 
 .charCount {
