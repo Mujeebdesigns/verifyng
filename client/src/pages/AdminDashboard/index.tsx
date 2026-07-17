@@ -7,10 +7,11 @@ import { reviewService } from '../../services/review.service.js';
 import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
+import { TwoFactorSettings } from '../../components/TwoFactorSettings/index.js';
 import { ROUTES } from '../../utils/constants.js';
 import styles from './AdminDashboard.module.css';
 
-type TabType = 'claims' | 'reports' | 'flagged' | 'users';
+type TabType = 'claims' | 'reports' | 'flagged' | 'users' | 'security';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -221,6 +222,16 @@ export const AdminDashboard: React.FC = () => {
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
               User List
+            </button>
+
+            <button
+              onClick={() => handleTabChange('security')}
+              className={`${styles.menuItem} ${activeTab === 'security' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              Security
             </button>
           </nav>
         </aside>
@@ -482,8 +493,19 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               )}
 
-              {/* Pagination controls */}
-              {totalPages > 1 && (
+              {/* SECURITY TAB */}
+              {activeTab === 'security' && (
+                <div>
+                  <h3 className={styles.panelTitle}>Two-Factor Authentication</h3>
+                  <p className={styles.panelSubtitle}>Protect your admin account with an authenticator app.</p>
+                  <div style={{ marginTop: '1.25rem' }}>
+                    <TwoFactorSettings />
+                  </div>
+                </div>
+              )}
+
+              {/* Pagination controls (data tabs only) */}
+              {activeTab !== 'security' && totalPages > 1 && (
                 <div className={styles.pagination}>
                   <Button
                     variant="secondary"

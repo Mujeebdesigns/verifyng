@@ -11,6 +11,7 @@ import flatStyles from './LoginForm.module.css';
 
 import { authService } from '../../services/auth.service.js';
 import { setStoredToken, clearStoredToken } from '../../utils/tokenStorage.js';
+import type { AuthResponse } from '../../types/auth.js';
 
 interface LoginFormProps {
   role?: 'BUYER' | 'VENDOR' | 'ADMIN';
@@ -34,6 +35,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
   const [turnstileToken, setTurnstileToken] = useState('');
   const turnstileRef = useRef<TurnstileHandle>(null);
   const captchaRequired = role === 'ADMIN' && Boolean(TURNSTILE_SITE_KEY);
+
+  // 2FA step: when admin login returns a challenge token, we switch to a code
+  // entry view and complete login via the /admin/2fa endpoint.
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
 
   const getFieldError = (name: string, value: string): string => {
     switch (name) {
@@ -101,37 +107,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
 
     setLoading(true);
     try {
-      let res;
       if (role === 'ADMIN') {
-        res = await authService.loginAdmin({ email, password, turnstileToken: turnstileToken || undefined });
-      } else {
-        res = await authService.login({ email, password });
-      }
-
-      setStoredToken(res.token);
-
-      if (role && res.user.role !== role) {
-        await authService.logout();
-        clearStoredToken();
-        const roleLabel = role === 'BUYER' ? 'shoppers' : role === 'VENDOR' ? 'merchants' : 'admins';
-        setError(`This login page is for ${roleLabel} only.`);
-        setLoading(false);
-        return;
-      }
-
-      await refreshUser();
-
-      const from = (location.state as { from?: { pathname: string; search?: string; hash?: string } })?.from;
-      if (from) {
-        navigate(from.pathname + (from.search || '') + (from.hash || ''));
-      } else {
-        if (res.user.role === 'ADMIN') {
-          navigate(ROUTES.ADMIN_DASHBOARD);
-        } else if (res.user.role === 'VENDOR') {
-          navigate(ROUTES.VENDOR_DASHBOARD);
-        } else {
-          navigate(ROUTES.HOME);
+        const res = await authService.loginAdmin({ email, password, turnstileToken: turnstileToken || undefined });
+        // 2FA enabled — switch to the code step instead of finishing login.
+        if ('twoFactorRequired' in res) {
+          setChallengeToken(res.challengeToken);
+          setError(null);
+          setLoading(false);
+          return;
         }
+        await completeLogin(res);
+      } else {
+        const res = await authService.login({ email, password });
+        await completeLogin(res);
       }
     } catch (err) {
       // Turnstile tokens are single-use — reset so the admin can retry cleanly.
@@ -144,6 +132,98 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
       setLoading(false);
     }
   };
+
+  const completeLogin = async (res: AuthResponse) => {
+    setStoredToken(res.token);
+
+    if (role && res.user.role !== role) {
+      await authService.logout();
+      clearStoredToken();
+      const roleLabel = role === 'BUYER' ? 'shoppers' : role === 'VENDOR' ? 'merchants' : 'admins';
+      setError(`This login page is for ${roleLabel} only.`);
+      return;
+    }
+
+    await refreshUser();
+
+    const from = (location.state as { from?: { pathname: string; search?: string; hash?: string } })?.from;
+    if (from) {
+      navigate(from.pathname + (from.search || '') + (from.hash || ''));
+    } else if (res.user.role === 'ADMIN') {
+      navigate(ROUTES.ADMIN_DASHBOARD);
+    } else if (res.user.role === 'VENDOR') {
+      navigate(ROUTES.VENDOR_DASHBOARD);
+    } else {
+      navigate(ROUTES.HOME);
+    }
+  };
+
+  const handleTwoFactorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!challengeToken) return;
+    if (twoFactorCode.trim().length < 6) {
+      setError('Enter the 6-digit code from your authenticator app (or a backup code).');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await authService.adminTwoFactor(challengeToken, twoFactorCode.trim());
+      await completeLogin(res);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invalid code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2FA code step (admin, after a correct password when 2FA is enabled).
+  if (challengeToken) {
+    return (
+      <form
+        className={flat ? undefined : styles.form}
+        onSubmit={handleTwoFactorSubmit}
+        noValidate
+        style={flat ? { width: '100%', display: 'flex', flexDirection: 'column', gap: '1.25rem', background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 } : undefined}
+      >
+        <div className={flat ? flatStyles.flatHeader : styles.headerGroup}>
+          <h2 className={flat ? flatStyles.flatTitle : styles.title}>Two-Factor Verification</h2>
+          <p className={flat ? flatStyles.flatSubtitle : styles.subtitle}>
+            Enter the 6-digit code from your authenticator app. You can also use a backup code.
+          </p>
+        </div>
+
+        <ErrorMessage message={error} />
+
+        <div className={styles.group}>
+          <label className={flat ? flatStyles.flatLabel : styles.label} htmlFor="twoFactorCode">Authentication Code</label>
+          <input
+            id="twoFactorCode"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            autoFocus
+            placeholder="123456"
+            className={flat ? flatStyles.flatInput : undefined}
+            value={twoFactorCode}
+            onChange={(e) => setTwoFactorCode(e.target.value)}
+          />
+        </div>
+
+        <Button type="submit" disabled={loading} fullWidth={true} className={flat ? flatStyles.flatSubmitBtn : undefined}>
+          {loading ? 'Verifying...' : 'Verify & Sign In'}
+        </Button>
+
+        <button
+          type="button"
+          onClick={() => { setChallengeToken(null); setTwoFactorCode(''); setError(null); }}
+          style={{ background: 'none', border: 'none', color: 'var(--color-text-sub-500)', fontSize: '0.8125rem', cursor: 'pointer', fontFamily: 'inherit' }}
+        >
+          ← Back to login
+        </button>
+      </form>
+    );
+  }
 
   return (
     <form

@@ -7,6 +7,8 @@ import type {
   UserProfile,
   ResetPasswordPayload,
   ChangePasswordPayload,
+  TwoFactorRequiredResponse,
+  TotpSetupResponse,
 } from '../types/auth.js';
 
 export const authService = {
@@ -22,8 +24,24 @@ export const authService = {
     return api.post<AuthResponse>('/auth/login', payload);
   },
 
-  async loginAdmin(payload: LoginPayload): Promise<AuthResponse> {
-    return api.post<AuthResponse>('/auth/admin/login', payload);
+  async loginAdmin(payload: LoginPayload): Promise<AuthResponse | TwoFactorRequiredResponse> {
+    return api.post<AuthResponse | TwoFactorRequiredResponse>('/auth/admin/login', payload);
+  },
+
+  async adminTwoFactor(challengeToken: string, code: string): Promise<AuthResponse> {
+    return api.post<AuthResponse>('/auth/admin/2fa', { challengeToken, code });
+  },
+
+  async totpSetup(): Promise<TotpSetupResponse> {
+    return api.post<TotpSetupResponse>('/auth/2fa/setup');
+  },
+
+  async totpConfirm(code: string): Promise<{ message: string; backupCodes: string[] }> {
+    return api.post<{ message: string; backupCodes: string[] }>('/auth/2fa/confirm', { code });
+  },
+
+  async totpDisable(code: string): Promise<{ message: string }> {
+    return api.post<{ message: string }>('/auth/2fa/disable', { code });
   },
 
   async logout(): Promise<void> {

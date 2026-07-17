@@ -72,10 +72,24 @@ export interface UserProfile {
   role: UserRole;
   isVerified: boolean;
   createdAt: string;
+  totpEnabled?: boolean;
 }
 
 /** Login/register success response */
 export interface AuthResponse {
   token: string;
   user: UserProfile;
+}
+
+/** Admin login response when 2FA is enabled — code step still required. */
+export interface TwoFactorRequiredResponse {
+  twoFactorRequired: true;
+  challengeToken: string;
+}
+
+/** TOTP enrollment setup payload (QR + secret to scan). */
+export interface TotpSetupResponse {
+  secret: string;
+  otpauthUrl: string;
+  qrDataUrl: string;
 }
