@@ -168,9 +168,17 @@
   text-align: left;
 }
 
-.menuItem:hover {
-  background-color: var(--color-bg-weak-100);
-  color: var(--color-text-main-900);
+/* Only apply hover on devices with a real pointer, and never to the active
+ * item. On touch devices :hover sticks after a tap, and .menuItem:hover
+ * outranks .menuItemActive on specificity — together that left a just-tapped
+ * tab showing the grey hover instead of the green active state until the
+ * user tapped elsewhere. Scoping to (hover: hover) + :not(.menuItemActive)
+ * fixes both the sticky-touch case and the desktop active-hover override. */
+@media (hover: hover) {
+  .menuItem:not(.menuItemActive):hover {
+    background-color: var(--color-bg-weak-100);
+    color: var(--color-text-main-900);
+  }
 }
 
 .menuItemActive {
@@ -777,8 +785,11 @@
     flex-shrink: 0;
   }
 
+  /* Hide the count badge on the tight mobile tab bar — its extra width forces
+   * "My Reviews" to wrap to two lines, breaking alignment with the other two
+   * single-line tabs. The count is still shown on the My Reviews tab itself. */
   .menuBadge {
-    margin-left: 0.25rem;
+    display: none;
   }
 
   .menuLabelShort {
