@@ -92,30 +92,30 @@ async function checkLimit(key: string, maxRequests: number, windowMs: number): P
 /**
  * Extract client IP safely.
  *
- * Only trusts header-based IP forwarding when the server is behind a known
- * reverse proxy. In production with Cloudflare or a trusted NGINX, set
- * TRUST_PROXY=true. Otherwise falls back to the connection socket address.
+ * Only trusts header-based IP forwarding when TRUST_PROXY=true. Critically, the
+ * real client IP is read from the RIGHT of X-Forwarded-For, not the left:
+ * Render (like most PaaS) APPENDS to XFF and never strips client-supplied
+ * values, so the leftmost entry is attacker-controlled and the trustworthy IP
+ * is the one the proxy itself appended. We count TRUST_PROXY_HOPS entries in
+ * from the right (1 = Render only). cf-connecting-ip / x-real-ip are NOT
+ * trusted — nothing in this deployment sets them, so any value is client-spoofed.
+ *
+ * Getting this wrong lets an attacker rotate a spoofed header to bypass every
+ * IP-keyed rate limit (login brute-force, admin lockout, search, etc.).
  */
 function getClientIp(req: IncomingMessage): string {
-  // Only trust proxy headers when explicitly configured
   if (process.env.TRUST_PROXY === 'true') {
-    const cfIp = req.headers['cf-connecting-ip'];
-    if (typeof cfIp === 'string' && cfIp.trim()) {
-      return cfIp.trim();
-    }
-
-    const realIp = req.headers['x-real-ip'];
-    if (typeof realIp === 'string' && realIp.trim()) {
-      return realIp.trim();
-    }
-
     const forwarded = req.headers['x-forwarded-for'];
     if (typeof forwarded === 'string' && forwarded.trim()) {
-      return forwarded.split(',')[0].trim();
+      const parts = forwarded.split(',').map((p) => p.trim()).filter(Boolean);
+      const idx = parts.length - env.TRUST_PROXY_HOPS;
+      if (idx >= 0 && parts[idx]) {
+        return parts[idx];
+      }
     }
   }
 
-  // Default: use the direct connection address
+  // Default (or malformed/short XFF): use the direct connection address.
   return req.socket.remoteAddress ?? 'unknown';
 }
 

@@ -78,6 +78,11 @@ export const env = {
   // Security
   BCRYPT_ROUNDS: int('BCRYPT_ROUNDS', 12),
   COOKIE_MAX_AGE_SECONDS: int('COOKIE_MAX_AGE_SECONDS', 604800), // 7 days default
+  // Number of trusted reverse-proxy hops in front of the app. Render appends
+  // (never strips) X-Forwarded-For, so the real client IP is this many entries
+  // in from the RIGHT, not the spoofable leftmost. 1 = Render only; set to 2
+  // if you later put another trusted proxy (e.g. Cloudflare) in front of it.
+  TRUST_PROXY_HOPS: int('TRUST_PROXY_HOPS', 1),
 
   // Misc
   FEATURED_VENDOR_COUNT: int('FEATURED_VENDOR_COUNT', 3),
