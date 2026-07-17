@@ -318,7 +318,6 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              marginLeft: 'auto',
               color: 'var(--color-text-sub-500)',
               fontWeight: 500,
               fontSize: '0.875rem',
