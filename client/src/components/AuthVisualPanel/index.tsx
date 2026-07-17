@@ -25,10 +25,13 @@ const SCENE_URL = `https://prod.spline.design/lvtWXuAHUQwGP1oB/scene.splinecode?
  * understated so it supports the auth form rather than competing with it.
  *
  * The scene mounts only at >= 48rem (the panel is hidden below that), so the
- * Spline runtime is never downloaded on mobile.
+ * Spline runtime is never downloaded on mobile. It also waits for the browser
+ * to go idle before mounting, so the heavy WebGL init never competes with the
+ * user's first interactions (form clicks) — keeping input latency (INP) low.
  */
 export const AuthVisualPanel: React.FC = () => {
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isIdle, setIsIdle] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 48rem)');
@@ -38,9 +41,22 @@ export const AuthVisualPanel: React.FC = () => {
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  useEffect(() => {
+    // Defer the Spline mount until the main thread is idle so its WebGL init
+    // doesn't block early clicks. requestIdleCallback where available, with a
+    // timeout fallback for browsers that lack it (older Safari).
+    const ric = window.requestIdleCallback;
+    if (typeof ric === 'function') {
+      const handle = ric(() => setIsIdle(true), { timeout: 2000 });
+      return () => window.cancelIdleCallback?.(handle);
+    }
+    const timer = window.setTimeout(() => setIsIdle(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
     <div className={styles.panel} aria-hidden="true">
-      {isDesktop && (
+      {isDesktop && isIdle && (
         <SplineBoundary>
           <Suspense fallback={null}>
             <div className={styles.scene}>
