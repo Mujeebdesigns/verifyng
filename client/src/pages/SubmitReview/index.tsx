@@ -156,7 +156,6 @@ export const SubmitReview: React.FC = () => {
             initialText={initialText}
             {...(!vendorId && !isEdit && prefilledName && { businessName: prefilledName })}
             onSubmit={handleSubmit}
-            onCancel={handleCancel}
             onDelete={handleDeleteClick}
           />
         </div>
