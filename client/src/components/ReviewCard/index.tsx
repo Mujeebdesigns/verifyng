@@ -57,8 +57,10 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         <div className={styles.ratingRow}>
           <StarRating rating={rating} />
           {verifiedBuyer && (
-            <span className={styles.verifiedBuyer} title="Verified purchase check">
-              Verified Buyer
+            <span className={styles.verifiedBuyer} title="Verified purchase" aria-label="Verified purchase">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
             </span>
           )}
         </div>
