@@ -14,6 +14,10 @@ import {
   handleDeleteUser,
   handlePromoteUser,
   handleGetFlaggedReviews,
+  handleGetAllReviews,
+  handleVerifyReview,
+  handleAdminDeleteReview,
+  handleGetAllVendors,
 } from '../controllers/admin.controller.js';
 import { authMiddleware, type AuthenticatedRequest } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/role.middleware.js';
@@ -100,5 +104,23 @@ export function registerAdminRoutes(router: ReturnType<typeof createRouter>): vo
 
   router.get('/api/admin/reviews/flagged', async (req, res) => {
     await adminGuard(req, res, () => handleGetFlaggedReviews(req, res));
+  });
+
+  router.get('/api/admin/reviews', async (req, res) => {
+    await adminGuard(req, res, () => handleGetAllReviews(req, res));
+  });
+
+  router.put('/api/admin/reviews/:id/verify', async (req, res, params) => {
+    if (!(await actionRateLimit(req, res))) return;
+    await adminGuard(req, res, () => handleVerifyReview(req, res, params));
+  });
+
+  router.delete('/api/admin/reviews/:id', async (req, res, params) => {
+    if (!(await actionRateLimit(req, res))) return;
+    await adminGuard(req, res, () => handleAdminDeleteReview(req, res, params));
+  });
+
+  router.get('/api/admin/vendors', async (req, res) => {
+    await adminGuard(req, res, () => handleGetAllVendors(req, res));
   });
 }

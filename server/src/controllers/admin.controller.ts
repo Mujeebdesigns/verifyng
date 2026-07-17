@@ -222,3 +222,66 @@ export async function handleGetFlaggedReviews(req: IncomingMessage, res: ServerR
     handleControllerError(res, error, 'handleGetFlaggedReviews');
   }
 }
+
+export async function handleGetAllReviews(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const { page, limit } = parsePagination(req.url ?? '');
+    const result = await adminService.getAllReviews(page, limit);
+    sendJson(res, 200, result);
+  } catch (error) {
+    handleControllerError(res, error, 'handleGetAllReviews');
+  }
+}
+
+export async function handleVerifyReview(
+  req: IncomingMessage,
+  res: ServerResponse,
+  params: Record<string, string>
+): Promise<void> {
+  try {
+    const { id } = params;
+    if (!id) {
+      sendError(res, 400, 'Review ID is required');
+      return;
+    }
+    const body = await parseBody<{ verified?: boolean }>(req);
+    if (typeof body.verified !== 'boolean') {
+      sendError(res, 400, 'verified (boolean) is required');
+      return;
+    }
+    const authReq = req as AuthenticatedRequest;
+    const result = await adminService.setReviewVerification(id, body.verified, authReq.userId);
+    sendJson(res, 200, { message: body.verified ? 'Review verified' : 'Verification removed', review: result });
+  } catch (error) {
+    handleControllerError(res, error, 'handleVerifyReview');
+  }
+}
+
+export async function handleAdminDeleteReview(
+  req: IncomingMessage,
+  res: ServerResponse,
+  params: Record<string, string>
+): Promise<void> {
+  try {
+    const { id } = params;
+    if (!id) {
+      sendError(res, 400, 'Review ID is required');
+      return;
+    }
+    const authReq = req as AuthenticatedRequest;
+    const result = await adminService.adminDeleteReview(id, authReq.userId);
+    sendJson(res, 200, result);
+  } catch (error) {
+    handleControllerError(res, error, 'handleAdminDeleteReview');
+  }
+}
+
+export async function handleGetAllVendors(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const { page, limit } = parsePagination(req.url ?? '');
+    const result = await adminService.getAllVendors(page, limit);
+    sendJson(res, 200, result);
+  } catch (error) {
+    handleControllerError(res, error, 'handleGetAllVendors');
+  }
+}

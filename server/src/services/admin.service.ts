@@ -1,6 +1,8 @@
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../utils/AppError.js';
 import { recordAuditLog } from '../utils/auditLog.js';
+import { recalculateTrustScore } from './review.service.js';
+import { generateVendorSummary } from './ai.service.js';
 
 function maskEmail(email: string): string {
   const atIdx = email.indexOf('@');
@@ -449,5 +451,144 @@ export async function getFlaggedReviews(page: number, limit: number) {
       total,
       totalPages: Math.ceil(total / limit),
     },
+  };
+}
+
+/**
+ * List all reviews (paginated) for admin moderation and buyer verification.
+ */
+export async function getAllReviews(page: number, limit: number) {
+  const skip = (page - 1) * limit;
+
+  const [reviews, total] = await prisma.$transaction([
+    prisma.review.findMany({
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        vendor: { select: { id: true, businessName: true } },
+        user: { select: { id: true, displayName: true } },
+      },
+    }),
+    prisma.review.count(),
+  ]);
+
+  return {
+    data: reviews.map((review) => ({
+      id: review.id,
+      vendorId: review.vendorId,
+      userId: review.userId,
+      rating: review.rating,
+      reviewText: review.reviewText,
+      transactionChannel: review.transactionChannel,
+      verifiedBuyer: review.verifiedBuyer,
+      isFlagged: review.isFlagged,
+      createdAt: review.createdAt.toISOString(),
+      vendor: { id: review.vendor.id, businessName: review.vendor.businessName },
+      user: { id: review.user.id, displayName: review.user.displayName },
+    })),
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  };
+}
+
+/**
+ * Award or revoke a review's "verified buyer" badge. Recomputes the vendor's
+ * trust score since verified reviews are weighted more heavily.
+ */
+export async function setReviewVerification(reviewId: string, verified: boolean, actorId: string) {
+  const review = await prisma.review.findUnique({ where: { id: reviewId }, select: { id: true, vendorId: true } });
+  if (!review) {
+    throw new AppError('Review not found', 404);
+  }
+
+  const updated = await prisma.review.update({
+    where: { id: reviewId },
+    data: { verifiedBuyer: verified },
+  });
+
+  await recalculateTrustScore(review.vendorId);
+
+  await recordAuditLog({
+    actorId,
+    action: verified ? 'VERIFY_REVIEW' : 'UNVERIFY_REVIEW',
+    targetType: 'Review',
+    targetId: reviewId,
+    metadata: { vendorId: review.vendorId },
+  });
+
+  return { id: updated.id, verifiedBuyer: updated.verifiedBuyer };
+}
+
+/**
+ * Admin-delete any review (no ownership or time-window restriction). Mirrors the
+ * buyer delete's side effects: decrement the vendor's count, recompute trust,
+ * and drop/regenerate the AI summary around the 3-review threshold.
+ */
+export async function adminDeleteReview(reviewId: string, actorId: string) {
+  const review = await prisma.review.findUnique({ where: { id: reviewId }, select: { id: true, vendorId: true } });
+  if (!review) {
+    throw new AppError('Review not found', 404);
+  }
+
+  await prisma.review.delete({ where: { id: reviewId } });
+
+  const vendor = await prisma.vendor.update({
+    where: { id: review.vendorId },
+    data: { reviewCount: { decrement: 1 } },
+  });
+
+  await recalculateTrustScore(review.vendorId);
+
+  if (vendor.reviewCount < 3) {
+    await prisma.vendorSummary.deleteMany({ where: { vendorId: review.vendorId } });
+    await prisma.vendor.update({
+      where: { id: review.vendorId },
+      data: { scamFlag: false, moderationFlag: false },
+    });
+  } else {
+    generateVendorSummary(review.vendorId).catch(() => { /* non-blocking */ });
+  }
+
+  await recordAuditLog({
+    actorId,
+    action: 'ADMIN_DELETE_REVIEW',
+    targetType: 'Review',
+    targetId: reviewId,
+    metadata: { vendorId: review.vendorId },
+  });
+
+  return { message: 'Review deleted successfully' };
+}
+
+/**
+ * List all vendors (paginated) for admin oversight and featuring.
+ */
+export async function getAllVendors(page: number, limit: number) {
+  const skip = (page - 1) * limit;
+
+  const [vendors, total] = await prisma.$transaction([
+    prisma.vendor.findMany({
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        businessName: true,
+        category: true,
+        state: true,
+        trustScore: true,
+        trustLabel: true,
+        reviewCount: true,
+        featured: true,
+        scamFlag: true,
+        claimStatus: true,
+      },
+    }),
+    prisma.vendor.count(),
+  ]);
+
+  return {
+    data: vendors,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 }

@@ -358,7 +358,7 @@ async function findOrCreateVendor(payload: CreateReviewPayload): Promise<string>
  * Pass a transaction client via `db` to run inside an existing transaction;
  * defaults to the global Prisma client otherwise.
  */
-async function recalculateTrustScore(
+export async function recalculateTrustScore(
   vendorId: string,
   db: Prisma.TransactionClient = prisma,
 ): Promise<void> {
