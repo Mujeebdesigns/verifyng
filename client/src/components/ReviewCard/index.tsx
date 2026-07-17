@@ -46,6 +46,9 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     <div className={styles.card}>
       <div className={styles.header}>
         <div className={styles.nameGroup}>
+          <span className={styles.displayName}>
+            {reviewUser?.displayName || 'Anonymous User'}
+          </span>
           {verifiedBuyer && (
             <span className={styles.verifiedBuyer} title="Verified purchase" aria-label="Verified purchase">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -53,9 +56,6 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               </svg>
             </span>
           )}
-          <span className={styles.displayName}>
-            {reviewUser?.displayName || 'Anonymous User'}
-          </span>
         </div>
         <div className={styles.ratingRow}>
           <StarRating rating={rating} />
