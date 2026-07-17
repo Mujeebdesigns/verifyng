@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { Navbar } from '../../components/Navbar/index.js';
-import { adminService, type AdminStats, type AdminClaim, type AdminReport, type AdminUser, type FlaggedReviewResponse } from '../../services/admin.service.js';
-import { reviewService } from '../../services/review.service.js';
+import { adminService, type AdminStats, type AdminClaim, type AdminReport, type AdminUser, type FlaggedReviewResponse, type AdminReview, type AdminVendor } from '../../services/admin.service.js';
 import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
@@ -11,7 +10,7 @@ import { TwoFactorSettings } from '../../components/TwoFactorSettings/index.js';
 import { ROUTES } from '../../utils/constants.js';
 import styles from './AdminDashboard.module.css';
 
-type TabType = 'claims' | 'reports' | 'flagged' | 'users' | 'security';
+type TabType = 'claims' | 'reports' | 'flagged' | 'reviews' | 'vendors' | 'users' | 'security';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -26,6 +25,8 @@ export const AdminDashboard: React.FC = () => {
   const [claims, setClaims] = useState<AdminClaim[]>([]);
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [flaggedReviews, setFlaggedReviews] = useState<FlaggedReviewResponse[]>([]);
+  const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [vendors, setVendors] = useState<AdminVendor[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
 
   // Pagination States
@@ -56,6 +57,14 @@ export const AdminDashboard: React.FC = () => {
       } else if (activeTab === 'flagged') {
         const res = await adminService.getFlaggedReviews(page, 10);
         setFlaggedReviews(res.data);
+        setTotalPages(res.pagination.totalPages);
+      } else if (activeTab === 'reviews') {
+        const res = await adminService.getAllReviews(page, 10);
+        setReviews(res.data);
+        setTotalPages(res.pagination.totalPages);
+      } else if (activeTab === 'vendors') {
+        const res = await adminService.getVendors(page, 10);
+        setVendors(res.data);
         setTotalPages(res.pagination.totalPages);
       } else if (activeTab === 'users') {
         const res = await adminService.getUsers(page, 10);
@@ -116,13 +125,33 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Review actions
+  // Review actions — admin endpoints (no ownership/time-window limits).
   const handleDeleteReview = async (reviewId: string) => {
-    if (!window.confirm('Are you sure you want to delete this flagged review?')) return;
+    if (!window.confirm('Delete this review permanently? This cannot be undone.')) return;
     try {
       setError(null);
-      await reviewService.deleteReview(reviewId);
+      await adminService.deleteReview(reviewId);
       loadStats();
+      loadTabData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  const handleVerifyReview = async (reviewId: string, verified: boolean) => {
+    try {
+      setError(null);
+      await adminService.verifyReview(reviewId, verified);
+      loadTabData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  const handleToggleFeature = async (vendorId: string) => {
+    try {
+      setError(null);
+      await adminService.toggleFeatured(vendorId);
       loadTabData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Action failed');
@@ -209,6 +238,29 @@ export const AdminDashboard: React.FC = () => {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
               Flagged Reviews
+            </button>
+
+            <button
+              onClick={() => handleTabChange('reviews')}
+              className={`${styles.menuItem} ${activeTab === 'reviews' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              All Reviews
+            </button>
+
+            <button
+              onClick={() => handleTabChange('vendors')}
+              className={`${styles.menuItem} ${activeTab === 'vendors' ? styles.menuItemActive : ''}`}
+            >
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}>
+                <path d="M3 9l1-5h16l1 5" />
+                <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" />
+                <path d="M9 22V12h6v10" />
+              </svg>
+              Vendors
             </button>
 
             <button
@@ -402,6 +454,115 @@ export const AdminDashboard: React.FC = () => {
                           </p>
                         </div>
                       ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ALL REVIEWS TAB */}
+              {activeTab === 'reviews' && (
+                <div>
+                  <h3 className={styles.panelTitle}>All Reviews</h3>
+                  <p className={styles.panelSubtitle}>Award the verified-buyer badge or remove reviews that violate the guidelines.</p>
+
+                  {reviews.length === 0 ? (
+                    <p className={styles.emptyText}>No reviews yet.</p>
+                  ) : (
+                    <div className={styles.tableWrapper}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th>Review</th>
+                            <th>Vendor</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reviews.map((rev) => (
+                            <tr key={rev.id} className={styles.trHover}>
+                              <td>
+                                <strong>{rev.user.displayName}</strong>
+                                <p className={styles.reporterText}>"{rev.reviewText}"</p>
+                              </td>
+                              <td>{rev.vendor.businessName}</td>
+                              <td>★ {rev.rating}/5</td>
+                              <td>
+                                {rev.verifiedBuyer && <span className={styles.badgeSuccess}>Verified</span>}
+                                {rev.isFlagged && <span className={styles.badgeDanger}>Flagged</span>}
+                                {!rev.verifiedBuyer && !rev.isFlagged && <span className={styles.badgeNeutral}>Unverified</span>}
+                              </td>
+                              <td>
+                                <div className={styles.buttonGroup}>
+                                  <Button
+                                    onClick={() => handleVerifyReview(rev.id, !rev.verifiedBuyer)}
+                                    variant={rev.verifiedBuyer ? 'secondary' : 'primary'}
+                                    style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}
+                                  >
+                                    {rev.verifiedBuyer ? 'Unverify' : 'Verify buyer'}
+                                  </Button>
+                                  <Button onClick={() => handleDeleteReview(rev.id)} variant="danger" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>
+                                    Delete
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* VENDORS TAB */}
+              {activeTab === 'vendors' && (
+                <div>
+                  <h3 className={styles.panelTitle}>Vendors</h3>
+                  <p className={styles.panelSubtitle}>Feature trusted vendors on the homepage and monitor trust standing.</p>
+
+                  {vendors.length === 0 ? (
+                    <p className={styles.emptyText}>No vendors yet.</p>
+                  ) : (
+                    <div className={styles.tableWrapper}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th>Business</th>
+                            <th>Trust</th>
+                            <th>Reviews</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {vendors.map((v) => (
+                            <tr key={v.id} className={styles.trHover}>
+                              <td>
+                                <strong>{v.businessName}</strong>
+                                <div className={styles.businessMeta}>{[v.category, v.state].filter(Boolean).join(' • ') || '—'}</div>
+                              </td>
+                              <td>{v.trustScore?.toFixed(1)} <span className={styles.businessMeta}>{v.trustLabel}</span></td>
+                              <td>{v.reviewCount}</td>
+                              <td>
+                                {v.featured && <span className={styles.badgeSuccess}>Featured</span>}
+                                {v.scamFlag && <span className={styles.badgeDanger}>Scam flag</span>}
+                                {!v.featured && !v.scamFlag && <span className={styles.badgeNeutral}>—</span>}
+                              </td>
+                              <td>
+                                <Button
+                                  onClick={() => handleToggleFeature(v.id)}
+                                  variant={v.featured ? 'secondary' : 'primary'}
+                                  style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}
+                                >
+                                  {v.featured ? 'Unfeature' : 'Feature'}
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>

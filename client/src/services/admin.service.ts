@@ -63,6 +63,33 @@ export interface FlaggedReviewResponse extends ReviewResponse {
   };
 }
 
+export interface AdminReview {
+  id: string;
+  vendorId: string;
+  userId: string;
+  rating: number;
+  reviewText: string;
+  transactionChannel: string | null;
+  verifiedBuyer: boolean;
+  isFlagged: boolean;
+  createdAt: string;
+  vendor: { id: string; businessName: string | null };
+  user: { id: string; displayName: string };
+}
+
+export interface AdminVendor {
+  id: string;
+  businessName: string | null;
+  category: string | null;
+  state: string | null;
+  trustScore: number;
+  trustLabel: string | null;
+  reviewCount: number;
+  featured: boolean;
+  scamFlag: boolean;
+  claimStatus: string;
+}
+
 export const adminService = {
   /**
    * Get administrative metrics.
@@ -153,5 +180,33 @@ export const adminService = {
    */
   async getFlaggedReviews(page = 1, limit = 10): Promise<PaginatedResponse<FlaggedReviewResponse>> {
     return api.get<PaginatedResponse<FlaggedReviewResponse>>(`/admin/reviews/flagged?page=${page}&limit=${limit}`);
+  },
+
+  /**
+   * List all reviews for moderation and verification.
+   */
+  async getAllReviews(page = 1, limit = 10): Promise<PaginatedResponse<AdminReview>> {
+    return api.get<PaginatedResponse<AdminReview>>(`/admin/reviews?page=${page}&limit=${limit}`);
+  },
+
+  /**
+   * Award or revoke a review's verified-buyer badge.
+   */
+  async verifyReview(reviewId: string, verified: boolean): Promise<{ message: string; review: { id: string; verifiedBuyer: boolean } }> {
+    return api.put(`/admin/reviews/${reviewId}/verify`, { verified });
+  },
+
+  /**
+   * Admin-delete any review (moderation).
+   */
+  async deleteReview(reviewId: string): Promise<{ message: string }> {
+    return api.delete<{ message: string }>(`/admin/reviews/${reviewId}`);
+  },
+
+  /**
+   * List all vendors (for featuring / oversight).
+   */
+  async getVendors(page = 1, limit = 10): Promise<PaginatedResponse<AdminVendor>> {
+    return api.get<PaginatedResponse<AdminVendor>>(`/admin/vendors?page=${page}&limit=${limit}`);
   },
 };
