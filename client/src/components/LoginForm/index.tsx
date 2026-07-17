@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { ROUTES } from '../../utils/constants.js';
 import { Button } from '../Button/index.js';
 import { ErrorMessage } from '../ErrorMessage/index.js';
+import { Turnstile, type TurnstileHandle } from '../Turnstile/index.js';
+import { TURNSTILE_SITE_KEY } from '../../utils/config.js';
 import styles from '../AuthCard/AuthCard.module.css';
 import flatStyles from './LoginForm.module.css';
 
@@ -25,6 +27,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Bot protection on admin login only (highest-value target). Buyer/vendor
+  // login is already covered by rate limiting; adding a captcha there would
+  // just add friction for every shopper.
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileHandle>(null);
+  const captchaRequired = role === 'ADMIN' && Boolean(TURNSTILE_SITE_KEY);
 
   const getFieldError = (name: string, value: string): string => {
     switch (name) {
@@ -85,11 +94,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
     setTouched({ email: true, password: true });
     if (Object.keys(newErrors).length > 0) return;
 
+    if (captchaRequired && !turnstileToken) {
+      setError('Please complete the captcha below before signing in.');
+      return;
+    }
+
     setLoading(true);
     try {
       let res;
       if (role === 'ADMIN') {
-        res = await authService.loginAdmin({ email, password });
+        res = await authService.loginAdmin({ email, password, turnstileToken: turnstileToken || undefined });
       } else {
         res = await authService.login({ email, password });
       }
@@ -120,6 +134,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
         }
       }
     } catch (err) {
+      // Turnstile tokens are single-use — reset so the admin can retry cleanly.
+      if (captchaRequired) {
+        setTurnstileToken('');
+        turnstileRef.current?.reset();
+      }
       setError(err instanceof Error ? err.message : 'Invalid credentials.');
     } finally {
       setLoading(false);
@@ -181,6 +200,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ role, flat = false }) => {
           Forgot Password?
         </Link>
       </div>
+
+      {captchaRequired && (
+        <Turnstile
+          ref={turnstileRef}
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken('')}
+        />
+      )}
 
       <Button type="submit" disabled={loading} fullWidth={true} className={flat ? flatStyles.flatSubmitBtn : undefined}>
         {loading ? 'Logging in...' : buttonLabel}

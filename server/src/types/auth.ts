@@ -40,6 +40,8 @@ export interface RegisterVendorPayload extends RegisterPayload {
 export interface LoginPayload {
   email: string;
   password: string;
+  /** Cloudflare Turnstile token — required on admin login when configured. */
+  turnstileToken?: string;
 }
 
 /** POST /api/auth/verify-email request body */

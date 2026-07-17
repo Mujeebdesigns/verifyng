@@ -14,7 +14,7 @@ import {
   validateImageField,
 } from '../utils/validation.js';
 import { setTokenCookie, clearTokenCookie, parseCookies } from '../utils/cookie.js';
-import { requireTurnstile } from '../utils/turnstile.js';
+import { requireTurnstile, isTurnstileEnabled, verifyTurnstileToken } from '../utils/turnstile.js';
 import {
   getClientIpAddress,
   isAdminLockedOut,
@@ -158,6 +158,14 @@ export async function handleAdminLogin(req: IncomingMessage, res: ServerResponse
 
     if (body.password.length > 128) {
       sendError(res, 400, 'Password must be under 128 characters');
+      return;
+    }
+
+    // Bot protection on the highest-value endpoint. A failed captcha counts as
+    // a failed attempt so automated stuffing still trips the lockout.
+    if (isTurnstileEnabled() && !(await verifyTurnstileToken(body.turnstileToken ?? '', ip))) {
+      await recordFailedAdminAttempt(ip);
+      sendError(res, 403, 'Captcha verification failed. Please try again.');
       return;
     }
 
