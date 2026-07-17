@@ -5,6 +5,7 @@ import { parseQuery } from '../utils/parseQuery.js';
 import { sendJson, sendError } from '../utils/response.js';
 import { handleControllerError, parsePagination } from '../utils/controllerWrapper.js';
 import { validateRating, validateReviewText } from '../utils/validation.js';
+import { requireTurnstile } from '../utils/turnstile.js';
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js';
 import type { CreateReviewPayload, UpdateReviewPayload, CreateReportPayload } from '../types/review.js';
 
@@ -44,6 +45,8 @@ export async function handleCreateReview(
   try {
     const authReq = req as AuthenticatedRequest;
     const body = await parseBody<CreateReviewPayload>(req);
+
+    if (!(await requireTurnstile(req, res, body.turnstileToken))) return;
 
     if (body.rating === undefined || !body.reviewText) {
       sendError(res, 400, 'Rating and review text are required');

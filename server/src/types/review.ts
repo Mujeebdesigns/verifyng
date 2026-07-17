@@ -9,6 +9,8 @@ export interface CreateReviewPayload {
   reviewText: string;
   transactionChannel?: string;
   orderDate?: string;
+  /** Cloudflare Turnstile token — verified at the controller, not persisted. */
+  turnstileToken?: string;
 }
 
 /** PUT /api/reviews/:id request body */

@@ -14,6 +14,7 @@ import {
   validateImageField,
 } from '../utils/validation.js';
 import { setTokenCookie, clearTokenCookie, parseCookies } from '../utils/cookie.js';
+import { requireTurnstile } from '../utils/turnstile.js';
 import {
   getClientIpAddress,
   isAdminLockedOut,
@@ -35,6 +36,8 @@ export async function handleRegister(req: IncomingMessage, res: ServerResponse):
   try {
     const body = await parseBody<RegisterPayload>(req);
 
+    if (!(await requireTurnstile(req, res, body.turnstileToken))) return;
+
     if (body.role && !['BUYER', 'VENDOR'].includes(body.role)) {
       sendError(res, 400, 'Invalid user role');
       return;
@@ -54,6 +57,10 @@ export async function handleRegisterVendor(req: IncomingMessage, res: ServerResp
   try {
     const body = await parseBody<RegisterVendorPayload>(req);
 
+    // Note: vendor registration is intentionally not Turnstile-gated — vendor
+    // accounts go through human admin approval (PENDING_APPROVAL), so automated
+    // spam can't reach the platform. CAPTCHA covers the self-service, instantly
+    // active vectors: buyer registration and review submission.
     if (!validateRegistrationInput(body, res)) return;
 
     if (!body.businessName || !body.category || !body.state || !body.city || !body.description) {

@@ -14,6 +14,8 @@ export interface RegisterPayload {
   password: string;
   displayName: string;
   role?: 'BUYER' | 'VENDOR';
+  /** Cloudflare Turnstile token — verified at the controller, not persisted. */
+  turnstileToken?: string;
 }
 
 /** POST /api/auth/register-vendor request body */

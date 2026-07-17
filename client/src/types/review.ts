@@ -9,6 +9,7 @@ export interface CreateReviewPayload {
   reviewText: string;
   transactionChannel?: string;
   orderDate?: string;
+  turnstileToken?: string;
 }
 
 /** PUT /api/reviews/:id request body */

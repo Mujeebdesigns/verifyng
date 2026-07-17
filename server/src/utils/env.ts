@@ -84,6 +84,11 @@ export const env = {
   // if you later put another trusted proxy (e.g. Cloudflare) in front of it.
   TRUST_PROXY_HOPS: int('TRUST_PROXY_HOPS', 1),
 
+  // Cloudflare Turnstile (bot/CAPTCHA). When TURNSTILE_SECRET_KEY is set, the
+  // register and review endpoints require and verify a Turnstile token; when
+  // unset (e.g. local dev), verification is skipped so those flows still work.
+  TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+
   // Misc
   FEATURED_VENDOR_COUNT: int('FEATURED_VENDOR_COUNT', 3),
   ADMIN_IP_ALLOWLIST: process.env.ADMIN_IP_ALLOWLIST,

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { ROUTES } from '../../utils/constants.js';
 import { Button } from '../Button/index.js';
 import { ErrorMessage } from '../ErrorMessage/index.js';
+import { Turnstile, type TurnstileHandle } from '../Turnstile/index.js';
+import { TURNSTILE_SITE_KEY } from '../../utils/config.js';
 import styles from '../AuthCard/AuthCard.module.css';
 import formStyles from './RegisterForm.module.css';
 import { EMPTY_FIELDS, type FieldName, type WizardFormApi } from './types.js';
@@ -61,6 +63,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
   const [success, setSuccess] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Captcha applies to buyer self-service registration only (vendors are
+  // human-approved). Active only when a site key is configured.
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileHandle>(null);
+  const captchaRequired = role === 'BUYER' && Boolean(TURNSTILE_SITE_KEY);
 
   const flatOnly = <T,>(value: T): T | undefined => (flat ? value : undefined);
 
@@ -235,6 +243,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
   });
 
   const submitRegistration = async () => {
+    if (captchaRequired && !turnstileToken) {
+      setError('Please complete the captcha before creating your account.');
+      return;
+    }
+
     setLoading(true);
     try {
       if (role === 'VENDOR') {
@@ -245,10 +258,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
           displayName: fields.displayName.trim(),
           password: fields.password,
           role: 'BUYER',
+          turnstileToken: turnstileToken || undefined,
         });
       }
       setSuccess(true);
     } catch (err) {
+      // Turnstile tokens are single-use — reset so the user can retry cleanly.
+      if (captchaRequired) {
+        setTurnstileToken('');
+        turnstileRef.current?.reset();
+      }
       setError(err instanceof Error ? err.message : 'Registration failed.');
     } finally {
       setLoading(false);
@@ -636,6 +655,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
           );
         })}
       </div>
+
+      {captchaRequired && (
+        <Turnstile
+          ref={turnstileRef}
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken('')}
+        />
+      )}
 
       <Button
         type="submit"

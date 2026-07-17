@@ -14,6 +14,7 @@ export interface RegisterPayload {
   password: string;
   displayName: string;
   role?: 'BUYER' | 'VENDOR';
+  turnstileToken?: string;
 }
 
 /** POST /api/auth/register-vendor request body */

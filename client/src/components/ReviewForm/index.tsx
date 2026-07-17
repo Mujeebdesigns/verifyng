@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StarRating } from '../StarRating/index.js';
 import { Button } from '../Button/index.js';
 import { ErrorMessage } from '../ErrorMessage/index.js';
+import { Turnstile, type TurnstileHandle } from '../Turnstile/index.js';
+import { TURNSTILE_SITE_KEY } from '../../utils/config.js';
 import type { CreateReviewPayload, UpdateReviewPayload } from '../../types/review.js';
 import styles from './ReviewForm.module.css';
 
@@ -65,6 +67,12 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileHandle>(null);
+  // Captcha only applies to new submissions (server enforces it on create, not
+  // edit) and only when a site key is configured.
+  const captchaRequired = !isEdit && Boolean(TURNSTILE_SITE_KEY);
+
   useEffect(() => {
     if (isEdit) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sync props to local state
@@ -121,6 +129,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
       }
     }
 
+    if (captchaRequired && !turnstileToken) {
+      setValidationError('Please complete the captcha below before submitting.');
+      return;
+    }
+
     setLoading(true);
     try {
       if (isEdit) {
@@ -132,6 +145,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
           transactionChannel: transactionChannel.trim() || undefined,
           orderDate: orderDate || undefined,
           vendorId: vendorId || undefined,
+          turnstileToken: turnstileToken || undefined,
         };
 
         if (!vendorId) {
@@ -144,6 +158,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
         await onSubmit(payload);
       }
     } catch (err) {
+      // Turnstile tokens are single-use — reset so the user can retry cleanly.
+      if (captchaRequired) {
+        setTurnstileToken('');
+        turnstileRef.current?.reset();
+      }
       setValidationError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setLoading(false);
@@ -300,6 +319,14 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
             </div>
           </div>
         </>
+      )}
+
+      {captchaRequired && (
+        <Turnstile
+          ref={turnstileRef}
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken('')}
+        />
       )}
 
       <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem', alignItems: 'center' }}>
