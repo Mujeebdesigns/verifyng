@@ -74,6 +74,7 @@ export interface UserProfile {
   role: UserRole;
   isVerified: boolean;
   createdAt: string;
+  totpEnabled?: boolean;
 }
 
 /** Login/register success response */

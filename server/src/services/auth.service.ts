@@ -487,6 +487,39 @@ export async function logoutOtherSessions(userId: string): Promise<{ token: stri
 }
 
 /**
+ * Issue a session for an admin who has already passed both the password check
+ * and the 2FA code step (proven by a valid 2FA challenge token). Re-confirms
+ * the account is still an active admin before minting the token.
+ */
+export async function issueAdminSession(userId: string): Promise<AuthResponse> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, displayName: true, role: true, isVerified: true, isBanned: true, tokenVersion: true, createdAt: true },
+  });
+
+  if (!user || user.role !== 'ADMIN') {
+    throw new AppError('Invalid email or password', 401);
+  }
+  if (user.isBanned) {
+    throw new AppError('Your account has been suspended.', 403);
+  }
+
+  const token = generateToken({ userId: user.id, displayName: user.displayName, role: user.role, tokenVersion: user.tokenVersion });
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      role: user.role,
+      isVerified: user.isVerified,
+      createdAt: user.createdAt.toISOString(),
+    },
+  };
+}
+
+/**
  * Get the current authenticated user's profile.
  */
 export async function getMe(userId: string): Promise<UserProfile> {
@@ -499,6 +532,7 @@ export async function getMe(userId: string): Promise<UserProfile> {
       role: true,
       isVerified: true,
       createdAt: true,
+      totpEnabled: true,
     },
   });
 
@@ -513,6 +547,7 @@ export async function getMe(userId: string): Promise<UserProfile> {
     role: user.role,
     isVerified: user.isVerified,
     createdAt: user.createdAt.toISOString(),
+    totpEnabled: user.totpEnabled,
   };
 }
 

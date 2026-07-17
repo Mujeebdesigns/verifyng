@@ -29,6 +29,14 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  // TOTP two-factor auth (currently used for admin accounts). totpSecret holds
+  // the base32 shared secret; totpBackupCodes holds bcrypt hashes of one-time
+  // recovery codes. 2FA is only active once totpEnabled is true (set after the
+  // user confirms enrollment with a valid code).
+  totpSecret      String?
+  totpEnabled     Boolean  @default(false)
+  totpBackupCodes String[] @default([])
+
   reviews            Review[]
   reports            Report[]
   verificationTokens VerificationToken[]

@@ -1,4 +1,5 @@
 import type { createRouter } from '../utils/router.js';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import {
   handleRegister,
   handleRegisterVendor,
@@ -12,8 +13,13 @@ import {
   handleResendVerification,
   handleChangePassword,
   handleLogoutOtherSessions,
+  handleAdminTwoFactor,
+  handleTotpSetup,
+  handleTotpConfirm,
+  handleTotpDisable,
 } from '../controllers/auth.controller.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware, type AuthenticatedRequest } from '../middleware/auth.middleware.js';
+import { requireRole } from '../middleware/role.middleware.js';
 import { loginRateLimit } from '../middleware/rateLimit.middleware.js';
 import { actionRateLimit } from '../middleware/rateLimit.middleware.js';
 
@@ -81,5 +87,40 @@ export function registerAuthRoutes(router: ReturnType<typeof createRouter>): voi
     if (!(await actionRateLimit(req, res))) return;
     if (!(await authMiddleware(req, res))) return;
     return handleLogoutOtherSessions(req, res);
+  });
+
+  // Second step of admin login — verify the TOTP/backup code. Rate-limited to
+  // blunt online brute-force of the 6-digit code.
+  router.post('/api/auth/admin/2fa', async (req, res) => {
+    if (!(await loginRateLimit(req, res))) return;
+    return handleAdminTwoFactor(req, res);
+  });
+
+  // 2FA enrollment — admin-only (only admin login enforces 2FA today).
+  const adminGuard = async (
+    req: IncomingMessage,
+    res: ServerResponse,
+    next: () => void | Promise<void>,
+  ) => {
+    if (!(await authMiddleware(req, res))) return;
+    const authReq = req as AuthenticatedRequest;
+    let allowed = false;
+    requireRole(['ADMIN'])(authReq, res, () => { allowed = true; });
+    if (allowed) await next();
+  };
+
+  router.post('/api/auth/2fa/setup', async (req, res) => {
+    if (!(await actionRateLimit(req, res))) return;
+    await adminGuard(req, res, () => handleTotpSetup(req, res));
+  });
+
+  router.post('/api/auth/2fa/confirm', async (req, res) => {
+    if (!(await actionRateLimit(req, res))) return;
+    await adminGuard(req, res, () => handleTotpConfirm(req, res));
+  });
+
+  router.post('/api/auth/2fa/disable', async (req, res) => {
+    if (!(await actionRateLimit(req, res))) return;
+    await adminGuard(req, res, () => handleTotpDisable(req, res));
   });
 }
