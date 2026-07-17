@@ -8,6 +8,7 @@ import { AppError } from '../utils/AppError.js';
 import { env } from '../utils/env.js';
 import { logger } from '../utils/logger.js';
 import { normalizeInstagramHandle } from '../utils/normalizeInstagramHandle.js';
+import { recordAuditLog } from '../utils/auditLog.js';
 import type {
   RegisterPayload,
   RegisterVendorPayload,
@@ -441,6 +442,8 @@ export async function changePassword(userId: string, payload: ChangePasswordPayl
     select: { tokenVersion: true },
   });
 
+  await recordAuditLog({ actorId: userId, action: 'CHANGE_PASSWORD', targetType: 'User', targetId: userId });
+
   const token = generateToken({
     userId,
     displayName: user.displayName,
@@ -470,6 +473,8 @@ export async function logoutOtherSessions(userId: string): Promise<{ token: stri
     data: { tokenVersion: { increment: 1 } },
     select: { tokenVersion: true },
   });
+
+  await recordAuditLog({ actorId: userId, action: 'LOGOUT_OTHER_SESSIONS', targetType: 'User', targetId: userId });
 
   const token = generateToken({
     userId,

@@ -10,6 +10,17 @@ for (const key of REQUIRED_VARS) {
   }
 }
 
+// A weak JWT signing secret lets an attacker forge tokens for any user, which
+// is a full auth bypass. Fail fast at boot rather than shipping a guessable
+// secret silently. 32 chars is the practical floor for an HS256 secret.
+const MIN_JWT_SECRET_LENGTH = 32;
+if (process.env.JWT_SECRET!.length < MIN_JWT_SECRET_LENGTH) {
+  throw new Error(
+    `JWT_SECRET must be at least ${MIN_JWT_SECRET_LENGTH} characters (got ${process.env.JWT_SECRET!.length}). ` +
+      'Generate a strong one with: openssl rand -hex 32',
+  );
+}
+
 function int(key: string, fallback: number): number {
   const v = process.env[key];
   return v ? parseInt(v, 10) : fallback;

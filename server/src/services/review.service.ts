@@ -5,6 +5,7 @@ import { AppError } from '../utils/AppError.js';
 import { computeTrustScore } from '../utils/trustScore.js';
 import { logger } from '../utils/logger.js';
 import { normalizeInstagramHandle } from '../utils/normalizeInstagramHandle.js';
+import { recordAuditLog } from '../utils/auditLog.js';
 import { generateVendorSummary } from './ai.service.js';
 import type { CreateReviewPayload, UpdateReviewPayload, ReviewResponse, CreateReportPayload } from '../types/review.js';
 import type { Prisma } from '@prisma/client';
@@ -200,6 +201,14 @@ export async function deleteReview(
   // Delete the review
   await prisma.review.delete({
     where: { id: reviewId },
+  });
+
+  await recordAuditLog({
+    actorId: userId,
+    action: 'DELETE_REVIEW',
+    targetType: 'Review',
+    targetId: reviewId,
+    metadata: { vendorId: review.vendorId },
   });
 
   // Decrement vendor's review count
