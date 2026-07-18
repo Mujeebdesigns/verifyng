@@ -700,8 +700,14 @@
     background-color: var(--color-bg-white-0);
     border-radius: 0.75rem;
     box-shadow: 0 0.0625rem 0.125rem color-mix(in srgb, var(--color-text-main-900) 5%, transparent);
-    padding: 1rem 1.125rem;
+    padding: 1.125rem 1.25rem;
     margin-bottom: 0.75rem;
+  }
+
+  /* Cards aren't hover targets like desktop rows — keep them white so a
+     sticky touch-hover doesn't grey the whole card. */
+  .cardMobile tr:hover {
+    background-color: var(--color-bg-white-0);
   }
 
   .cardMobile td {
@@ -717,7 +723,7 @@
 
   /* label : value rows — label floats left, value sits right */
   .cardMobile td[data-label] {
-    padding: 0.375rem 0;
+    padding: 0.625rem 0;
     text-align: right;
     border-top: 0.0625rem solid var(--color-stroke-soft-200);
   }
