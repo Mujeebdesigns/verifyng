@@ -301,33 +301,21 @@ export const AdminDashboard: React.FC = () => {
               <div className={styles.statCard}>
                 <span className={styles.statLabel}>Total Users</span>
                 <div className={styles.statValue}>{stats.totalUsers}</div>
-                <div className={styles.statFoot}>
-                  <span className={styles.statFootValue}>{stats.newUsersThisWeek}</span> new this week
-                </div>
               </div>
 
               <div className={styles.statCard}>
                 <span className={styles.statLabel}>Total Vendors</span>
                 <div className={styles.statValue}>{stats.totalVendors}</div>
-                <div className={styles.statFoot}>
-                  <span className={styles.statFootValue}>{stats.newVendorsThisWeek}</span> new this week
-                </div>
               </div>
 
               <div className={styles.statCard}>
                 <span className={styles.statLabel}>Pending Claims</span>
                 <div className={stats.pendingClaims > 0 ? styles.statValueAttention : styles.statValue}>{stats.pendingClaims}</div>
-                <div className={styles.statFoot}>
-                  <span className={styles.statFootValue}>{stats.newClaimsThisWeek}</span> new this week
-                </div>
               </div>
 
               <div className={styles.statCard}>
                 <span className={styles.statLabel}>Pending Reports</span>
                 <div className={stats.pendingReports > 0 ? styles.statValueAttention : styles.statValue}>{stats.pendingReports}</div>
-                <div className={styles.statFoot}>
-                  <span className={styles.statFootValue}>{stats.newReportsThisWeek}</span> new this week
-                </div>
               </div>
             </div>
           )}

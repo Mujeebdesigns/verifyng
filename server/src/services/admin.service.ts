@@ -33,15 +33,9 @@ export async function getStats() {
 
   const flaggedReviews = await prisma.review.count({ where: { isFlagged: true } });
 
-  // "New this week" context for each card footer — real counts, no fabricated
-  // percentages (we don't retain prior-period snapshots to compute a delta).
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const [newUsersThisWeek, newVendorsThisWeek, newClaimsThisWeek, newReportsThisWeek] = await Promise.all([
-    prisma.user.count({ where: { createdAt: { gte: weekAgo } } }),
-    prisma.vendor.count({ where: { createdAt: { gte: weekAgo } } }),
-    prisma.vendor.count({ where: { claimStatus: 'PENDING_APPROVAL', createdAt: { gte: weekAgo } } }),
-    prisma.report.count({ where: { createdAt: { gte: weekAgo } } }),
-  ]);
+  const recentSignups = await prisma.user.count({
+    where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+  });
 
   return {
     totalUsers,
@@ -50,12 +44,8 @@ export async function getStats() {
     pendingClaims,
     pendingReports,
     flaggedReviews,
-    recentSignups: newUsersThisWeek,
+    recentSignups,
     recentSignupsPeriod: 'last 7 days',
-    newUsersThisWeek,
-    newVendorsThisWeek,
-    newClaimsThisWeek,
-    newReportsThisWeek,
   };
 }
 
