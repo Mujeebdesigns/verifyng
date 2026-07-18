@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { Navbar } from '../../components/Navbar/index.js';
 import { adminService, type AdminStats, type AdminClaim, type AdminReport, type AdminUser, type FlaggedReviewResponse, type AdminReview, type AdminVendor } from '../../services/admin.service.js';
-import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
 import { TwoFactorSettings } from '../../components/TwoFactorSettings/index.js';
 import { RowActionMenu } from '../../components/RowActionMenu/index.js';
+import { Pagination } from '../../components/Pagination/index.js';
 import { ROUTES } from '../../utils/constants.js';
 import styles from './AdminDashboard.module.css';
 
@@ -32,6 +32,7 @@ export const AdminDashboard: React.FC = () => {
 
   // Pagination States
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
   const loadStats = async () => {
@@ -48,27 +49,27 @@ export const AdminDashboard: React.FC = () => {
     setError(null);
     try {
       if (activeTab === 'claims') {
-        const res = await adminService.getClaims(page, 10);
+        const res = await adminService.getClaims(page, pageSize);
         setClaims(res.data);
         setTotalPages(res.pagination.totalPages);
       } else if (activeTab === 'reports') {
-        const res = await adminService.getReports(page, 10);
+        const res = await adminService.getReports(page, pageSize);
         setReports(res.data);
         setTotalPages(res.pagination.totalPages);
       } else if (activeTab === 'flagged') {
-        const res = await adminService.getFlaggedReviews(page, 10);
+        const res = await adminService.getFlaggedReviews(page, pageSize);
         setFlaggedReviews(res.data);
         setTotalPages(res.pagination.totalPages);
       } else if (activeTab === 'reviews') {
-        const res = await adminService.getAllReviews(page, 10);
+        const res = await adminService.getAllReviews(page, pageSize);
         setReviews(res.data);
         setTotalPages(res.pagination.totalPages);
       } else if (activeTab === 'vendors') {
-        const res = await adminService.getVendors(page, 10);
+        const res = await adminService.getVendors(page, pageSize);
         setVendors(res.data);
         setTotalPages(res.pagination.totalPages);
       } else if (activeTab === 'users') {
-        const res = await adminService.getUsers(page, 10);
+        const res = await adminService.getUsers(page, pageSize);
         setUsers(res.data);
         setTotalPages(res.pagination.totalPages);
       }
@@ -91,10 +92,15 @@ export const AdminDashboard: React.FC = () => {
     loadStats();
     loadTabData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, activeTab, page]);
+  }, [isAuthenticated, activeTab, page, pageSize]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
+    setPage(1);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
     setPage(1);
   };
 
@@ -669,25 +675,13 @@ export const AdminDashboard: React.FC = () => {
 
               {/* Pagination controls (data tabs only) */}
               {activeTab !== 'security' && totalPages > 1 && (
-                <div className={styles.pagination}>
-                  <Button
-                    variant="secondary"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className={styles.paginationText}>
-                    Page {page} of {totalPages}
-                  </span>
-                  <Button
-                    variant="secondary"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    Next
-                  </Button>
-                </div>
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={handlePageSizeChange}
+                />
               )}
 
             </div>
