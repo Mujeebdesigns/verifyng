@@ -597,23 +597,6 @@
   color: var(--color-text-sub-500);
 }
 
-/* Footer Section */
-.footer {
-  background-color: var(--color-primary-primary-darker);
-  color: var(--color-text-white-0);
-  padding: 2rem 0;
-  border-top: 0.0625rem solid var(--color-stroke-soft-200);
-  text-align: center;
-  font-size: 0.8125rem;
-  margin-top: auto;
-  opacity: 0.95;
-}
-
-.footer p {
-  margin: 0;
-  color: var(--color-text-disabled-300);
-}
-
 /* Responsiveness */
 @media (max-width: 48rem) {
   .dashboardContainer {

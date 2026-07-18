@@ -688,13 +688,6 @@ export const AdminDashboard: React.FC = () => {
           )}
         </main>
       </div>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className="container">
-          <p>© {new Date().getFullYear()} VerifyNG Admin Suite. Secure administrative portal.</p>
-        </div>
-      </footer>
     </div>
   );
 };
