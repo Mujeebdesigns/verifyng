@@ -7,6 +7,7 @@ import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
 import { TwoFactorSettings } from '../../components/TwoFactorSettings/index.js';
+import { RowActionMenu } from '../../components/RowActionMenu/index.js';
 import { ROUTES } from '../../utils/constants.js';
 import styles from './AdminDashboard.module.css';
 
@@ -353,7 +354,7 @@ export const AdminDashboard: React.FC = () => {
                             <th>Business Details</th>
                             <th>Claimant User</th>
                             <th>Location / Category</th>
-                            <th>Actions</th>
+                            <th className={styles.actionsCol}></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -373,11 +374,11 @@ export const AdminDashboard: React.FC = () => {
                                 {c.category}
                                 <div className={styles.businessMeta}>{c.state}</div>
                               </td>
-                              <td>
-                                <div className={styles.buttonGroup}>
-                                  <button type="button" onClick={() => handleClaimApproval(c.id, true)} className={styles.rowBtnPrimary}>Approve</button>
-                                  <button type="button" onClick={() => handleClaimApproval(c.id, false)} className={styles.rowBtn}>Reject</button>
-                                </div>
+                              <td className={styles.actionsCol}>
+                                <RowActionMenu actions={[
+                                  { label: 'Approve claim', onClick: () => handleClaimApproval(c.id, true) },
+                                  { label: 'Reject claim', onClick: () => handleClaimApproval(c.id, false), danger: true },
+                                ]} />
                               </td>
                             </tr>
                           ))}
@@ -412,7 +413,7 @@ export const AdminDashboard: React.FC = () => {
                             <th>Reported Vendor</th>
                             <th>Reporter User</th>
                             <th>Reason & Description</th>
-                            <th>Actions</th>
+                            <th className={styles.actionsCol}></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -430,11 +431,11 @@ export const AdminDashboard: React.FC = () => {
                                 <span className={styles.badgeDanger}>{r.reason}</span>
                                 <p className={styles.reporterText}>{r.description}</p>
                               </td>
-                              <td>
-                                <div className={styles.buttonGroup}>
-                                  <button type="button" onClick={() => handleResolveReport(r.id, 'REVIEWED')} className={styles.rowBtnPrimary}>Resolve</button>
-                                  <button type="button" onClick={() => handleResolveReport(r.id, 'DISMISSED')} className={styles.rowBtn}>Dismiss</button>
-                                </div>
+                              <td className={styles.actionsCol}>
+                                <RowActionMenu actions={[
+                                  { label: 'Mark resolved', onClick: () => handleResolveReport(r.id, 'REVIEWED') },
+                                  { label: 'Dismiss report', onClick: () => handleResolveReport(r.id, 'DISMISSED') },
+                                ]} />
                               </td>
                             </tr>
                           ))}
@@ -507,7 +508,7 @@ export const AdminDashboard: React.FC = () => {
                             <th>Vendor</th>
                             <th>Rating</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th className={styles.actionsCol}></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -524,19 +525,11 @@ export const AdminDashboard: React.FC = () => {
                                 {rev.isFlagged && <span className={styles.badgeDanger}>Flagged</span>}
                                 {!rev.verifiedBuyer && !rev.isFlagged && <span className={styles.badgeNeutral}>Unverified</span>}
                               </td>
-                              <td>
-                                <div className={styles.buttonGroup}>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleVerifyReview(rev.id, !rev.verifiedBuyer)}
-                                    className={rev.verifiedBuyer ? styles.rowBtn : styles.rowBtnPrimary}
-                                  >
-                                    {rev.verifiedBuyer ? 'Unverify' : 'Verify buyer'}
-                                  </button>
-                                  <button type="button" onClick={() => handleDeleteReview(rev.id)} className={styles.rowBtnDanger}>
-                                    Delete
-                                  </button>
-                                </div>
+                              <td className={styles.actionsCol}>
+                                <RowActionMenu actions={[
+                                  { label: rev.verifiedBuyer ? 'Remove verified badge' : 'Verify buyer', onClick: () => handleVerifyReview(rev.id, !rev.verifiedBuyer) },
+                                  { label: 'Delete review', onClick: () => handleDeleteReview(rev.id), danger: true },
+                                ]} />
                               </td>
                             </tr>
                           ))}
@@ -572,7 +565,7 @@ export const AdminDashboard: React.FC = () => {
                             <th>Trust</th>
                             <th>Reviews</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th className={styles.actionsCol}></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -589,14 +582,10 @@ export const AdminDashboard: React.FC = () => {
                                 {v.scamFlag && <span className={styles.badgeDanger}>Scam flag</span>}
                                 {!v.featured && !v.scamFlag && <span className={styles.badgeNeutral}>—</span>}
                               </td>
-                              <td>
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleFeature(v.id)}
-                                  className={v.featured ? styles.rowBtn : styles.rowBtnPrimary}
-                                >
-                                  {v.featured ? 'Unfeature' : 'Feature'}
-                                </button>
+                              <td className={styles.actionsCol}>
+                                <RowActionMenu actions={[
+                                  { label: v.featured ? 'Remove from featured' : 'Feature on homepage', onClick: () => handleToggleFeature(v.id) },
+                                ]} />
                               </td>
                             </tr>
                           ))}
@@ -620,7 +609,7 @@ export const AdminDashboard: React.FC = () => {
                           <th>Name / Email</th>
                           <th>Role</th>
                           <th>Status</th>
-                          <th>Actions</th>
+                          <th className={styles.actionsCol}></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -648,42 +637,16 @@ export const AdminDashboard: React.FC = () => {
                                 <span className={styles.badgeNeutral} style={{ textTransform: 'none' }}>Unverified</span>
                               )}
                             </td>
-                            <td>
-                              <div className={styles.buttonGroup}>
-                                {u.role !== 'ADMIN' && (
-                                  <button
-                                    onClick={() => handleUserAction(u.id, 'promote')}
-                                    className={styles.btnPromote}
-                                  >
-                                    Make Admin
-                                  </button>
-                                )}
-                                {u.role !== 'ADMIN' && (
-                                  u.isBanned ? (
-                                    <button
-                                      onClick={() => handleUserAction(u.id, 'unban')}
-                                      className={styles.btnPromote}
-                                    >
-                                      Unban
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleUserAction(u.id, 'ban')}
-                                      className={styles.btnBan}
-                                    >
-                                      Ban
-                                    </button>
-                                  )
-                                )}
-                                {u.role !== 'ADMIN' && (
-                                  <button
-                                    onClick={() => handleUserAction(u.id, 'delete')}
-                                    className={styles.btnDelete}
-                                  >
-                                    Delete
-                                  </button>
-                                )}
-                              </div>
+                            <td className={styles.actionsCol}>
+                              {u.role !== 'ADMIN' && (
+                                <RowActionMenu actions={[
+                                  { label: 'Make admin', onClick: () => handleUserAction(u.id, 'promote') },
+                                  u.isBanned
+                                    ? { label: 'Unban user', onClick: () => handleUserAction(u.id, 'unban') }
+                                    : { label: 'Ban user', onClick: () => handleUserAction(u.id, 'ban') },
+                                  { label: 'Delete user', onClick: () => handleUserAction(u.id, 'delete'), danger: true },
+                                ]} />
+                              )}
                             </td>
                           </tr>
                         ))}

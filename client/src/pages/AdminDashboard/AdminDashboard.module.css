@@ -362,6 +362,12 @@
   border-bottom: none;
 }
 
+/* Actions column holds only the kebab menu — narrow and right-aligned */
+.actionsCol {
+  text-align: right;
+  width: 3.5rem;
+}
+
 .trHover {
   transition: background-color 0.15s ease;
 }
