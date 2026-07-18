@@ -154,9 +154,15 @@
   text-align: left;
 }
 
-.menuItem:hover {
-  background-color: var(--color-bg-weak-100);
-  color: var(--color-text-main-900);
+/* Only apply hover on real-pointer devices, and never to the active item.
+   On touch, :hover sticks after a tap and .menuItem:hover outranks
+   .menuItemActive on specificity — which left a just-tapped tab showing the
+   grey hover instead of the green active state (same fix as the buyer side). */
+@media (hover: hover) {
+  .menuItem:not(.menuItemActive):hover {
+    background-color: var(--color-bg-weak-100);
+    color: var(--color-text-main-900);
+  }
 }
 
 .menuItemActive {
