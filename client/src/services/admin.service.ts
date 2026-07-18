@@ -4,11 +4,14 @@ import type { UserProfile } from '../types/auth.js';
 import type { ReviewResponse } from '../types/review.js';
 
 export interface AdminStats {
-  usersCount: number;
-  vendorsCount: number;
-  reviewsCount: number;
-  pendingReportsCount: number;
-  pendingClaimsCount: number;
+  totalUsers: number;
+  totalVendors: number;
+  totalReviews: number;
+  pendingClaims: number;
+  pendingReports: number;
+  flaggedReviews: number;
+  recentSignups: number;
+  recentSignupsPeriod: string;
 }
 
 export interface AdminClaim {

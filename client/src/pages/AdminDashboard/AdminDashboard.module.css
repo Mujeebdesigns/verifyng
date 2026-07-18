@@ -249,46 +249,70 @@
 /* Stats Scorecard Grid */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
 .statCard {
   background-color: var(--color-bg-white-0);
   border: 0.0625rem solid var(--color-stroke-soft-200);
-  border-radius: 0.625rem;
+  border-radius: 0.75rem;
   padding: 1.25rem;
-  box-shadow: var(--effect-regular-shadow-x-small);
   display: flex;
   flex-direction: column;
+  gap: 0.875rem;
 }
 
-.statLabel {
-  font-size: 0.6875rem;
-  color: var(--color-text-soft-400);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0312rem;
-  margin-bottom: 0.5rem;
+.statCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
 }
 
-.statValue {
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: var(--color-text-main-900);
-  line-height: 1.1;
-  margin: 0;
+.statIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.statValueWarning {
-  composes: statValue;
+.statIconBrand {
+  composes: statIcon;
+  background-color: color-mix(in srgb, var(--color-primary-primary-base) 12%, transparent);
+  color: var(--color-primary-primary-dark);
+}
+
+.statIconWarn {
+  composes: statIcon;
+  background-color: color-mix(in srgb, var(--color-state-warning) 14%, transparent);
   color: var(--color-state-warning);
 }
 
-.statValueDanger {
+.statLabel {
+  font-size: 0.8125rem;
+  color: var(--color-text-sub-500);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-text-main-900);
+  line-height: 1;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pending counts glow amber only when there's something waiting */
+.statValueAttention {
   composes: statValue;
-  color: var(--color-state-error);
+  color: var(--color-state-warning);
 }
 
 /* Table styling for queues */

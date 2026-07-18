@@ -210,8 +210,8 @@ export const AdminDashboard: React.FC = () => {
                 <polyline points="10 9 9 9 8 9" />
               </svg>
               Claims
-              {stats?.pendingClaimsCount !== undefined && stats.pendingClaimsCount > 0 && (
-                <span className={styles.menuBadge}>{stats.pendingClaimsCount}</span>
+              {stats?.pendingClaims !== undefined && stats.pendingClaims > 0 && (
+                <span className={styles.menuBadge}>{stats.pendingClaims}</span>
               )}
             </button>
 
@@ -225,8 +225,8 @@ export const AdminDashboard: React.FC = () => {
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
               Disputes
-              {stats?.pendingReportsCount !== undefined && stats.pendingReportsCount > 0 && (
-                <span className={styles.menuBadge}>{stats.pendingReportsCount}</span>
+              {stats?.pendingReports !== undefined && stats.pendingReports > 0 && (
+                <span className={styles.menuBadge}>{stats.pendingReports}</span>
               )}
             </button>
 
@@ -299,20 +299,60 @@ export const AdminDashboard: React.FC = () => {
           {stats && (
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
-                <span className={styles.statLabel}>Total Users</span>
-                <div className={styles.statValue}>{stats.usersCount}</div>
+                <div className={styles.statCardHeader}>
+                  <span className={styles.statIconBrand}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </span>
+                  <span className={styles.statLabel}>Total Users</span>
+                </div>
+                <div className={styles.statValue}>{stats.totalUsers}</div>
               </div>
+
               <div className={styles.statCard}>
-                <span className={styles.statLabel}>Total Vendors</span>
-                <div className={styles.statValue}>{stats.vendorsCount}</div>
+                <div className={styles.statCardHeader}>
+                  <span className={styles.statIconBrand}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l1-5h16l1 5" />
+                      <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" />
+                      <path d="M9 22V12h6v10" />
+                    </svg>
+                  </span>
+                  <span className={styles.statLabel}>Total Vendors</span>
+                </div>
+                <div className={styles.statValue}>{stats.totalVendors}</div>
               </div>
+
               <div className={styles.statCard}>
-                <span className={styles.statLabel}>Pending Claims</span>
-                <div className={styles.statValueWarning}>{stats.pendingClaimsCount}</div>
+                <div className={styles.statCardHeader}>
+                  <span className={styles.statIconWarn}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <polyline points="9 15 11 17 15 13" />
+                    </svg>
+                  </span>
+                  <span className={styles.statLabel}>Pending Claims</span>
+                </div>
+                <div className={stats.pendingClaims > 0 ? styles.statValueAttention : styles.statValue}>{stats.pendingClaims}</div>
               </div>
+
               <div className={styles.statCard}>
-                <span className={styles.statLabel}>Pending Reports</span>
-                <div className={styles.statValueDanger}>{stats.pendingReportsCount}</div>
+                <div className={styles.statCardHeader}>
+                  <span className={styles.statIconWarn}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                      <line x1="12" y1="9" x2="12" y2="13" />
+                      <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                  </span>
+                  <span className={styles.statLabel}>Pending Reports</span>
+                </div>
+                <div className={stats.pendingReports > 0 ? styles.statValueAttention : styles.statValue}>{stats.pendingReports}</div>
               </div>
             </div>
           )}
