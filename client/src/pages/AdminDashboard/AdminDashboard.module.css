@@ -340,7 +340,7 @@
 
 .table th {
   padding: 0.75rem 1rem;
-  background-color: transparent;
+  background-color: var(--color-bg-weak-100);
   border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
   color: var(--color-text-soft-400);
   font-weight: 500;
@@ -350,11 +350,18 @@
   white-space: nowrap;
 }
 
+/* Two-tone hierarchy: data cells are one muted grey; only the primary
+   column's <strong> is dark. Keeps the row calm, per the reference. */
 .table td {
-  padding: 1.125rem 1rem;
+  padding: 0.9375rem 1rem;
   border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
-  color: var(--color-text-main-900);
+  color: var(--color-text-sub-500);
   vertical-align: middle;
+}
+
+.table td strong {
+  color: var(--color-text-main-900);
+  font-weight: 500;
 }
 
 /* Last row sits flush — the panel edge closes the table, not a hard line */
