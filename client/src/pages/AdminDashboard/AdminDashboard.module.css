@@ -637,6 +637,7 @@
   }
 
   .menuItem {
+    width: auto;
     padding: 0.5rem 0.75rem;
     font-size: 0.8125rem;
     flex-shrink: 0;
@@ -669,7 +670,14 @@
 }
 
 @media (max-width: 30rem) {
+  /* Keep two compact stat columns on phones rather than four tall stacked
+     cards — halves the vertical scroll before reaching the table. */
   .statsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.625rem;
+  }
+
+  .statValue {
+    font-size: 1.375rem;
   }
 }
