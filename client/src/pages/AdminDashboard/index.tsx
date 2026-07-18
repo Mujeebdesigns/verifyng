@@ -364,8 +364,8 @@ export const AdminDashboard: React.FC = () => {
                               </td>
                               <td>
                                 <div className={styles.buttonGroup}>
-                                  <Button onClick={() => handleClaimApproval(c.id, true)} style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Approve</Button>
-                                  <Button onClick={() => handleClaimApproval(c.id, false)} variant="secondary" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Reject</Button>
+                                  <button type="button" onClick={() => handleClaimApproval(c.id, true)} className={styles.rowBtnPrimary}>Approve</button>
+                                  <button type="button" onClick={() => handleClaimApproval(c.id, false)} className={styles.rowBtn}>Reject</button>
                                 </div>
                               </td>
                             </tr>
@@ -413,8 +413,8 @@ export const AdminDashboard: React.FC = () => {
                               </td>
                               <td>
                                 <div className={styles.buttonGroup}>
-                                  <Button onClick={() => handleResolveReport(r.id, 'REVIEWED')} style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Resolve</Button>
-                                  <Button onClick={() => handleResolveReport(r.id, 'DISMISSED')} variant="secondary" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>Dismiss</Button>
+                                  <button type="button" onClick={() => handleResolveReport(r.id, 'REVIEWED')} className={styles.rowBtnPrimary}>Resolve</button>
+                                  <button type="button" onClick={() => handleResolveReport(r.id, 'DISMISSED')} className={styles.rowBtn}>Dismiss</button>
                                 </div>
                               </td>
                             </tr>
@@ -445,9 +445,9 @@ export const AdminDashboard: React.FC = () => {
                               </span>
                               <span className={styles.businessMeta}>Rating: ★ {rev.rating}/5</span>
                             </div>
-                            <Button onClick={() => handleDeleteReview(rev.id)} variant="danger" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>
+                            <button type="button" onClick={() => handleDeleteReview(rev.id)} className={styles.rowBtnDanger}>
                               Delete Review
-                            </Button>
+                            </button>
                           </div>
                           <p className={styles.flaggedReviewBody}>
                             "{rev.reviewText}"
@@ -495,16 +495,16 @@ export const AdminDashboard: React.FC = () => {
                               </td>
                               <td>
                                 <div className={styles.buttonGroup}>
-                                  <Button
+                                  <button
+                                    type="button"
                                     onClick={() => handleVerifyReview(rev.id, !rev.verifiedBuyer)}
-                                    variant={rev.verifiedBuyer ? 'secondary' : 'primary'}
-                                    style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}
+                                    className={rev.verifiedBuyer ? styles.rowBtn : styles.rowBtnPrimary}
                                   >
                                     {rev.verifiedBuyer ? 'Unverify' : 'Verify buyer'}
-                                  </Button>
-                                  <Button onClick={() => handleDeleteReview(rev.id)} variant="danger" style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}>
+                                  </button>
+                                  <button type="button" onClick={() => handleDeleteReview(rev.id)} className={styles.rowBtnDanger}>
                                     Delete
-                                  </Button>
+                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -551,13 +551,13 @@ export const AdminDashboard: React.FC = () => {
                                 {!v.featured && !v.scamFlag && <span className={styles.badgeNeutral}>—</span>}
                               </td>
                               <td>
-                                <Button
+                                <button
+                                  type="button"
                                   onClick={() => handleToggleFeature(v.id)}
-                                  variant={v.featured ? 'secondary' : 'primary'}
-                                  style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem' }}
+                                  className={v.featured ? styles.rowBtn : styles.rowBtnPrimary}
                                 >
                                   {v.featured ? 'Unfeature' : 'Feature'}
-                                </Button>
+                                </button>
                               </td>
                             </tr>
                           ))}

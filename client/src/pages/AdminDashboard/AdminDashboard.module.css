@@ -294,10 +294,8 @@
 /* Table styling for queues */
 .tableWrapper {
   overflow-x: auto;
-  border: 0.0625rem solid var(--color-stroke-soft-200);
-  border-radius: 0.5rem;
   background-color: var(--color-bg-white-0);
-  margin-top: 0.75rem;
+  margin-top: 1rem;
 }
 
 .table {
@@ -308,21 +306,31 @@
 }
 
 .table th {
-  padding: 0.875rem 1rem;
-  background-color: var(--color-bg-weak-100);
-  border-bottom: 0.125rem solid var(--color-stroke-soft-200);
-  color: var(--color-text-sub-500);
-  font-weight: 600;
-  font-size: 0.8125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.0312rem;
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+  border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
+  color: var(--color-text-soft-400);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .table td {
-  padding: 1rem;
+  padding: 1.125rem 1rem;
   border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
   color: var(--color-text-main-900);
   vertical-align: middle;
+}
+
+/* Last row sits flush — the panel edge closes the table, not a hard line */
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.trHover {
+  transition: background-color 0.15s ease;
 }
 
 .trHover:hover {
@@ -342,35 +350,45 @@
   line-height: 1.4;
 }
 
-/* Badges */
+/* Status pills — soft tint + a leading dot, calm and rounded */
 .badge {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  display: inline-block;
-  padding: 0.1875rem 0.5rem;
-  border-radius: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.0312rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 62.5rem;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
 }
 
 .badgeSuccess {
   composes: badge;
-  background-color: var(--color-primary-primary-lighter);
+  background-color: color-mix(in srgb, var(--color-primary-primary-base) 12%, transparent);
   color: var(--color-primary-primary-dark);
 }
 
 .badgeWarning {
   composes: badge;
-  background-color: #fffbeb;
+  background-color: color-mix(in srgb, var(--color-state-warning) 14%, transparent);
   color: var(--color-state-warning);
-  border: 0.0625rem solid #fef3c7;
 }
 
 .badgeDanger {
   composes: badge;
-  background-color: #fef2f2;
+  background-color: color-mix(in srgb, var(--color-state-error) 10%, transparent);
   color: var(--color-state-error);
-  border: 0.0625rem solid #fee2e2;
 }
 
 .badgeNeutral {
@@ -381,9 +399,8 @@
 
 .badgeInfo {
   composes: badge;
-  background-color: #eff6ff;
+  background-color: color-mix(in srgb, var(--color-state-information) 12%, transparent);
   color: var(--color-state-information);
-  border: 0.0625rem solid #dbeafe;
 }
 
 /* Flagged Review Cards */
@@ -426,6 +443,51 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+}
+
+/* Calm row-level action buttons — ghost by default, restrained accents.
+   Deliberately understated so the table reads calm, not busy. */
+.rowBtn {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.4375rem;
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  background-color: var(--color-bg-white-0);
+  color: var(--color-text-sub-500);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.rowBtn:hover {
+  background-color: var(--color-bg-weak-100);
+  color: var(--color-text-main-900);
+}
+
+/* Affirmative action (verify, feature) — soft green tint, no saturation block */
+.rowBtnPrimary {
+  composes: rowBtn;
+  border-color: transparent;
+  background-color: color-mix(in srgb, var(--color-primary-primary-base) 12%, transparent);
+  color: var(--color-primary-primary-dark);
+}
+
+.rowBtnPrimary:hover {
+  background-color: color-mix(in srgb, var(--color-primary-primary-base) 20%, transparent);
+  color: var(--color-primary-primary-dark);
+}
+
+/* Destructive action — neutral until hovered, then a soft red wash */
+.rowBtnDanger {
+  composes: rowBtn;
+}
+
+.rowBtnDanger:hover {
+  background-color: color-mix(in srgb, var(--color-state-error) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-state-error) 25%, transparent);
+  color: var(--color-state-error);
 }
 
 .actionButtonInline {
