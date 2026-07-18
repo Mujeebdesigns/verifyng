@@ -506,7 +506,7 @@ export const AdminDashboard: React.FC = () => {
                       <p>Buyer reviews will appear here once they start reviewing vendors.</p>
                     </div>
                   ) : (
-                    <div className={styles.tableWrapper}>
+                    <div className={`${styles.tableWrapper} ${styles.cardMobile}`}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
@@ -524,9 +524,9 @@ export const AdminDashboard: React.FC = () => {
                                 <strong>{rev.user.displayName}</strong>
                                 <p className={styles.reporterText}>"{rev.reviewText}"</p>
                               </td>
-                              <td>{rev.vendor.businessName}</td>
-                              <td>★ {rev.rating}/5</td>
-                              <td>
+                              <td data-label="Vendor">{rev.vendor.businessName}</td>
+                              <td data-label="Rating">★ {rev.rating}/5</td>
+                              <td data-label="Status">
                                 {rev.verifiedBuyer && <span className={styles.badgeSuccess}>Verified</span>}
                                 {rev.isFlagged && <span className={styles.badgeDanger}>Flagged</span>}
                                 {!rev.verifiedBuyer && !rev.isFlagged && <span className={styles.badgeNeutral}>Unverified</span>}
