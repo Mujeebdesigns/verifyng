@@ -8,6 +8,7 @@ import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
 import { ConfirmModal } from '../../components/ConfirmModal/index.js';
+import { Pagination } from '../../components/Pagination/index.js';
 import { PasswordRequirements } from '../../components/PasswordRequirements/index.js';
 import { getPasswordPolicyError } from '../../utils/passwordPolicy.js';
 import type { MyReviewResponse } from '../../types/review.js';
@@ -80,6 +81,7 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalReviews, setTotalReviews] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
@@ -153,12 +155,13 @@ export const Dashboard: React.FC = () => {
     searchVal = '',
     ratingVal = '',
     channelVal = '',
-    sortVal = 'desc'
+    sortVal = 'desc',
+    sizeVal = 10
   ) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await reviewService.getMyReviews(p, 10, {
+      const res = await reviewService.getMyReviews(p, sizeVal, {
         search: searchVal,
         rating: ratingVal,
         channel: channelVal,
@@ -188,9 +191,9 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     Promise.resolve().then(() => {
-      fetchReviews(page, activeSearch, reviewsRating, reviewsChannel, reviewsSortBy);
+      fetchReviews(page, activeSearch, reviewsRating, reviewsChannel, reviewsSortBy, pageSize);
     });
-  }, [page, activeSearch, reviewsRating, reviewsChannel, reviewsSortBy, fetchReviews]);
+  }, [page, activeSearch, reviewsRating, reviewsChannel, reviewsSortBy, pageSize, fetchReviews]);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
@@ -644,29 +647,19 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     {totalPages > 1 && (
-                      <div className={styles.pagination}>
-                        <Button
-                          variant="secondary"
-                          disabled={page === 1}
-                          onClick={() => {
-                            setPage(page - 1);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                        >
-                          ← Previous
-                        </Button>
-                        <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
-                        <Button
-                          variant="secondary"
-                          disabled={page === totalPages}
-                          onClick={() => {
-                            setPage(page + 1);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                        >
-                          Next →
-                        </Button>
-                      </div>
+                      <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        pageSize={pageSize}
+                        onPageChange={(p) => {
+                          setPage(p);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        onPageSizeChange={(s) => {
+                          setPageSize(s);
+                          setPage(1);
+                        }}
+                      />
                     )}
                   </>
                 )}
