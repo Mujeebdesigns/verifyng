@@ -336,7 +336,15 @@ export const AdminDashboard: React.FC = () => {
                   <p className={styles.panelSubtitle}>Verify and approve vendor ownership claims for their business pages.</p>
                   
                   {claims.length === 0 ? (
-                    <p className={styles.emptyText}>No pending vendor claims at this time.</p>
+                    <div className={styles.emptyState}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <polyline points="9 15 11 17 15 13" />
+                      </svg>
+                      <h3>No pending claims</h3>
+                      <p>Vendor ownership claims will appear here when someone requests to manage a business page.</p>
+                    </div>
                   ) : (
                     <div className={styles.tableWrapper}>
                       <table className={styles.table}>
@@ -387,7 +395,15 @@ export const AdminDashboard: React.FC = () => {
                   <p className={styles.panelSubtitle}>Investigate customer reports regarding online vendor fraud or bad conducts.</p>
                   
                   {reports.length === 0 ? (
-                    <p className={styles.emptyText}>No pending reports.</p>
+                    <div className={styles.emptyState}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                      <h3>No reports</h3>
+                      <p>Scam and moderation reports submitted by buyers will show up here for review.</p>
+                    </div>
                   ) : (
                     <div className={styles.tableWrapper}>
                       <table className={styles.table}>
@@ -436,7 +452,13 @@ export const AdminDashboard: React.FC = () => {
                   <p className={styles.panelSubtitle}>Manage reviews that have been flagged as spam, suspicious, or inappropriate.</p>
                   
                   {flaggedReviews.length === 0 ? (
-                    <p className={styles.emptyText}>No flagged reviews right now.</p>
+                    <div className={styles.emptyState}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      <h3>No flagged reviews</h3>
+                      <p>Reviews flagged for spam or suspicious activity will appear here for moderation.</p>
+                    </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                       {flaggedReviews.map((rev) => (
@@ -469,7 +491,13 @@ export const AdminDashboard: React.FC = () => {
                   <p className={styles.panelSubtitle}>Award the verified-buyer badge or remove reviews that violate the guidelines.</p>
 
                   {reviews.length === 0 ? (
-                    <p className={styles.emptyText}>No reviews yet.</p>
+                    <div className={styles.emptyState}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      <h3>No reviews yet</h3>
+                      <p>Buyer reviews will appear here once they start reviewing vendors.</p>
+                    </div>
                   ) : (
                     <div className={styles.tableWrapper}>
                       <table className={styles.table}>
@@ -526,7 +554,15 @@ export const AdminDashboard: React.FC = () => {
                   <p className={styles.panelSubtitle}>Feature trusted vendors on the homepage and monitor trust standing.</p>
 
                   {vendors.length === 0 ? (
-                    <p className={styles.emptyText}>No vendors yet.</p>
+                    <div className={styles.emptyState}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 9l1-5h16l1 5" />
+                        <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" />
+                        <path d="M9 22V12h6v10" />
+                      </svg>
+                      <h3>No vendors yet</h3>
+                      <p>Registered vendors will appear here as businesses join the platform.</p>
+                    </div>
                   ) : (
                     <div className={styles.tableWrapper}>
                       <table className={styles.table}>
