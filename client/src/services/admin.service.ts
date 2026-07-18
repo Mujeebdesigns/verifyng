@@ -12,6 +12,10 @@ export interface AdminStats {
   flaggedReviews: number;
   recentSignups: number;
   recentSignupsPeriod: string;
+  newUsersThisWeek: number;
+  newVendorsThisWeek: number;
+  newClaimsThisWeek: number;
+  newReportsThisWeek: number;
 }
 
 export interface AdminClaim {
