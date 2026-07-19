@@ -353,7 +353,7 @@ export const AdminDashboard: React.FC = () => {
                       <p>Vendor ownership claims will appear here when someone requests to manage a business page.</p>
                     </div>
                   ) : (
-                    <div className={styles.tableWrapper}>
+                    <div className={`${styles.tableWrapper} ${styles.cardMobile}`}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
@@ -372,11 +372,11 @@ export const AdminDashboard: React.FC = () => {
                                   📸 @{c.instagramHandle} | 📞 {c.phoneNumber}
                                 </div>
                               </td>
-                              <td>
+                              <td className={styles.cardFull} data-label="Claimant User">
                                 {c.owner?.displayName}
                                 <div className={styles.businessMeta}>{c.owner?.email}</div>
                               </td>
-                              <td>
+                              <td className={styles.cardFull} data-label="Location / Category">
                                 {c.category}
                                 <div className={styles.businessMeta}>{c.state}</div>
                               </td>
@@ -412,7 +412,7 @@ export const AdminDashboard: React.FC = () => {
                       <p>Scam and moderation reports submitted by buyers will show up here for review.</p>
                     </div>
                   ) : (
-                    <div className={styles.tableWrapper}>
+                    <div className={`${styles.tableWrapper} ${styles.cardMobile}`}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
@@ -429,11 +429,11 @@ export const AdminDashboard: React.FC = () => {
                                 <strong>{r.vendor.businessName}</strong>
                                 <div className={styles.businessMeta}>@{r.vendor.instagramHandle}</div>
                               </td>
-                              <td>
+                              <td className={styles.cardFull} data-label="Reporter">
                                 {r.user.displayName}
                                 <div className={styles.businessMeta}>{r.user.email}</div>
                               </td>
-                              <td>
+                              <td className={styles.cardFull} data-label="Reason & Description">
                                 <span className={styles.badgeDanger}>{r.reason}</span>
                                 <p className={styles.reporterText}>{r.description}</p>
                               </td>
@@ -563,7 +563,7 @@ export const AdminDashboard: React.FC = () => {
                       <p>Registered vendors will appear here as businesses join the platform.</p>
                     </div>
                   ) : (
-                    <div className={styles.tableWrapper}>
+                    <div className={`${styles.tableWrapper} ${styles.cardMobile}`}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
@@ -581,9 +581,9 @@ export const AdminDashboard: React.FC = () => {
                                 <strong>{v.businessName}</strong>
                                 <div className={styles.businessMeta}>{[v.category, v.state].filter(Boolean).join(' • ') || '—'}</div>
                               </td>
-                              <td>{v.trustScore?.toFixed(1)} <span className={styles.businessMeta}>{v.trustLabel}</span></td>
-                              <td>{v.reviewCount}</td>
-                              <td>
+                              <td data-label="Trust">{v.trustScore?.toFixed(1)} <span className={styles.businessMeta}>{v.trustLabel}</span></td>
+                              <td data-label="Reviews">{v.reviewCount}</td>
+                              <td data-label="Status">
                                 {v.featured && <span className={styles.badgeSuccess}>Featured</span>}
                                 {v.scamFlag && <span className={styles.badgeDanger}>Scam flag</span>}
                                 {!v.featured && !v.scamFlag && <span className={styles.badgeNeutral}>—</span>}
@@ -608,7 +608,7 @@ export const AdminDashboard: React.FC = () => {
                   <h3 className={styles.panelTitle}>User Access Control</h3>
                   <p className={styles.panelSubtitle}>Ban, promote, or remove accounts across the platform.</p>
                   
-                  <div className={styles.tableWrapper}>
+                  <div className={`${styles.tableWrapper} ${styles.cardMobile}`}>
                     <table className={styles.table}>
                       <thead>
                         <tr>
@@ -625,7 +625,7 @@ export const AdminDashboard: React.FC = () => {
                               <strong>{u.displayName}</strong>
                               <div className={styles.businessMeta}>{u.email}</div>
                             </td>
-                            <td>
+                            <td data-label="Role">
                               <span className={
                                 u.role === 'ADMIN' ? styles.badgeDanger :
                                 u.role === 'VENDOR' ? styles.badgeSuccess :
@@ -634,7 +634,7 @@ export const AdminDashboard: React.FC = () => {
                                 {u.role}
                               </span>
                             </td>
-                            <td>
+                            <td data-label="Status">
                               {u.isBanned ? (
                                 <span className={styles.badgeDanger} style={{ textTransform: 'none' }}>Banned</span>
                               ) : u.isVerified ? (

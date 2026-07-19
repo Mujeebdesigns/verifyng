@@ -735,6 +735,23 @@
     font-weight: 500;
   }
 
+  /* Full-width variant for long content (e.g. a report's reason/description)
+     — label on its own line above a left-aligned value, instead of right-aligned. */
+  .cardMobile td.cardFull {
+    text-align: left;
+    padding: 0.625rem 0;
+    border-top: 0.0625rem solid var(--color-stroke-soft-200);
+  }
+
+  .cardMobile td.cardFull::before {
+    content: attr(data-label);
+    display: block;
+    float: none;
+    color: var(--color-text-soft-400);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
   /* Kebab pinned to the card's top-right corner */
   .cardMobile td.actionsCol {
     position: absolute;
