@@ -69,9 +69,16 @@
   font-size: 0.8125rem;
 }
 
-.sizeSelect {
+.sizeWrap {
+  position: relative;
+}
+
+.sizeTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   height: 2rem;
-  padding: 0 2rem 0 0.75rem;
+  padding: 0 0.625rem 0 0.75rem;
   border: 0.0625rem solid var(--color-stroke-soft-200);
   border-radius: 0.4375rem;
   background-color: var(--color-bg-white-0);
@@ -80,5 +87,63 @@
   font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
-  width: auto;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.sizeTrigger:hover {
+  background-color: var(--color-bg-weak-100);
+  border-color: var(--color-stroke-sub-300);
+  color: var(--color-text-main-900);
+}
+
+.sizeArrow {
+  color: var(--color-text-soft-400);
+  flex-shrink: 0;
+}
+
+/* Opens upward — the pagination bar sits at the bottom of the page */
+.sizeOptions {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.375rem;
+  min-width: 100%;
+  background-color: var(--color-bg-white-0);
+  border: 0.0625rem solid var(--color-stroke-soft-200);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-text-main-900) 12%, transparent);
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  z-index: 20;
+}
+
+.sizeOption {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: var(--color-text-sub-500);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sizeOption:hover {
+  background-color: var(--color-bg-weak-100);
+  color: var(--color-text-main-900);
+}
+
+.sizeOptionActive {
+  composes: sizeOption;
+  background-color: var(--color-bg-weak-100);
+  color: var(--color-text-main-900);
+  font-weight: 600;
 }
