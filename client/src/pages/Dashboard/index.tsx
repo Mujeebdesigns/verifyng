@@ -15,62 +15,7 @@ import type { MyReviewResponse } from '../../types/review.js';
 import { ROUTES, REVIEW_EDIT_WINDOW_HOURS, REVIEW_UNDER_REVIEW_HOURS } from '../../utils/constants.js';
 import styles from './Dashboard.module.css';
 import { Navbar } from '../../components/Navbar/index.js';
-
-interface CustomSelectProps {
-  value: string;
-  onChange: (val: string) => void;
-  options: { value: string; label: string }[];
-  placeholder: string;
-}
-
-const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const selectedOption = options.find((o) => o.value === value);
-
-  return (
-    <div className={styles.customSelectWrapper} ref={dropdownRef}>
-      <button
-        type="button"
-        className={styles.customSelectTrigger}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span>{selectedOption ? selectedOption.label : placeholder}</span>
-        <svg className={styles.customSelectArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
-      {isOpen && (
-        <div className={styles.customSelectOptions}>
-          {options.map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              className={`${styles.customSelectOption} ${o.value === value ? styles.customSelectOptionActive : ''}`}
-              onClick={() => {
-                onChange(o.value);
-                setIsOpen(false);
-              }}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+import { CustomSelect } from '../../components/CustomSelect/index.js';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -533,6 +478,7 @@ export const Dashboard: React.FC = () => {
                           { value: '1', label: '1 Star' },
                         ]}
                         placeholder="All Ratings"
+                        wrapperClassName={styles.customSelectWrapper}
                       />
 
                       <CustomSelect
@@ -552,6 +498,7 @@ export const Dashboard: React.FC = () => {
                           { value: 'Other', label: 'Other' },
                         ]}
                         placeholder="All Channels"
+                        wrapperClassName={styles.customSelectWrapper}
                       />
 
                       <CustomSelect
@@ -565,6 +512,7 @@ export const Dashboard: React.FC = () => {
                           { value: 'asc', label: 'Oldest First' },
                         ]}
                         placeholder="Sort By"
+                        wrapperClassName={styles.customSelectWrapper}
                       />
                     </div>
                   </div>

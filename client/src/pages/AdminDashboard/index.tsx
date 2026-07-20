@@ -477,9 +477,9 @@ export const AdminDashboard: React.FC = () => {
                               </span>
                               <span className={styles.businessMeta}>Rating: ★ {rev.rating}/5</span>
                             </div>
-                            <button type="button" onClick={() => handleDeleteReview(rev.id)} className={styles.rowBtnDanger}>
-                              Delete Review
-                            </button>
+                            <RowActionMenu actions={[
+                              { label: 'Delete review', onClick: () => handleDeleteReview(rev.id), danger: true },
+                            ]} />
                           </div>
                           <p className={styles.flaggedReviewBody}>
                             "{rev.reviewText}"

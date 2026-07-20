@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
+import { CustomSelect } from '../CustomSelect/index.js';
 import styles from './Pagination.module.css';
 
 interface PaginationProps {
@@ -53,27 +54,6 @@ export const Pagination: React.FC<PaginationProps> = ({
   const atStart = page <= 1;
   const atEnd = page >= totalPages;
 
-  // Custom page-size dropdown — avoids the native browser <select> popup,
-  // which ignores styling and clashes with the calm design.
-  const [sizeOpen, setSizeOpen] = useState(false);
-  const sizeRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!sizeOpen) return;
-    const onDocClick = (e: MouseEvent) => {
-      if (sizeRef.current && !sizeRef.current.contains(e.target as Node)) setSizeOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSizeOpen(false);
-    };
-    document.addEventListener('mousedown', onDocClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDocClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [sizeOpen]);
-
   return (
     <div className={styles.bar}>
       <span className={styles.info}>Page {page} of {totalPages}</span>
@@ -110,40 +90,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         </button>
       </div>
 
-      <div className={styles.sizeWrap} ref={sizeRef}>
-        <button
-          type="button"
-          className={styles.sizeTrigger}
-          onClick={() => setSizeOpen((o) => !o)}
-          aria-haspopup="listbox"
-          aria-expanded={sizeOpen}
-          aria-label="Rows per page"
-        >
-          <span>{pageSize} / page</span>
-          <svg className={styles.sizeArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
-        {sizeOpen && (
-          <div className={styles.sizeOptions} role="listbox">
-            {pageSizeOptions.map((size) => (
-              <button
-                key={size}
-                type="button"
-                role="option"
-                aria-selected={size === pageSize}
-                className={size === pageSize ? styles.sizeOptionActive : styles.sizeOption}
-                onClick={() => {
-                  onPageSizeChange(size);
-                  setSizeOpen(false);
-                }}
-              >
-                {size} / page
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <CustomSelect
+        compact
+        openUp
+        ariaLabel="Rows per page"
+        value={String(pageSize)}
+        onChange={(v) => onPageSizeChange(Number(v))}
+        options={pageSizeOptions.map((size) => ({ value: String(size), label: `${size} / page` }))}
+      />
     </div>
   );
 };

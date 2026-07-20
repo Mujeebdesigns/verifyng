@@ -490,113 +490,6 @@
   border-left: 0.1875rem solid var(--color-state-error);
 }
 
-/* Action layouts */
-.buttonGroup {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-/* Calm row-level action buttons — ghost by default, restrained accents.
-   Deliberately understated so the table reads calm, not busy. */
-.rowBtn {
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.4375rem;
-  border: 0.0625rem solid var(--color-stroke-soft-200);
-  background-color: var(--color-bg-white-0);
-  color: var(--color-text-sub-500);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.rowBtn:hover {
-  background-color: var(--color-bg-weak-100);
-  color: var(--color-text-main-900);
-}
-
-/* Affirmative action (verify, feature) — soft green tint, no saturation block */
-.rowBtnPrimary {
-  composes: rowBtn;
-  border-color: transparent;
-  background-color: color-mix(in srgb, var(--color-primary-primary-base) 12%, transparent);
-  color: var(--color-primary-primary-dark);
-}
-
-.rowBtnPrimary:hover {
-  background-color: color-mix(in srgb, var(--color-primary-primary-base) 20%, transparent);
-  color: var(--color-primary-primary-dark);
-}
-
-/* Destructive action — neutral until hovered, then a soft red wash */
-.rowBtnDanger {
-  composes: rowBtn;
-}
-
-.rowBtnDanger:hover {
-  background-color: color-mix(in srgb, var(--color-state-error) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-state-error) 25%, transparent);
-  color: var(--color-state-error);
-}
-
-.actionButtonInline {
-  background: none;
-  border: none;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  font-size: 0.8125rem;
-  transition: opacity 0.2s;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-}
-
-.actionButtonInline:hover {
-  opacity: 0.8;
-  background-color: var(--color-bg-weak-100);
-}
-
-.btnPromote {
-  composes: actionButtonInline;
-  color: var(--color-primary-primary-base);
-}
-
-.btnBan {
-  composes: actionButtonInline;
-  color: var(--color-state-away);
-}
-
-.btnDelete {
-  composes: actionButtonInline;
-  color: var(--color-state-error);
-}
-
-/* Empty State */
-.emptyText {
-  color: var(--color-text-soft-400);
-  text-align: center;
-  margin: 3rem 0;
-  font-size: 0.9375rem;
-}
-
-/* Pagination Row */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.paginationText {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-sub-500);
-}
-
 /* Responsiveness */
 @media (max-width: 48rem) {
   .dashboardContainer {
@@ -651,10 +544,6 @@
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
-  }
-
-  .buttonGroup {
-    justify-content: flex-start;
   }
 }
 
