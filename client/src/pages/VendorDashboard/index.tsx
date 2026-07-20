@@ -6,6 +6,8 @@ import { vendorService } from '../../services/vendor.service.js';
 import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
+import { CustomSelect } from '../../components/CustomSelect/index.js';
+import { StarRating } from '../../components/StarRating/index.js';
 import type { VendorDetail } from '../../types/vendor.js';
 import type { ReviewResponse } from '../../types/review.js';
 import { ROUTES } from '../../utils/constants.js';
@@ -363,35 +365,27 @@ export const VendorDashboard: React.FC = () => {
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label className={styles.formLabel} htmlFor="categorySelect">Category *</label>
-                      <select
-                        id="categorySelect"
-                        required
+                      <label className={styles.formLabel}>Category *</label>
+                      <CustomSelect
                         value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                      >
-                        <option value="">Select Category</option>
-                        {CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
+                        onChange={setCategory}
+                        placeholder="Select Category"
+                        wrapperClassName={styles.selectField}
+                        options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                      />
                     </div>
                   </div>
 
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
-                      <label className={styles.formLabel} htmlFor="stateSelect">State *</label>
-                      <select
-                        id="stateSelect"
-                        required
+                      <label className={styles.formLabel}>State *</label>
+                      <CustomSelect
                         value={stateName}
-                        onChange={(e) => setStateName(e.target.value)}
-                      >
-                        <option value="">Select State</option>
-                        {STATES.map((st) => (
-                          <option key={st} value={st}>{st}</option>
-                        ))}
-                      </select>
+                        onChange={setStateName}
+                        placeholder="Select State"
+                        wrapperClassName={styles.selectField}
+                        options={STATES.map((st) => ({ value: st, label: st }))}
+                      />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.formLabel} htmlFor="cityName">City *</label>
@@ -459,7 +453,7 @@ export const VendorDashboard: React.FC = () => {
                       </p>
                       {coverImageError && (
                         <div className={styles.fileError}>
-                          ⚠️ {coverImageError}
+                          {coverImageError}
                         </div>
                       )}
                       {coverImage && !coverImageError && (
@@ -485,7 +479,7 @@ export const VendorDashboard: React.FC = () => {
                       </p>
                       {logoImageError && (
                         <div className={styles.fileError}>
-                          ⚠️ {logoImageError}
+                          {logoImageError}
                         </div>
                       )}
                       {logoImage && !logoImageError && (
@@ -535,7 +529,10 @@ export const VendorDashboard: React.FC = () => {
                     {/* Claims Alert Banner */}
                     {vendor.claimStatus === 'PENDING_APPROVAL' && (
                       <div className={`${styles.alertBox} ${styles.alertBoxWarning}`}>
-                        <span>⏳</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
                         <span>Your claim request is currently pending administrator verification. Some features may be hidden on your public page until approved.</span>
                       </div>
                     )}
@@ -558,9 +555,9 @@ export const VendorDashboard: React.FC = () => {
 
                       <div className={styles.statCard}>
                         <span className={styles.statLabel}>Status</span>
-                        <div className={styles.statValueSecondary}>
-                          {vendor.claimStatus === 'CLAIMED' ? '✓ Verified' : '⏳ Pending Approval'}
-                        </div>
+                        <span className={vendor.claimStatus === 'CLAIMED' ? styles.statusPillVerified : styles.statusPillPending}>
+                          {vendor.claimStatus === 'CLAIMED' ? 'Verified' : 'Pending approval'}
+                        </span>
                         <span className={styles.statSubtext}>Claim confirmation state</span>
                       </div>
                     </div>
@@ -597,7 +594,7 @@ export const VendorDashboard: React.FC = () => {
                               <div key={rev.id} className={styles.reviewItemCard}>
                                 <div className={styles.reviewItemHeader}>
                                   <span className={styles.reviewAuthor}>{rev.user?.displayName || 'Buyer'}</span>
-                                  <span className={styles.reviewStars}>★ {rev.rating}/5</span>
+                                  <StarRating rating={rev.rating} />
                                 </div>
                                 <p className={styles.reviewText}>{rev.reviewText}</p>
                                 {rev.verifiedBuyer && <span className={styles.purchaseBadge}>Verified Purchase</span>}
@@ -616,25 +613,24 @@ export const VendorDashboard: React.FC = () => {
                     <h3 className={`${styles.panelTitle} ${styles.panelTitleSpacedLg}`}>Update Business Profile</h3>
                     {saveSuccess && (
                       <div className={styles.saveSuccessNote}>
-                        ✓ Profile details updated successfully.
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Profile details updated successfully.
                       </div>
                     )}
 
                     <form onSubmit={handleUpdateProfile}>
                       <div className={styles.formGrid}>
                         <div className={styles.formGroup}>
-                          <label className={styles.formLabel} htmlFor="editCategory">Category</label>
-                          <select
-                            id="editCategory"
-                            className={styles.formSelect}
-                            required
+                          <label className={styles.formLabel}>Category</label>
+                          <CustomSelect
                             value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                          >
-                            {CATEGORIES.map((cat) => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                          </select>
+                            onChange={setCategory}
+                            placeholder="Select Category"
+                            wrapperClassName={styles.selectField}
+                            options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                          />
                         </div>
                         <div className={styles.formGroup}>
                           <label className={styles.formLabel}>Business Name</label>
@@ -649,18 +645,14 @@ export const VendorDashboard: React.FC = () => {
 
                       <div className={styles.formGrid}>
                         <div className={styles.formGroup}>
-                          <label className={styles.formLabel} htmlFor="editState">State</label>
-                          <select
-                            id="editState"
-                            className={styles.formSelect}
-                            required
+                          <label className={styles.formLabel}>State</label>
+                          <CustomSelect
                             value={stateName}
-                            onChange={(e) => setStateName(e.target.value)}
-                          >
-                            {STATES.map((st) => (
-                              <option key={st} value={st}>{st}</option>
-                            ))}
-                          </select>
+                            onChange={setStateName}
+                            placeholder="Select State"
+                            wrapperClassName={styles.selectField}
+                            options={STATES.map((st) => ({ value: st, label: st }))}
+                          />
                         </div>
                         <div className={styles.formGroup}>
                           <label className={styles.formLabel} htmlFor="editCity">City</label>
@@ -703,7 +695,7 @@ export const VendorDashboard: React.FC = () => {
                           </p>
                           {coverImageError && (
                             <div className={styles.fileError}>
-                              ⚠️ {coverImageError}
+                              {coverImageError}
                             </div>
                           )}
                           {coverImage && !coverImageError && (
@@ -729,7 +721,7 @@ export const VendorDashboard: React.FC = () => {
                           </p>
                           {logoImageError && (
                             <div className={styles.fileError}>
-                              ⚠️ {logoImageError}
+                              {logoImageError}
                             </div>
                           )}
                           {logoImage && !logoImageError && (
@@ -799,11 +791,6 @@ export const VendorDashboard: React.FC = () => {
           </div>
         </main>
       </div>
-
-      {/* Footer */}
-      <footer className={styles.dashboardFooter}>
-        <p>© {new Date().getFullYear()} VerifyNG Vendor Portal. Building verified reputations.</p>
-      </footer>
     </div>
   );
 };
