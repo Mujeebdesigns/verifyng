@@ -338,7 +338,7 @@ export const VendorDashboard: React.FC = () => {
                 onClick={() => setActiveTab('overview')}
                 className={`${styles.menuItem} ${activeTab === 'overview' ? styles.menuItemActive : ''}`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.menuIcon}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.menuIcon}>
                   <rect x="3" y="3" width="7" height="9" />
                   <rect x="14" y="3" width="7" height="5" />
                   <rect x="14" y="12" width="7" height="9" />
@@ -351,7 +351,7 @@ export const VendorDashboard: React.FC = () => {
                 onClick={() => setActiveTab('reviews')}
                 className={`${styles.menuItem} ${activeTab === 'reviews' ? styles.menuItemActive : ''}`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.menuIcon}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.menuIcon}>
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
                 Reviews
@@ -361,7 +361,7 @@ export const VendorDashboard: React.FC = () => {
                 onClick={() => setActiveTab('edit')}
                 className={`${styles.menuItem} ${activeTab === 'edit' ? styles.menuItemActive : ''}`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.menuIcon}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.menuIcon}>
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
@@ -694,11 +694,17 @@ export const VendorDashboard: React.FC = () => {
 
                 {/* REVIEWS TAB */}
                 {activeTab === 'reviews' && (
-                  <div className={styles.panel}>
-                    <h3 className={`${styles.panelTitle} ${styles.panelTitleSpaced}`}>Customer Reviews</h3>
-                    <p className={styles.panelSubtitle}>
-                      {vendor.reviewCount} review{vendor.reviewCount !== 1 ? 's' : ''} from your community.
-                    </p>
+                  <>
+                    <div className={styles.minimalHeader}>
+                      <div className={styles.headerTitleCol}>
+                        <h1 className={styles.minimalTitle}>Customer Reviews</h1>
+                        <div className={styles.headerMetaRow}>
+                          <span className={styles.metaLabel}>
+                            {vendor.reviewCount} review{vendor.reviewCount !== 1 ? 's' : ''} from your community.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                     {reviews.length === 0 ? (
                       <p className={styles.emptyFeedNote}>
                         No reviews submitted yet. Use the share link to collect customer ratings.
@@ -746,7 +752,7 @@ export const VendorDashboard: React.FC = () => {
                         ))}
                       </div>
                     )}
-                  </div>
+                  </>
                 )}
 
                 {/* EDIT TAB */}
