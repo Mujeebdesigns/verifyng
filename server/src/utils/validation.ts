@@ -141,7 +141,10 @@ export function validateSocialUrls(body: {
 /** Validate a base64 data-URI image or an https:// image link. */
 export function validateImageField(value: string | null | undefined, label: string): string | null {
   if (!value) return null;
-  if (value.length > 2_000_000) {
+  // The client accepts image files up to 3 MB; base64 encoding inflates that by
+  // ~33%, so allow ~4.4 MB of string here. Kept below MAX_BODY_SIZE so two
+  // images plus fields still fit in one request.
+  if (value.length > 4_400_000) {
     return `${label} is too large`;
   }
   if (value.startsWith('data:image/')) return null;

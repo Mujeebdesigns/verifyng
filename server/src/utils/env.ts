@@ -58,7 +58,11 @@ export const env = {
   RESEND_FROM: process.env.RESEND_FROM ?? 'VerifyNG <verifyng@your-domain.com>',
 
   // Request limits
-  MAX_BODY_SIZE: int('MAX_BODY_SIZE', 1048576), // 1 MB default
+  // 10 MB default — vendor registration/profile updates carry base64 cover and
+  // logo images (up to 3 MB each, ~33% larger once base64-encoded), which blow
+  // past a 1 MB limit and cause the socket to be destroyed mid-request (surfaces
+  // as "Failed to fetch" in the browser). Matches .env.example.
+  MAX_BODY_SIZE: int('MAX_BODY_SIZE', 10485760),
 
   // Rate limits (count / window-ms)
   RATE_LIMIT_REVIEW_MAX: int('RATE_LIMIT_REVIEW_MAX', 5),

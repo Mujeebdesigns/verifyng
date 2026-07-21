@@ -171,6 +171,11 @@ export async function registerVendor(payload: RegisterVendorPayload): Promise<Au
     });
 
     return newUser;
+  }, {
+    // Vendor writes include base64 images; give the transaction more room than
+    // the 5s default so a larger write doesn't expire mid-flight. Client-side
+    // compression keeps images small, so this is defensive headroom.
+    timeout: 20000,
   });
 
   // Send verification email

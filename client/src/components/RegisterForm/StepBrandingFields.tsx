@@ -81,7 +81,7 @@ export const StepBrandingFields: React.FC<StepBrandingFieldsProps> = ({
               <span style={{ color: 'var(--color-primary-primary-base)', fontWeight: 500 }}>Click to browse</span> or drag and drop
             </span>
             <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-soft-400)', marginTop: '0.125rem' }}>
-              JPG, PNG or WEBP · Min 800×37.5rem · Max 3MB
+              JPG, PNG or WEBP · Min 800×600px · Max 8MB · optimized automatically
             </span>
           </div>
         </div>

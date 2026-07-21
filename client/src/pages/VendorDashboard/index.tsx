@@ -11,6 +11,7 @@ import { StarRating } from '../../components/StarRating/index.js';
 import type { VendorDetail } from '../../types/vendor.js';
 import type { ReviewResponse } from '../../types/review.js';
 import { ROUTES } from '../../utils/constants.js';
+import { compressImage } from '../../utils/compressImage.js';
 import styles from './VendorDashboard.module.css';
 
 const CATEGORIES = [
@@ -74,66 +75,48 @@ export const VendorDashboard: React.FC = () => {
   const [logoImage, setLogoImage] = useState('');
   const [logoImageError, setLogoImageError] = useState<string | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setCoverImageError(null);
+    if (file.size > 8 * 1024 * 1024) {
+      setCoverImageError('Image is too large. Maximum size is 8MB.');
+      return;
+    }
 
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      if (img.width < 800 || img.height < 600) {
-        setCoverImageError(`Image is too small (${img.width}x${img.height}px). Minimum required is 800x600px.`);
+    try {
+      const { dataUrl, width, height } = await compressImage(file, { maxDimension: 1600 });
+      if (width < 800 || height < 600) {
+        setCoverImageError(`Image is too small (${width}x${height}px). Minimum required is 800x600px.`);
         return;
       }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      setCoverImageError('Invalid image file.');
-    };
-
-    img.src = objectUrl;
+      setCoverImage(dataUrl);
+    } catch (err) {
+      setCoverImageError(err instanceof Error ? err.message : 'Invalid image file.');
+    }
   };
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setLogoImageError(null);
+    if (file.size > 8 * 1024 * 1024) {
+      setLogoImageError('Image is too large. Maximum size is 8MB.');
+      return;
+    }
 
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      if (img.width < 200 || img.height < 200) {
-        setLogoImageError(`Image is too small (${img.width}x${img.height}px). Minimum required is 200x200px.`);
+    try {
+      const { dataUrl, width, height } = await compressImage(file, { maxDimension: 600 });
+      if (width < 200 || height < 200) {
+        setLogoImageError(`Image is too small (${width}x${height}px). Minimum required is 200x200px.`);
         return;
       }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      setLogoImageError('Invalid image file.');
-    };
-
-    img.src = objectUrl;
+      setLogoImage(dataUrl);
+    } catch (err) {
+      setLogoImageError(err instanceof Error ? err.message : 'Invalid image file.');
+    }
   };
 
   const fetchProfileAndReviews = async () => {
