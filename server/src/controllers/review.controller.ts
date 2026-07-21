@@ -4,10 +4,10 @@ import { parseBody } from '../utils/parseBody.js';
 import { parseQuery } from '../utils/parseQuery.js';
 import { sendJson, sendError } from '../utils/response.js';
 import { handleControllerError, parsePagination } from '../utils/controllerWrapper.js';
-import { validateRating, validateReviewText } from '../utils/validation.js';
+import { validateRating, validateReviewText, validateReplyText } from '../utils/validation.js';
 import { requireTurnstile } from '../utils/turnstile.js';
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js';
-import type { CreateReviewPayload, UpdateReviewPayload, CreateReportPayload } from '../types/review.js';
+import type { CreateReviewPayload, UpdateReviewPayload, CreateReportPayload, ReplyToReviewPayload } from '../types/review.js';
 
 export async function handleGetMyReviews(
   req: IncomingMessage,
@@ -177,6 +177,37 @@ export async function handleDeleteReview(
     sendJson(res, 200, result);
   } catch (error) {
     handleControllerError(res, error, 'DeleteReview');
+  }
+}
+
+export async function handleReplyToReview(
+  req: IncomingMessage,
+  res: ServerResponse,
+  params: Record<string, string>
+): Promise<void> {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const { id: reviewId } = params;
+
+    if (!reviewId) {
+      sendError(res, 400, 'Review ID is required');
+      return;
+    }
+
+    const body = await parseBody<ReplyToReviewPayload>(req);
+
+    if (!body.replyText) {
+      sendError(res, 400, 'Reply text is required');
+      return;
+    }
+
+    const replyText = validateReplyText(body.replyText, res);
+    if (replyText === null) return;
+
+    const result = await reviewService.replyToReview(reviewId, authReq.userId, replyText);
+    sendJson(res, 200, result);
+  } catch (error) {
+    handleControllerError(res, error, 'ReplyToReview');
   }
 }
 

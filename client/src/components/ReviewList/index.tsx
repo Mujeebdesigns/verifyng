@@ -10,6 +10,7 @@ interface ReviewListProps {
   totalPages: number;
   onPageChange: (newPage: number) => void;
   onEditReviewClick?: (review: ReviewResponse) => void;
+  vendorName?: string;
 }
 
 export const ReviewList: React.FC<ReviewListProps> = ({
@@ -18,6 +19,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
   totalPages,
   onPageChange,
   onEditReviewClick,
+  vendorName,
 }) => {
   if (reviews.length === 0) {
     return null;
@@ -30,6 +32,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
           key={review.id}
           review={review}
           onEditClick={onEditReviewClick}
+          vendorName={vendorName}
         />
       ))}
 

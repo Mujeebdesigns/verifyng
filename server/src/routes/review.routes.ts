@@ -5,6 +5,7 @@ import {
   handleCreateReview,
   handleUpdateReview,
   handleDeleteReview,
+  handleReplyToReview,
   handleReportVendor,
 } from '../controllers/review.controller.js';
 import { authMiddleware, type AuthenticatedRequest } from '../middleware/auth.middleware.js';
@@ -58,5 +59,28 @@ export function registerReviewRoutes(router: ReturnType<typeof createRouter>): v
   router.post('/api/vendors/:id/report', async (req, res, params) => {
     if (!(await reportRateLimit(req, res))) return;
     await buyerGuard(req, res, (authReq) => handleReportVendor(authReq, res, params));
+  });
+
+  const vendorGuard = async (
+    req: IncomingMessage,
+    res: ServerResponse,
+    next: (authReq: AuthenticatedRequest) => void | Promise<void>
+  ) => {
+    if (!(await authMiddleware(req, res))) return;
+    const authReq = req as AuthenticatedRequest;
+
+    let isAllowed = false;
+    requireRole(['VENDOR', 'ADMIN'])(authReq, res, () => {
+      isAllowed = true;
+    });
+
+    if (isAllowed) {
+      await next(authReq);
+    }
+  };
+
+  router.put('/api/reviews/:id/reply', async (req, res, params) => {
+    if (!(await actionRateLimit(req, res))) return;
+    await vendorGuard(req, res, (authReq) => handleReplyToReview(authReq, res, params));
   });
 }

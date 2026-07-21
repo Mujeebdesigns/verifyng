@@ -7,11 +7,13 @@ import styles from './ReviewCard.module.css';
 interface ReviewCardProps {
   review: ReviewResponse;
   onEditClick?: (review: ReviewResponse) => void;
+  vendorName?: string;
 }
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({
   review,
   onEditClick,
+  vendorName,
 }) => {
   const { user } = useAuth();
   const {
@@ -21,6 +23,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     orderDate,
     verifiedBuyer,
     isFlagged,
+    vendorReplyText,
     createdAt,
     user: reviewUser,
   } = review;
@@ -72,6 +75,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           ? '⚠️ This review has been flagged for moderation check.'
           : reviewText}
       </p>
+
+      {vendorReplyText && (
+        <div className={styles.vendorReply}>
+          <span className={styles.vendorReplyLabel}>Response from {vendorName || 'the vendor'}</span>
+          <p className={styles.vendorReplyText}>{vendorReplyText}</p>
+        </div>
+      )}
 
       <div className={styles.footer}>
         <div className={styles.channelInfo}>

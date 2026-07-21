@@ -67,6 +67,15 @@ export function validateReviewText(text: string, res: ServerResponse): string | 
   return trimmed;
 }
 
+export function validateReplyText(text: string, res: ServerResponse): string | null {
+  const trimmed = text.trim();
+  if (trimmed.length < 10 || trimmed.length > 500) {
+    sendError(res, 400, 'Reply must be between 10 and 500 characters');
+    return null;
+  }
+  return trimmed;
+}
+
 export function validatePassword(password: string, res: ServerResponse): boolean {
   if (password.length < PASSWORD_MIN_LENGTH || password.length > PASSWORD_MAX_LENGTH) {
     sendError(res, 400, `Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters`);

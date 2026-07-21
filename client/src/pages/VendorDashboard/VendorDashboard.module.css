@@ -441,6 +441,125 @@
   font-weight: 500;
 }
 
+/* Vendor reply to a review */
+.replyToggleBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-primary-primary-dark);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.replyToggleBtn:hover {
+  color: var(--color-primary-primary-base);
+}
+
+.replyDisplay {
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-bg-weak-100);
+  border-left: 0.1875rem solid var(--color-primary-primary-base);
+}
+
+.replyDisplayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.replyDisplayLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-main-900);
+}
+
+.replyDisplayText {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-sub-500);
+  line-height: 1.5;
+}
+
+.replyForm {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.replyTextarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid var(--color-stroke-sub-300);
+  font-size: 0.8125rem;
+  color: var(--color-text-main-900);
+  background: var(--color-bg-white-0);
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.replyTextarea:focus {
+  border-color: var(--color-primary-primary-base);
+  box-shadow: 0 0 0 0.125rem color-mix(in srgb, var(--color-primary-primary-base) 15%, transparent);
+}
+
+.replyErrorNote {
+  font-size: 0.75rem;
+  color: var(--color-state-error);
+}
+
+.replyFormActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.replyCancelBtn {
+  background: none;
+  border: none;
+  padding: 0.375rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-sub-500);
+  cursor: pointer;
+}
+
+.replyCancelBtn:hover:not(:disabled) {
+  color: var(--color-text-main-900);
+}
+
+.replySaveBtn {
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-neutral-0);
+  background-color: var(--color-primary-primary-base);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.replySaveBtn:hover:not(:disabled) {
+  background-color: var(--color-primary-primary-dark);
+}
+
+.replySaveBtn:disabled,
+.replyCancelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Section Dividers */
 .sectionTitle {
   font-size: 0.9375rem;

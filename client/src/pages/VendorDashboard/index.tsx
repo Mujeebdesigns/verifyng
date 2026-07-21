@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { Navbar } from '../../components/Navbar/index.js';
 import { vendorService } from '../../services/vendor.service.js';
+import { reviewService } from '../../services/review.service.js';
 import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
@@ -74,6 +75,12 @@ export const VendorDashboard: React.FC = () => {
   const [coverImageError, setCoverImageError] = useState<string | null>(null);
   const [logoImage, setLogoImage] = useState('');
   const [logoImageError, setLogoImageError] = useState<string | null>(null);
+
+  // Review reply state
+  const [replyingId, setReplyingId] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState('');
+  const [replySaving, setReplySaving] = useState(false);
+  const [replyError, setReplyError] = useState<string | null>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -252,6 +259,33 @@ export const VendorDashboard: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const startReply = (rev: ReviewResponse) => {
+    setReplyError(null);
+    setReplyDraft(rev.vendorReplyText || '');
+    setReplyingId(rev.id);
+  };
+
+  const cancelReply = () => {
+    setReplyingId(null);
+    setReplyDraft('');
+    setReplyError(null);
+  };
+
+  const submitReply = async (reviewId: string) => {
+    setReplyError(null);
+    setReplySaving(true);
+    try {
+      const updated = await reviewService.replyToReview(reviewId, { replyText: replyDraft });
+      setReviews((prev) => prev.map((r) => (r.id === reviewId ? updated : r)));
+      setReplyingId(null);
+      setReplyDraft('');
+    } catch (err) {
+      setReplyError(err instanceof Error ? err.message : 'Failed to save reply');
+    } finally {
+      setReplySaving(false);
     }
   };
 
@@ -581,6 +615,52 @@ export const VendorDashboard: React.FC = () => {
                                 </div>
                                 <p className={styles.reviewText}>{rev.reviewText}</p>
                                 {rev.verifiedBuyer && <span className={styles.purchaseBadge}>Verified Purchase</span>}
+
+                                {replyingId === rev.id ? (
+                                  <div className={styles.replyForm}>
+                                    <textarea
+                                      className={styles.replyTextarea}
+                                      value={replyDraft}
+                                      onChange={(e) => setReplyDraft(e.target.value)}
+                                      placeholder="Write a public reply to this review (10–500 characters)"
+                                      maxLength={500}
+                                      rows={3}
+                                    />
+                                    {replyError && <div className={styles.replyErrorNote}>{replyError}</div>}
+                                    <div className={styles.replyFormActions}>
+                                      <button
+                                        type="button"
+                                        className={styles.replyCancelBtn}
+                                        onClick={cancelReply}
+                                        disabled={replySaving}
+                                      >
+                                        Cancel
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className={styles.replySaveBtn}
+                                        onClick={() => submitReply(rev.id)}
+                                        disabled={replySaving || replyDraft.trim().length < 10}
+                                      >
+                                        {replySaving ? 'Saving...' : 'Save Reply'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : rev.vendorReplyText ? (
+                                  <div className={styles.replyDisplay}>
+                                    <div className={styles.replyDisplayHeader}>
+                                      <span className={styles.replyDisplayLabel}>Your reply</span>
+                                      <button type="button" className={styles.replyToggleBtn} onClick={() => startReply(rev)}>
+                                        Edit
+                                      </button>
+                                    </div>
+                                    <p className={styles.replyDisplayText}>{rev.vendorReplyText}</p>
+                                  </div>
+                                ) : (
+                                  <button type="button" className={styles.replyToggleBtn} onClick={() => startReply(rev)}>
+                                    Reply
+                                  </button>
+                                )}
                               </div>
                             ))}
                           </div>

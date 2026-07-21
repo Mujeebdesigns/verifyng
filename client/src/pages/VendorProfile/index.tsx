@@ -425,6 +425,7 @@ export const VendorProfile: React.FC = () => {
                     totalPages={totalPages}
                     onPageChange={setPage}
                     onEditReviewClick={setEditingReview}
+                    vendorName={displayName}
                   />
                 )}
               </section>

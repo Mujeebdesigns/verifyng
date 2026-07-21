@@ -121,6 +121,8 @@ model Review {
   orderDate          DateTime?
   verifiedBuyer      Boolean  @default(false)
   isFlagged          Boolean  @default(false)
+  vendorReplyText    String?
+  vendorRepliedAt    DateTime?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

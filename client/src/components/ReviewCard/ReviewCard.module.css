@@ -72,6 +72,33 @@
   margin-bottom: 0.75rem;
 }
 
+.vendorReply {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-bg-weak-100);
+  border-left: 0.1875rem solid var(--color-primary-primary-base);
+  margin-bottom: 0.75rem;
+}
+
+.vendorReplyLabel {
+  display: block;
+  font-size: var(--font-label-x-small-font-size);
+  font-weight: 600;
+  color: var(--color-text-main-900);
+  margin-bottom: 0.25rem;
+}
+
+.vendorReplyText {
+  margin: 0;
+  font-size: var(--font-paragraph-x-small-font-size);
+  color: var(--color-text-sub-500);
+  line-height: 1.5;
+  text-align: left;
+  word-break: break-word;
+}
+
 .footer {
   display: flex;
   justify-content: space-between;

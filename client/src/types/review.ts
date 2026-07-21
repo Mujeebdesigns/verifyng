@@ -18,6 +18,11 @@ export interface UpdateReviewPayload {
   reviewText?: string;
 }
 
+/** PUT /api/reviews/:id/reply request body */
+export interface ReplyToReviewPayload {
+  replyText: string;
+}
+
 /** Review as returned in API responses */
 export interface ReviewResponse {
   id: string;
@@ -29,6 +34,8 @@ export interface ReviewResponse {
   orderDate: string | null;
   verifiedBuyer: boolean;
   isFlagged: boolean;
+  vendorReplyText: string | null;
+  vendorRepliedAt: string | null;
   createdAt: string;
   updatedAt: string;
   user?: {
@@ -47,6 +54,8 @@ export interface MyReviewResponse {
   orderDate: string | null;
   verifiedBuyer: boolean;
   isFlagged: boolean;
+  vendorReplyText: string | null;
+  vendorRepliedAt: string | null;
   createdAt: string;
   updatedAt: string;
   vendor: {

@@ -2,6 +2,7 @@ import { api } from './api.js';
 import type {
   CreateReviewPayload,
   UpdateReviewPayload,
+  ReplyToReviewPayload,
   ReviewResponse,
   CreateReportPayload,
   MyReviewResponse,
@@ -48,6 +49,16 @@ export const reviewService = {
     payload: UpdateReviewPayload
   ): Promise<ReviewResponse> {
     return api.put<ReviewResponse>(`/reviews/${reviewId}`, payload);
+  },
+
+  /**
+   * Attach or update the vendor's reply to a review on their own profile.
+   */
+  async replyToReview(
+    reviewId: string,
+    payload: ReplyToReviewPayload
+  ): Promise<ReviewResponse> {
+    return api.put<ReviewResponse>(`/reviews/${reviewId}/reply`, payload);
   },
 
   /**

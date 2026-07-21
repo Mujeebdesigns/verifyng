@@ -105,6 +105,8 @@ export async function createReview(
     orderDate: review.orderDate?.toISOString() ?? null,
     verifiedBuyer: review.verifiedBuyer,
     isFlagged: review.isFlagged,
+    vendorReplyText: review.vendorReplyText,
+    vendorRepliedAt: review.vendorRepliedAt?.toISOString() ?? null,
     createdAt: review.createdAt.toISOString(),
     updatedAt: review.updatedAt.toISOString(),
     user: { displayName: review.user.displayName },
@@ -165,6 +167,58 @@ export async function updateReview(
     orderDate: updated.orderDate?.toISOString() ?? null,
     verifiedBuyer: updated.verifiedBuyer,
     isFlagged: updated.isFlagged,
+    vendorReplyText: updated.vendorReplyText,
+    vendorRepliedAt: updated.vendorRepliedAt?.toISOString() ?? null,
+    createdAt: updated.createdAt.toISOString(),
+    updatedAt: updated.updatedAt.toISOString(),
+    user: { displayName: updated.user.displayName },
+  };
+}
+
+/**
+ * Attach or update the vendor's reply to a review.
+ * Only the owning vendor may reply — strict ownership check, no admin bypass
+ * (consistent with vendor.service.ts's updateVendorProfile).
+ */
+export async function replyToReview(
+  reviewId: string,
+  userId: string,
+  replyText: string,
+): Promise<ReviewResponse> {
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+    include: { vendor: true, user: { select: { displayName: true } } },
+  });
+
+  if (!review) {
+    throw new AppError('Review not found', 404);
+  }
+
+  if (review.vendor.ownerId !== userId) {
+    throw new AppError('You do not own this vendor profile', 403);
+  }
+
+  const updated = await prisma.review.update({
+    where: { id: reviewId },
+    data: {
+      vendorReplyText: replyText,
+      vendorRepliedAt: new Date(),
+    },
+    include: { user: { select: { displayName: true } } },
+  });
+
+  return {
+    id: updated.id,
+    vendorId: updated.vendorId,
+    userId: updated.userId,
+    rating: updated.rating,
+    reviewText: updated.reviewText,
+    transactionChannel: updated.transactionChannel,
+    orderDate: updated.orderDate?.toISOString() ?? null,
+    verifiedBuyer: updated.verifiedBuyer,
+    isFlagged: updated.isFlagged,
+    vendorReplyText: updated.vendorReplyText,
+    vendorRepliedAt: updated.vendorRepliedAt?.toISOString() ?? null,
     createdAt: updated.createdAt.toISOString(),
     updatedAt: updated.updatedAt.toISOString(),
     user: { displayName: updated.user.displayName },
@@ -388,6 +442,8 @@ export interface MyReview {
   orderDate: string | null;
   verifiedBuyer: boolean;
   isFlagged: boolean;
+  vendorReplyText: string | null;
+  vendorRepliedAt: string | null;
   createdAt: string;
   updatedAt: string;
   vendor: {
@@ -464,6 +520,8 @@ export async function getMyReviews(
     orderDate: r.orderDate?.toISOString() ?? null,
     verifiedBuyer: r.verifiedBuyer,
     isFlagged: r.isFlagged,
+    vendorReplyText: r.vendorReplyText,
+    vendorRepliedAt: r.vendorRepliedAt?.toISOString() ?? null,
     createdAt: r.createdAt.toISOString(),
     updatedAt: r.updatedAt.toISOString(),
     vendor: { businessName: r.vendor.businessName },

@@ -133,6 +133,8 @@ export async function getReviews(
       orderDate: review.orderDate?.toISOString() ?? null,
       verifiedBuyer: review.verifiedBuyer,
       isFlagged: review.isFlagged,
+      vendorReplyText: review.vendorReplyText,
+      vendorRepliedAt: review.vendorRepliedAt?.toISOString() ?? null,
       createdAt: review.createdAt.toISOString(),
       updatedAt: review.updatedAt.toISOString(),
       user: { displayName: review.user.displayName },
