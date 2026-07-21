@@ -7,6 +7,7 @@ import { logger } from '../utils/logger.js';
 import { normalizeInstagramHandle } from '../utils/normalizeInstagramHandle.js';
 import { recordAuditLog } from '../utils/auditLog.js';
 import { generateVendorSummary } from './ai.service.js';
+import { sendNewReviewNotification } from '../utils/email.js';
 import type { CreateReviewPayload, UpdateReviewPayload, ReviewResponse, CreateReportPayload } from '../types/review.js';
 import type { Prisma } from '@prisma/client';
 
@@ -38,10 +39,13 @@ export async function createReview(
   // Create the review inside a transaction to prevent TOCTOU race conditions
   // (ownership check + insert are atomic — prevents self-review bypass via
   // vendor claiming their profile between the check and the insert)
-  let review;
+  let created;
   try {
-    review = await prisma.$transaction(async (tx) => {
-      const vendor = await tx.vendor.findUnique({ where: { id: vendorId } });
+    created = await prisma.$transaction(async (tx) => {
+      const vendor = await tx.vendor.findUnique({
+        where: { id: vendorId },
+        include: { owner: { select: { email: true, displayName: true } } },
+      });
       if (!vendor) {
         throw new AppError('Vendor not found', 404);
       }
@@ -59,7 +63,7 @@ export async function createReview(
         throw new AppError('You have already reviewed this vendor', 409);
       }
 
-      return tx.review.create({
+      const review = await tx.review.create({
         data: {
           vendorId,
           userId,
@@ -72,6 +76,8 @@ export async function createReview(
           user: { select: { displayName: true } },
         },
       });
+
+      return { review, vendorOwner: vendor.owner, businessName: vendor.businessName };
     });
   } catch (error) {
     if (error instanceof AppError) throw error;
@@ -80,6 +86,8 @@ export async function createReview(
     }
     throw error;
   }
+
+  const { review, vendorOwner, businessName } = created;
 
   // Update vendor review count and recalculate trust score atomically
   await prisma.$transaction(async (tx) => {
@@ -94,6 +102,18 @@ export async function createReview(
   generateVendorSummary(vendorId).catch((error: unknown) => {
     logger.error('AI summary generation failed', error);
   });
+
+  // Notify the vendor owner of the new review, if the profile is claimed (fire and forget)
+  if (vendorOwner) {
+    sendNewReviewNotification(vendorOwner.email, {
+      businessName: businessName ?? 'your business',
+      reviewerName: review.user.displayName,
+      rating: review.rating,
+      reviewText: review.reviewText,
+    }).catch((error: unknown) => {
+      logger.error('New review notification email failed', error);
+    });
+  }
 
   return {
     id: review.id,

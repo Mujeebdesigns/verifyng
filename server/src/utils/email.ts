@@ -123,6 +123,30 @@ export async function sendPasswordResetEmail(to: string, token: string, role: Us
   await dispatchEmail(to, subject, html);
 }
 
+export async function sendNewReviewNotification(to: string, payload: {
+  businessName: string;
+  reviewerName: string;
+  rating: number;
+  reviewText: string;
+}): Promise<void> {
+  const businessName = escapeHtml(payload.businessName);
+  const reviewerName = escapeHtml(payload.reviewerName);
+  const reviewText = escapeHtml(payload.reviewText);
+  const stars = '★'.repeat(payload.rating) + '☆'.repeat(5 - payload.rating);
+  const dashboardUrl = `${env.CLIENT_URL}/vendor-dashboard`;
+
+  const subject = `New review for ${payload.businessName}`;
+  const htmlContent = `
+    <p style="font-size:14px;color:#4a4f5a;line-height:1.6;margin:0 0 12px;"><strong style="color:#1a1d23;">${reviewerName}</strong> left a <strong style="color:#f5a623;">${stars}</strong> review on your VerifyNG profile for <strong style="color:#1a1d23;">${businessName}</strong>:</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">
+      <tr><td style="padding:8px 12px;background:#f4f6f8;border-radius:6px;font-size:14px;color:#4a4f5a;line-height:1.6;">${reviewText}</td></tr>
+    </table>
+    <p style="font-size:14px;color:#4a4f5a;line-height:1.6;margin:12px 0 0;">You can reply publicly from your vendor dashboard.</p>`;
+
+  const html = emailTemplate('You Have a New Review', htmlContent, dashboardUrl, 'View & Reply');
+  await dispatchEmail(to, subject, html);
+}
+
 export async function sendAdminNotification(payload: {
   name: string;
   email: string;
