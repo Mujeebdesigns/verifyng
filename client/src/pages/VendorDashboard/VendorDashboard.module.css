@@ -393,6 +393,92 @@
   outline: none;
 }
 
+/* AI Reputation Summary Panel */
+.summaryHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.summaryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 6.25rem;
+  background: color-mix(in srgb, var(--color-state-feature) 10%, transparent);
+  color: var(--color-state-feature);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.summaryText {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-text-sub-500);
+  margin: 0 0 1.25rem;
+}
+
+.breakdownGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.875rem;
+}
+
+.breakdownCard {
+  background: var(--color-bg-weak-100);
+  border-radius: 0.75rem;
+  padding: 1rem 1.125rem;
+}
+
+.breakdownTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-main-900);
+  margin: 0 0 0.375rem;
+}
+
+.breakdownDot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-primary-primary-base);
+}
+
+.dotComplaint {
+  background: var(--color-state-error);
+}
+
+.dotPositive {
+  background: var(--color-primary-primary-base);
+}
+
+.breakdownDesc {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-text-sub-500);
+  margin: 0;
+}
+
+.summaryPlaceholder {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 1rem 1.125rem;
+  background: var(--color-bg-weak-100);
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-text-sub-500);
+}
+
 /* Reviews List Area */
 .reviewsFeed {
   display: flex;

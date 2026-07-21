@@ -9,7 +9,7 @@ import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
 import { CustomSelect } from '../../components/CustomSelect/index.js';
 import { StarRating } from '../../components/StarRating/index.js';
-import type { VendorDetail } from '../../types/vendor.js';
+import type { VendorDetail, VendorSummaryResponse, VendorSummaryApiResponse } from '../../types/vendor.js';
 import type { ReviewResponse } from '../../types/review.js';
 import { ROUTES } from '../../utils/constants.js';
 import { compressImage } from '../../utils/compressImage.js';
@@ -50,6 +50,10 @@ export const VendorDashboard: React.FC = () => {
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [summary, setSummary] = useState<VendorSummaryResponse | null>(null);
+  const [summaryStatus, setSummaryStatus] = useState<VendorSummaryApiResponse['status'] | null>(null);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   // Profile Form States
   const [description, setDescription] = useState('');
@@ -149,6 +153,16 @@ export const VendorDashboard: React.FC = () => {
       // Load reviews
       const reviewsRes = await vendorService.getReviews(data.id, 1, 50);
       setReviews(reviewsRes.data);
+
+      // Load AI summary (best-effort — a failure here shouldn't block the rest of the dashboard)
+      setSummaryError(null);
+      try {
+        const summaryRes = await vendorService.getSummary(data.id);
+        setSummaryStatus(summaryRes.status);
+        setSummary(summaryRes.status === 'ready' ? summaryRes.data : null);
+      } catch (summaryErr) {
+        setSummaryError(summaryErr instanceof Error ? summaryErr.message : 'Failed to load AI summary');
+      }
     } catch (err: unknown) {
       const error = err as { statusCode?: number; message?: string };
       if (error.statusCode === 404) {
@@ -577,6 +591,73 @@ export const VendorDashboard: React.FC = () => {
                         </span>
                         <span className={styles.statSubtext}>Claim confirmation state</span>
                       </div>
+                    </div>
+
+                    {/* AI reputation summary */}
+                    <div className={styles.panel}>
+                      <div className={styles.summaryHeaderRow}>
+                        <div>
+                          <h3 className={styles.panelTitle}>Your AI Reputation Summary</h3>
+                          <p className={styles.panelSubtitle}>How buyers see your business, generated from community reviews.</p>
+                        </div>
+                        {summary && (
+                          <span className={styles.summaryBadge}>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 3l1.9 5.8L20 10l-5.8 1.9L12 18l-1.9-6L4 10l6.1-1.2L12 3z" />
+                            </svg>
+                            AI generated
+                          </span>
+                        )}
+                      </div>
+                      <ErrorMessage message={summaryError} />
+                      {summary ? (
+                        <>
+                          <p className={styles.summaryText}>{summary.summaryText}</p>
+                          <div className={styles.breakdownGrid}>
+                            {summary.deliveryReliability && (
+                              <div className={styles.breakdownCard}>
+                                <h4 className={styles.breakdownTitle}><span className={styles.breakdownDot} />Delivery Reliability</h4>
+                                <p className={styles.breakdownDesc}>{summary.deliveryReliability}</p>
+                              </div>
+                            )}
+                            {summary.customerSatisfaction && (
+                              <div className={styles.breakdownCard}>
+                                <h4 className={styles.breakdownTitle}><span className={styles.breakdownDot} />Customer Satisfaction</h4>
+                                <p className={styles.breakdownDesc}>{summary.customerSatisfaction}</p>
+                              </div>
+                            )}
+                            {summary.recurringComplaints && (
+                              <div className={styles.breakdownCard}>
+                                <h4 className={styles.breakdownTitle}><span className={`${styles.breakdownDot} ${styles.dotComplaint}`} />Recurring Complaints</h4>
+                                <p className={styles.breakdownDesc}>{summary.recurringComplaints}</p>
+                              </div>
+                            )}
+                            {summary.trustPatterns && (
+                              <div className={styles.breakdownCard}>
+                                <h4 className={styles.breakdownTitle}><span className={`${styles.breakdownDot} ${styles.dotPositive}`} />Positive Trust Patterns</h4>
+                                <p className={styles.breakdownDesc}>{summary.trustPatterns}</p>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <div className={styles.summaryPlaceholder}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                          </svg>
+                          <span>
+                            {summaryStatus === 'generating'
+                              ? 'An AI summary is being compiled from your reviews. Check back shortly.'
+                              : summaryStatus === 'insufficient_data'
+                              ? `A summary unlocks once you have at least 3 reviews (currently ${vendor.reviewCount}). Share your link to collect more.`
+                              : summaryStatus === 'unavailable'
+                              ? 'The AI summary is temporarily unavailable.'
+                              : 'An AI summary will compile automatically once you reach 3 reviews.'}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Link share box and recent review log split */}
