@@ -8,7 +8,7 @@ import { Button } from '../../components/Button/index.js';
 import { LoadingSpinner } from '../../components/LoadingSpinner/index.js';
 import { ErrorMessage } from '../../components/ErrorMessage/index.js';
 import { CustomSelect } from '../../components/CustomSelect/index.js';
-import { StarRating } from '../../components/StarRating/index.js';
+import { ReviewCard } from '../../components/ReviewCard/index.js';
 import type { VendorDetail, VendorSummaryResponse, VendorSummaryApiResponse } from '../../types/vendor.js';
 import type { ReviewResponse } from '../../types/review.js';
 import { ROUTES } from '../../utils/constants.js';
@@ -39,7 +39,7 @@ const STATES = [
   'Anambra',
 ];
 
-type TabType = 'overview' | 'edit';
+type TabType = 'overview' | 'reviews' | 'edit';
 
 export const VendorDashboard: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -345,6 +345,16 @@ export const VendorDashboard: React.FC = () => {
                   <rect x="3" y="16" width="7" height="5" />
                 </svg>
                 Overview
+              </button>
+
+              <button
+                onClick={() => setActiveTab('reviews')}
+                className={`${styles.menuItem} ${activeTab === 'reviews' ? styles.menuItemActive : ''}`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.menuIcon}>
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Reviews
               </button>
 
               <button
@@ -660,98 +670,83 @@ export const VendorDashboard: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Link share box and recent review log split */}
-                    <div className={styles.splitRow}>
-                      <div className={styles.splitCol}>
-                        <div className={styles.shareWidget}>
-                          <h3 className={styles.shareWidgetTitle}>Collect Rating Reviews</h3>
-                          <p className={styles.shareWidgetDesc}>Share your VerifyNG profile link to gather verified feedback and build reputation.</p>
-                          <div className={styles.shareInputGroup}>
-                            <input
-                              type="text"
-                              readOnly
-                              value={`${window.location.origin}/vendors/${vendor.id}`}
-                              className={styles.shareInput}
-                            />
-                            <Button onClick={copyTrustLink} variant="primary">
-                              {copySuccess ? 'Copied!' : 'Copy Link'}
-                            </Button>
-                          </div>
-                          <span className={styles.profileViewsNote}>
-                            {vendor.profileViews} profile view{vendor.profileViews !== 1 ? 's' : ''} so far
-                          </span>
-                        </div>
+                    {/* Link share box */}
+                    <div className={styles.shareWidget}>
+                      <h3 className={styles.shareWidgetTitle}>Collect Rating Reviews</h3>
+                      <p className={styles.shareWidgetDesc}>Share your VerifyNG profile link to gather verified feedback and build reputation.</p>
+                      <div className={styles.shareInputGroup}>
+                        <input
+                          type="text"
+                          readOnly
+                          value={`${window.location.origin}/vendors/${vendor.id}`}
+                          className={styles.shareInput}
+                        />
+                        <Button onClick={copyTrustLink} variant="primary">
+                          {copySuccess ? 'Copied!' : 'Copy Link'}
+                        </Button>
                       </div>
-
-                      <div className={`${styles.panel} ${styles.feedPanel}`}>
-                        <h3 className={`${styles.panelTitle} ${styles.panelTitleSpaced}`}>Recent Customer Feedback</h3>
-                        {reviews.length === 0 ? (
-                          <p className={styles.emptyFeedNote}>
-                            No reviews submitted yet. Use the share link to collect customer ratings.
-                          </p>
-                        ) : (
-                          <div className={styles.reviewsFeed}>
-                            {reviews.map((rev) => (
-                              <div key={rev.id} className={styles.reviewItemCard}>
-                                <div className={styles.reviewItemHeader}>
-                                  <span className={styles.reviewAuthor}>{rev.user?.displayName || 'Buyer'}</span>
-                                  <StarRating rating={rev.rating} />
-                                </div>
-                                <p className={styles.reviewText}>{rev.reviewText}</p>
-                                {rev.verifiedBuyer && <span className={styles.purchaseBadge}>Verified Purchase</span>}
-
-                                {replyingId === rev.id ? (
-                                  <div className={styles.replyForm}>
-                                    <textarea
-                                      className={styles.replyTextarea}
-                                      value={replyDraft}
-                                      onChange={(e) => setReplyDraft(e.target.value)}
-                                      placeholder="Write a public reply to this review (10–500 characters)"
-                                      maxLength={500}
-                                      rows={3}
-                                    />
-                                    {replyError && <div className={styles.replyErrorNote}>{replyError}</div>}
-                                    <div className={styles.replyFormActions}>
-                                      <button
-                                        type="button"
-                                        className={styles.replyCancelBtn}
-                                        onClick={cancelReply}
-                                        disabled={replySaving}
-                                      >
-                                        Cancel
-                                      </button>
-                                      <button
-                                        type="button"
-                                        className={styles.replySaveBtn}
-                                        onClick={() => submitReply(rev.id)}
-                                        disabled={replySaving || replyDraft.trim().length < 10}
-                                      >
-                                        {replySaving ? 'Saving...' : 'Save Reply'}
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : rev.vendorReplyText ? (
-                                  <div className={styles.replyDisplay}>
-                                    <div className={styles.replyDisplayHeader}>
-                                      <span className={styles.replyDisplayLabel}>Your reply</span>
-                                      <button type="button" className={styles.replyToggleBtn} onClick={() => startReply(rev)}>
-                                        Edit
-                                      </button>
-                                    </div>
-                                    <p className={styles.replyDisplayText}>{rev.vendorReplyText}</p>
-                                  </div>
-                                ) : (
-                                  <button type="button" className={styles.replyToggleBtn} onClick={() => startReply(rev)}>
-                                    Reply
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <span className={styles.profileViewsNote}>
+                        {vendor.profileViews} profile view{vendor.profileViews !== 1 ? 's' : ''} so far
+                      </span>
                     </div>
                   </>
+                )}
+
+                {/* REVIEWS TAB */}
+                {activeTab === 'reviews' && (
+                  <div className={styles.panel}>
+                    <h3 className={`${styles.panelTitle} ${styles.panelTitleSpaced}`}>Customer Reviews</h3>
+                    <p className={styles.panelSubtitle}>
+                      {vendor.reviewCount} review{vendor.reviewCount !== 1 ? 's' : ''} from your community.
+                    </p>
+                    {reviews.length === 0 ? (
+                      <p className={styles.emptyFeedNote}>
+                        No reviews submitted yet. Use the share link to collect customer ratings.
+                      </p>
+                    ) : (
+                      <div className={styles.reviewsFeed}>
+                        {reviews.map((rev) => (
+                          <ReviewCard
+                            key={rev.id}
+                            review={rev}
+                            vendorName={vendor.businessName || undefined}
+                            onReplyClick={() => startReply(rev)}
+                            replyFormSlot={replyingId === rev.id ? (
+                              <div className={styles.replyForm}>
+                                <textarea
+                                  className={styles.replyTextarea}
+                                  value={replyDraft}
+                                  onChange={(e) => setReplyDraft(e.target.value)}
+                                  placeholder="Write a public reply to this review (10–500 characters)"
+                                  maxLength={500}
+                                  rows={3}
+                                />
+                                {replyError && <div className={styles.replyErrorNote}>{replyError}</div>}
+                                <div className={styles.replyFormActions}>
+                                  <button
+                                    type="button"
+                                    className={styles.replyCancelBtn}
+                                    onClick={cancelReply}
+                                    disabled={replySaving}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={styles.replySaveBtn}
+                                    onClick={() => submitReply(rev.id)}
+                                    disabled={replySaving || replyDraft.trim().length < 10}
+                                  >
+                                    {replySaving ? 'Saving...' : 'Save Reply'}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : undefined}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 {/* EDIT TAB */}

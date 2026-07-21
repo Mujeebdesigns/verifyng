@@ -8,12 +8,18 @@ interface ReviewCardProps {
   review: ReviewResponse;
   onEditClick?: (review: ReviewResponse) => void;
   vendorName?: string;
+  /** Vendor-only: renders a Reply/Edit reply action in the footer. */
+  onReplyClick?: (review: ReviewResponse) => void;
+  /** Vendor-only: when set (this review is being replied to), renders in place of the static reply block. */
+  replyFormSlot?: React.ReactNode;
 }
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({
   review,
   onEditClick,
   vendorName,
+  onReplyClick,
+  replyFormSlot,
 }) => {
   const { user } = useAuth();
   const {
@@ -76,12 +82,14 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           : reviewText}
       </p>
 
-      {vendorReplyText && (
+      {replyFormSlot ? (
+        replyFormSlot
+      ) : vendorReplyText ? (
         <div className={styles.vendorReply}>
           <span className={styles.vendorReplyLabel}>Response from {vendorName || 'the vendor'}</span>
           <p className={styles.vendorReplyText}>{vendorReplyText}</p>
         </div>
-      )}
+      ) : null}
 
       <div className={styles.footer}>
         <div className={styles.channelInfo}>
@@ -97,6 +105,15 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               onClick={() => onEditClick(review)}
             >
               Edit
+            </button>
+          )}
+          {onReplyClick && !replyFormSlot && (
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={() => onReplyClick(review)}
+            >
+              {vendorReplyText ? 'Edit reply' : 'Reply'}
             </button>
           )}
         </div>

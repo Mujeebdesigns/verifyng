@@ -493,92 +493,7 @@
   gap: 1rem;
 }
 
-.reviewItemCard {
-  border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
-  padding-bottom: 1rem;
-}
-
-.reviewItemCard:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.reviewItemHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.375rem;
-}
-
-.reviewAuthor {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-main-900);
-}
-
-.reviewText {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-sub-500);
-  line-height: 1.5;
-}
-
-.purchaseBadge {
-  display: inline-block;
-  margin-top: 0.375rem;
-  font-size: 0.6875rem;
-  background-color: var(--color-primary-primary-lighter);
-  color: var(--color-primary-primary-dark);
-  padding: 0.0625rem 0.375rem;
-  border-radius: 0.25rem;
-  font-weight: 500;
-}
-
 /* Vendor reply to a review */
-.replyToggleBtn {
-  background: none;
-  border: none;
-  padding: 0;
-  margin-top: 0.625rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-primary-primary-dark);
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.replyToggleBtn:hover {
-  color: var(--color-primary-primary-base);
-}
-
-.replyDisplay {
-  margin-top: 0.75rem;
-  padding: 0.75rem 0.875rem;
-  border-radius: 0.5rem;
-  background-color: var(--color-bg-weak-100);
-  border-left: 0.1875rem solid var(--color-primary-primary-base);
-}
-
-.replyDisplayHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-}
-
-.replyDisplayLabel {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-main-900);
-}
-
-.replyDisplayText {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-text-sub-500);
-  line-height: 1.5;
-}
-
 .replyForm {
   margin-top: 0.75rem;
   display: flex;
@@ -794,26 +709,6 @@
   font-size: 0.875rem;
   color: var(--color-text-soft-400);
   font-weight: normal;
-}
-
-.splitRow {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  flex-direction: row;
-}
-
-.splitCol {
-  flex: 1;
-  min-width: 20rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.feedPanel {
-  flex: 1.2;
-  min-width: 20rem;
 }
 
 .panelTitleSpaced {
