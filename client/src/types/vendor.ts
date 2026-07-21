@@ -53,6 +53,7 @@ export interface VendorDetail {
   trustScore: number;
   trustLabel: string;
   reviewCount: number;
+  profileViews: number;
   scamFlag: boolean;
   moderationFlag: boolean;
   coverImage: string | null;

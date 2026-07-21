@@ -677,6 +677,9 @@ export const VendorDashboard: React.FC = () => {
                               {copySuccess ? 'Copied!' : 'Copy Link'}
                             </Button>
                           </div>
+                          <span className={styles.profileViewsNote}>
+                            {vendor.profileViews} profile view{vendor.profileViews !== 1 ? 's' : ''} so far
+                          </span>
                         </div>
                       </div>
 

@@ -382,6 +382,13 @@
   gap: 0.5rem;
 }
 
+.profileViewsNote {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-soft-400);
+}
+
 .shareInput {
   flex: 1;
   padding: 0.625rem;

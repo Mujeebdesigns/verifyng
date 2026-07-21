@@ -90,6 +90,7 @@ model Vendor {
   trustScore       Float       @default(0.0)
   trustLabel       String      @default("Unrated")
   reviewCount      Int         @default(0)
+  profileViews     Int         @default(0)
   scamFlag         Boolean     @default(false)
   moderationFlag   Boolean     @default(false)
   coverImage       String?

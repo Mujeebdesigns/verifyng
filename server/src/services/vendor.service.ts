@@ -3,6 +3,7 @@ import { normaliseSearchQuery } from '../utils/normaliseSearchQuery.js';
 import { normalizeInstagramHandle } from '../utils/normalizeInstagramHandle.js';
 import { AppError } from '../utils/AppError.js';
 import { env } from '../utils/env.js';
+import { logger } from '../utils/logger.js';
 import { toVendorSearchResult, toVendorDetail } from '../utils/vendorMapper.js';
 import type { ClaimStatus, Prisma } from '@prisma/client';
 import type {
@@ -86,6 +87,16 @@ export async function getById(id: string, viewerUserId: string | null = null): P
 
   if (!vendor) {
     throw new AppError('Vendor not found', 404);
+  }
+
+  // Count the view unless the vendor is looking at their own profile.
+  // Fire-and-forget — a failed increment should never slow down or break a page load.
+  if (vendor.ownerId === null || vendor.ownerId !== viewerUserId) {
+    prisma.vendor
+      .update({ where: { id }, data: { profileViews: { increment: 1 } } })
+      .catch((error: unknown) => {
+        logger.error('Failed to increment vendor profile view count', error);
+      });
   }
 
   return toVendorDetail(vendor, viewerUserId);

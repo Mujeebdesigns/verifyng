@@ -66,6 +66,7 @@ export function toVendorDetail(vendor: Vendor, viewerUserId: string | null = nul
     trustScore: vendor.trustScore,
     trustLabel: vendor.trustLabel,
     reviewCount: vendor.reviewCount,
+    profileViews: vendor.profileViews,
     scamFlag: vendor.scamFlag,
     moderationFlag: vendor.moderationFlag,
     coverImage: vendor.coverImage,
