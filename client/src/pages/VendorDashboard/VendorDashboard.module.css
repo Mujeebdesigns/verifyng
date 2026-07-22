@@ -657,21 +657,73 @@
   margin-bottom: 1.5rem;
 }
 
-.fileInput {
-  display: block;
-  width: 100%;
-  padding: 0.5rem;
-  border: 0.0625rem dashed var(--color-stroke-soft-200);
-  border-radius: 0.5rem;
+.hiddenFileInput {
+  display: none;
+}
+
+.uploadBox {
+  border: 0.0625rem dashed var(--color-stroke-sub-300);
+  border-radius: 0.75rem;
+  padding: 2rem 1.25rem;
   background: var(--color-bg-white-0);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.uploadBox:hover {
+  border-color: var(--color-primary-primary-base);
+}
+
+.uploadIconWrap {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-primary-primary-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-primary-base);
+  flex-shrink: 0;
+}
+
+.uploadTextCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.uploadTitle {
+  font-size: 0.875rem;
+  color: var(--color-text-main-900);
+  font-weight: 500;
+}
+
+.uploadSubtext {
+  font-size: 0.8125rem;
+  color: var(--color-text-soft-400);
+}
+
+.uploadLink {
+  color: var(--color-primary-primary-base);
+  font-weight: 500;
+}
+
+.uploadMeta {
+  font-size: 0.6875rem;
+  color: var(--color-text-soft-400);
+  margin-top: 0.125rem;
 }
 
 .fileHint {
   font-size: 0.75rem;
   color: var(--color-text-soft-400);
-  margin-top: 0.375rem;
-  margin: 0;
+  margin: 0.5rem 0 0;
 }
 
 .fileError {
@@ -715,10 +767,6 @@
 
 .panelTitleSpaced {
   margin-bottom: 1rem;
-}
-
-.panelTitleSpacedLg {
-  margin-bottom: 1.25rem;
 }
 
 .emptyFeedNote {

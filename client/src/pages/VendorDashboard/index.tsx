@@ -41,6 +41,65 @@ const STATES = [
 
 type TabType = 'overview' | 'reviews' | 'edit';
 
+interface ImageUploadBoxProps {
+  id: string;
+  title: string;
+  metaText: string;
+  caption: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error: string | null;
+  previewSrc: string;
+  previewClassName: string;
+  required?: boolean;
+}
+
+/** Dashed drag-and-drop-styled upload trigger, matching the registration wizard's cover/logo upload step. */
+const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({
+  id,
+  title,
+  metaText,
+  caption,
+  onChange,
+  error,
+  previewSrc,
+  previewClassName,
+  required,
+}) => (
+  <div>
+    <div className={styles.uploadBox} onClick={() => document.getElementById(id)?.click()}>
+      <input
+        id={id}
+        type="file"
+        accept="image/*"
+        required={required}
+        onChange={onChange}
+        className={styles.hiddenFileInput}
+      />
+      <div className={styles.uploadIconWrap}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>
+      </div>
+      <div className={styles.uploadTextCol}>
+        <span className={styles.uploadTitle}>{title}</span>
+        <span className={styles.uploadSubtext}>
+          <span className={styles.uploadLink}>Click to browse</span> or drag and drop
+        </span>
+        <span className={styles.uploadMeta}>{metaText}</span>
+      </div>
+    </div>
+    {error && <div className={styles.fileError}>{error}</div>}
+    <p className={styles.fileHint}>{caption}</p>
+    {previewSrc && !error && (
+      <div className={previewClassName}>
+        <img src={previewSrc} alt={`${title} preview`} className={styles.previewImg} />
+      </div>
+    )}
+  </div>
+);
+
 export const VendorDashboard: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -365,7 +424,7 @@ export const VendorDashboard: React.FC = () => {
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
-                Edit Business Details
+                Profile
               </button>
             </nav>
           )}
@@ -378,11 +437,17 @@ export const VendorDashboard: React.FC = () => {
               ← Back to Search
             </Link>
             <h1 className={styles.pageTitle}>
-              {vendor && activeTab === 'reviews' ? 'Customer Reviews' : 'Vendor Dashboard'}
+              {vendor && activeTab === 'reviews'
+                ? 'Customer Reviews'
+                : vendor && activeTab === 'edit'
+                ? 'Profile'
+                : 'Vendor Dashboard'}
             </h1>
             <p className={styles.pageSubtitle}>
               {vendor && activeTab === 'reviews'
                 ? `${vendor.reviewCount} review${vendor.reviewCount !== 1 ? 's' : ''} from your community.`
+                : vendor && activeTab === 'edit'
+                ? 'Update your business details, contact info, and images.'
                 : vendor
                 ? 'Manage your credentials, verify reviews, and update your business bio.'
                 : 'Publish your business page to start collecting reviews.'}
@@ -485,56 +550,32 @@ export const VendorDashboard: React.FC = () => {
                   </div>
 
                   <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
-                    <label className={styles.formLabel} htmlFor="coverImageInput">Product Cover Image *</label>
-                    <div>
-                      <input
-                        id="coverImageInput"
-                        type="file"
-                        accept="image/*"
-                        required
-                        onChange={handleImageChange}
-                        className={styles.fileInput}
-                      />
-                      <p className={styles.fileHint}>
-                        Add a product photo that represents your business best — this is what buyers see first. Minimum size 800×37.5rem.
-                      </p>
-                      {coverImageError && (
-                        <div className={styles.fileError}>
-                          {coverImageError}
-                        </div>
-                      )}
-                      {coverImage && !coverImageError && (
-                        <div className={styles.coverPreview}>
-                          <img src={coverImage} alt="Cover Preview" className={styles.previewImg} />
-                        </div>
-                      )}
-                    </div>
+                    <label className={styles.formLabel}>Product Cover Image *</label>
+                    <ImageUploadBox
+                      id="coverImageInput"
+                      title="Upload cover image"
+                      metaText="JPG, PNG or WEBP · Min 800×600px · Max 8MB"
+                      caption="Add a product photo that represents your business best — this is what buyers see first."
+                      onChange={handleImageChange}
+                      error={coverImageError}
+                      previewSrc={coverImage}
+                      previewClassName={styles.coverPreview}
+                      required
+                    />
                   </div>
 
                   <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
-                    <label className={styles.formLabel} htmlFor="logoImageInput">Logo / Profile Picture</label>
-                    <div>
-                      <input
-                        id="logoImageInput"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoChange}
-                        className={styles.fileInput}
-                      />
-                      <p className={styles.fileHint}>
-                        Add a logo or profile picture for your business. Minimum size 200×12.5rem.
-                      </p>
-                      {logoImageError && (
-                        <div className={styles.fileError}>
-                          {logoImageError}
-                        </div>
-                      )}
-                      {logoImage && !logoImageError && (
-                        <div className={styles.logoPreview}>
-                          <img src={logoImage} alt="Logo Preview" className={styles.previewImg} />
-                        </div>
-                      )}
-                    </div>
+                    <label className={styles.formLabel}>Logo / Profile Picture</label>
+                    <ImageUploadBox
+                      id="logoImageInput"
+                      title="Upload logo"
+                      metaText="JPG, PNG or WEBP · Min 200×200px · Max 8MB"
+                      caption="Add a logo or profile picture for your business."
+                      onChange={handleLogoChange}
+                      error={logoImageError}
+                      previewSrc={logoImage}
+                      previewClassName={styles.logoPreview}
+                    />
                   </div>
 
                   <h3 className={styles.sectionTitle}>Social Profiles</h3>
@@ -754,7 +795,6 @@ export const VendorDashboard: React.FC = () => {
                 {/* EDIT TAB */}
                 {activeTab === 'edit' && (
                   <div className={styles.panel}>
-                    <h3 className={`${styles.panelTitle} ${styles.panelTitleSpacedLg}`}>Update Business Profile</h3>
                     {saveSuccess && (
                       <div className={styles.saveSuccessNote}>
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -825,55 +865,31 @@ export const VendorDashboard: React.FC = () => {
                       </div>
 
                       <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
-                        <label className={styles.formLabel} htmlFor="editCoverImageInput">Product Cover Image</label>
-                        <div>
-                          <input
-                            id="editCoverImageInput"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className={styles.fileInput}
-                          />
-                          <p className={styles.fileHint}>
-                            Add a product photo that represents your business best — this is what buyers see first. Minimum size 800×37.5rem.
-                          </p>
-                          {coverImageError && (
-                            <div className={styles.fileError}>
-                              {coverImageError}
-                            </div>
-                          )}
-                          {coverImage && !coverImageError && (
-                            <div className={styles.coverPreview}>
-                              <img src={coverImage} alt="Cover Preview" className={styles.previewImg} />
-                            </div>
-                          )}
-                        </div>
+                        <label className={styles.formLabel}>Product Cover Image</label>
+                        <ImageUploadBox
+                          id="editCoverImageInput"
+                          title="Upload cover image"
+                          metaText="JPG, PNG or WEBP · Min 800×600px · Max 8MB"
+                          caption="Add a product photo that represents your business best — this is what buyers see first."
+                          onChange={handleImageChange}
+                          error={coverImageError}
+                          previewSrc={coverImage}
+                          previewClassName={styles.coverPreview}
+                        />
                       </div>
 
                       <div className={`${styles.formGroup} ${styles.formGroupLoose}`}>
-                        <label className={styles.formLabel} htmlFor="editLogoImageInput">Logo / Profile Picture</label>
-                        <div>
-                          <input
-                            id="editLogoImageInput"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleLogoChange}
-                            className={styles.fileInput}
-                          />
-                          <p className={styles.fileHint}>
-                            Add a logo or profile picture for your business. Minimum size 200×12.5rem.
-                          </p>
-                          {logoImageError && (
-                            <div className={styles.fileError}>
-                              {logoImageError}
-                            </div>
-                          )}
-                          {logoImage && !logoImageError && (
-                            <div className={styles.logoPreview}>
-                              <img src={logoImage} alt="Logo Preview" className={styles.previewImg} />
-                            </div>
-                          )}
-                        </div>
+                        <label className={styles.formLabel}>Logo / Profile Picture</label>
+                        <ImageUploadBox
+                          id="editLogoImageInput"
+                          title="Upload logo"
+                          metaText="JPG, PNG or WEBP · Min 200×200px · Max 8MB"
+                          caption="Add a logo or profile picture for your business."
+                          onChange={handleLogoChange}
+                          error={logoImageError}
+                          previewSrc={logoImage}
+                          previewClassName={styles.logoPreview}
+                        />
                       </div>
 
                       <h4 className={styles.sectionTitle}>Contact & Social Channels</h4>
