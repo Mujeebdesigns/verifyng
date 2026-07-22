@@ -5,12 +5,15 @@ interface StarRatingProps {
   rating: number;
   interactive?: boolean;
   onChange?: (rating: number) => void;
+  /** 'sm' renders smaller stars for compact contexts like review cards. Defaults to the standard size. */
+  size?: 'sm' | 'md';
 }
 
 export const StarRating: React.FC<StarRatingProps> = ({
   rating,
   interactive = false,
   onChange,
+  size = 'md',
 }) => {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
@@ -36,7 +39,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
 
   return (
     <div
-      className={[styles.container, interactive ? styles.interactive : ''].join(
+      className={[styles.container, interactive ? styles.interactive : '', size === 'sm' ? styles.sm : ''].join(
         ' '
       )}
       onMouseLeave={handleMouseLeave}

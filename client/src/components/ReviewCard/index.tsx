@@ -68,7 +68,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           )}
         </div>
         <div className={styles.ratingRow}>
-          <StarRating rating={rating} />
+          <StarRating rating={rating} size="sm" />
         </div>
       </div>
 

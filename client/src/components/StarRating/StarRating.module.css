@@ -30,3 +30,7 @@
 .filled {
   color: #fbbf24; /* Yellow gold */
 }
+
+.sm .star {
+  font-size: 1.0625rem;
+}
