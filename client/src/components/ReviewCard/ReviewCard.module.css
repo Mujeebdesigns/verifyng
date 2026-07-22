@@ -1,13 +1,18 @@
 .card {
   background-color: var(--color-bg-white-0);
   border: 0.0625rem solid var(--color-stroke-soft-200);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  box-shadow: var(--effect-regular-shadow-small);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: none;
+  transition: border-color 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+}
+
+.card:hover {
+  border-color: var(--color-text-soft-400);
 }
 
 .header {
