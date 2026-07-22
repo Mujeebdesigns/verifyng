@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { StarRating } from '../StarRating/index.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import type { ReviewResponse } from '../../types/review.js';
@@ -22,6 +22,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   replyFormSlot,
 }) => {
   const { user } = useAuth();
+  const [showReply, setShowReply] = useState(false);
   const {
     rating,
     reviewText,
@@ -86,8 +87,28 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         replyFormSlot
       ) : vendorReplyText ? (
         <div className={styles.vendorReply}>
-          <span className={styles.vendorReplyLabel}>Response from {vendorName || 'the vendor'}</span>
-          <p className={styles.vendorReplyText}>{vendorReplyText}</p>
+          <button
+            type="button"
+            className={styles.vendorReplyToggle}
+            onClick={() => setShowReply((prev) => !prev)}
+            aria-expanded={showReply}
+          >
+            <span className={styles.vendorReplyLabel}>Response from {vendorName || 'the vendor'}</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={[styles.vendorReplyChevron, showReply ? styles.vendorReplyChevronOpen : ''].join(' ')}
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          {showReply && <p className={styles.vendorReplyText}>{vendorReplyText}</p>}
         </div>
       ) : null}
 

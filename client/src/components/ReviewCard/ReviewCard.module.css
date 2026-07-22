@@ -87,16 +87,38 @@
   margin-bottom: 0.75rem;
 }
 
+.vendorReplyToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
 .vendorReplyLabel {
-  display: block;
   font-size: var(--font-label-x-small-font-size);
   font-weight: 600;
   color: var(--color-text-main-900);
-  margin-bottom: 0.25rem;
+}
+
+.vendorReplyChevron {
+  color: var(--color-text-soft-400);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.vendorReplyChevronOpen {
+  transform: rotate(180deg);
 }
 
 .vendorReplyText {
-  margin: 0;
+  margin: 0.5rem 0 0;
   font-size: var(--font-paragraph-x-small-font-size);
   color: var(--color-text-sub-500);
   line-height: 1.5;
