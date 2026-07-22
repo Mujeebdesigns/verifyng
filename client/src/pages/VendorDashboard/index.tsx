@@ -377,9 +377,15 @@ export const VendorDashboard: React.FC = () => {
             <Link to={ROUTES.HOME} className={styles.backLink}>
               ← Back to Search
             </Link>
-            <h1 className={styles.pageTitle}>Vendor Dashboard</h1>
+            <h1 className={styles.pageTitle}>
+              {vendor && activeTab === 'reviews' ? 'Customer Reviews' : 'Vendor Dashboard'}
+            </h1>
             <p className={styles.pageSubtitle}>
-              {vendor ? 'Manage your credentials, verify reviews, and update your business bio.' : 'Publish your business page to start collecting reviews.'}
+              {vendor && activeTab === 'reviews'
+                ? `${vendor.reviewCount} review${vendor.reviewCount !== 1 ? 's' : ''} from your community.`
+                : vendor
+                ? 'Manage your credentials, verify reviews, and update your business bio.'
+                : 'Publish your business page to start collecting reviews.'}
             </p>
           </div>
 
@@ -695,16 +701,6 @@ export const VendorDashboard: React.FC = () => {
                 {/* REVIEWS TAB */}
                 {activeTab === 'reviews' && (
                   <>
-                    <div className={styles.minimalHeader}>
-                      <div className={styles.headerTitleCol}>
-                        <h1 className={styles.minimalTitle}>Customer Reviews</h1>
-                        <div className={styles.headerMetaRow}>
-                          <span className={styles.metaLabel}>
-                            {vendor.reviewCount} review{vendor.reviewCount !== 1 ? 's' : ''} from your community.
-                          </span>
-                        </div>
-                      </div>
-                    </div>
                     {reviews.length === 0 ? (
                       <p className={styles.emptyFeedNote}>
                         No reviews submitted yet. Use the share link to collect customer ratings.
