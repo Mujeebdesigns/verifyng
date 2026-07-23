@@ -113,13 +113,4 @@ export type VendorSummaryApiResponse =
   | { status: 'generating' }
   | { status: 'unavailable' };
 
-/** Paginated response wrapper */
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+export type { PaginatedResponse } from './common.js';

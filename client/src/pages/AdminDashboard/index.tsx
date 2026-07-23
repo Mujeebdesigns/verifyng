@@ -104,86 +104,55 @@ export const AdminDashboard: React.FC = () => {
     setPage(1);
   };
 
-  // Claim actions
-  const handleClaimApproval = async (vendorId: string, approve: boolean) => {
+  /** Shared shape for every admin action below: clear the error, run it, refresh, report failure. */
+  const runAdminAction = async (action: () => Promise<unknown>, refresh: () => void) => {
     try {
       setError(null);
-      if (approve) {
-        await adminService.approveClaim(vendorId);
-      } else {
-        await adminService.rejectClaim(vendorId);
-      }
-      loadStats();
-      loadTabData();
+      await action();
+      refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Action failed');
     }
   };
+
+  // Claim actions
+  const handleClaimApproval = (vendorId: string, approve: boolean) =>
+    runAdminAction(
+      () => (approve ? adminService.approveClaim(vendorId) : adminService.rejectClaim(vendorId)),
+      () => { loadStats(); loadTabData(); }
+    );
 
   // Report actions
-  const handleResolveReport = async (reportId: string, status: 'REVIEWED' | 'DISMISSED') => {
-    try {
-      setError(null);
-      await adminService.resolveReport(reportId, status);
-      loadStats();
-      loadTabData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    }
-  };
+  const handleResolveReport = (reportId: string, status: 'REVIEWED' | 'DISMISSED') =>
+    runAdminAction(
+      () => adminService.resolveReport(reportId, status),
+      () => { loadStats(); loadTabData(); }
+    );
 
   // Review actions — admin endpoints (no ownership/time-window limits).
-  const handleDeleteReview = async (reviewId: string) => {
+  const handleDeleteReview = (reviewId: string) => {
     if (!window.confirm('Delete this review permanently? This cannot be undone.')) return;
-    try {
-      setError(null);
-      await adminService.deleteReview(reviewId);
-      loadStats();
-      loadTabData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    }
+    return runAdminAction(
+      () => adminService.deleteReview(reviewId),
+      () => { loadStats(); loadTabData(); }
+    );
   };
 
-  const handleVerifyReview = async (reviewId: string, verified: boolean) => {
-    try {
-      setError(null);
-      await adminService.verifyReview(reviewId, verified);
-      loadTabData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    }
-  };
+  const handleVerifyReview = (reviewId: string, verified: boolean) =>
+    runAdminAction(() => adminService.verifyReview(reviewId, verified), loadTabData);
 
-  const handleToggleFeature = async (vendorId: string) => {
-    try {
-      setError(null);
-      await adminService.toggleFeatured(vendorId);
-      loadTabData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    }
-  };
+  const handleToggleFeature = (vendorId: string) =>
+    runAdminAction(() => adminService.toggleFeatured(vendorId), loadTabData);
 
   // User actions
-  const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'delete' | 'promote') => {
+  const handleUserAction = (userId: string, action: 'ban' | 'unban' | 'delete' | 'promote') => {
     if (action === 'delete' && !window.confirm('Delete this user? All reviews and reports from this user will be deleted too.')) return;
-    try {
-      setError(null);
-      if (action === 'ban') {
-        await adminService.banUser(userId);
-      } else if (action === 'unban') {
-        await adminService.unbanUser(userId);
-      } else if (action === 'promote') {
-        await adminService.promoteUser(userId);
-      } else if (action === 'delete') {
-        await adminService.deleteUser(userId);
-      }
-      loadStats();
-      loadTabData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    }
+    return runAdminAction(() => {
+      if (action === 'ban') return adminService.banUser(userId);
+      if (action === 'unban') return adminService.unbanUser(userId);
+      if (action === 'promote') return adminService.promoteUser(userId);
+      return adminService.deleteUser(userId);
+    }, () => { loadStats(); loadTabData(); });
   };
 
   return (

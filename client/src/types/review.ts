@@ -62,16 +62,7 @@ export interface MyReviewResponse {
   };
 }
 
-/** Paginated response wrapper */
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+export type { PaginatedResponse } from './common.js';
 
 /** POST /api/vendors/:id/report request body */
 export interface CreateReportPayload {

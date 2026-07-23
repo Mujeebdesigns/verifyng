@@ -13,6 +13,7 @@ export function toVendorSearchResult(vendor: Pick<
   | 'scamFlag'
   | 'moderationFlag'
   | 'state'
+  | 'city'
   | 'category'
   | 'claimStatus'
   | 'featured'
@@ -31,6 +32,7 @@ export function toVendorSearchResult(vendor: Pick<
     scamFlag: vendor.scamFlag,
     moderationFlag: vendor.moderationFlag,
     state: vendor.state,
+    city: vendor.city,
     category: vendor.category,
     claimStatus: vendor.claimStatus as ClaimStatus,
     featured: vendor.featured,

@@ -5,59 +5,6 @@
   background-color: var(--color-bg-weak-100);
 }
 
-.nav {
-  height: 4.5rem;
-  background-color: var(--color-bg-white-0);
-  border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--effect-regular-shadow-x-small);
-}
-
-.navContainer {
-  width: 100%;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.navLogo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.logoImg {
-  height: 2.5rem;
-  width: auto;
-  display: block;
-}
-
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.navLink {
-  color: var(--color-text-sub-500);
-  text-decoration: none;
-  font-size: var(--font-label-small-font-size);
-  font-weight: 500;
-  transition: color 0.2s;
-  min-height: 2.75rem;
-  display: flex;
-  align-items: center;
-}
-
-.navLink:hover {
-  color: var(--color-primary-primary-base);
-}
-
 /* Sidebar Layout Container */
 .dashboardContainer {
   display: flex;
@@ -218,16 +165,6 @@
   font-size: 0.875rem;
   color: var(--color-text-soft-400);
   margin: 0;
-}
-
-.contentBody {
-  width: 100%;
-}
-
-.tabContent {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
 }
 
 /* Panel Card Container */
@@ -431,12 +368,6 @@
   color: var(--color-primary-primary-dark);
 }
 
-.badgeWarning {
-  composes: badge;
-  background-color: color-mix(in srgb, var(--color-state-warning) 14%, transparent);
-  color: var(--color-state-warning);
-}
-
 .badgeDanger {
   composes: badge;
   background-color: color-mix(in srgb, var(--color-state-error) 10%, transparent);
@@ -447,12 +378,6 @@
   composes: badge;
   background-color: var(--color-bg-soft-200);
   color: var(--color-text-sub-500);
-}
-
-.badgeInfo {
-  composes: badge;
-  background-color: color-mix(in srgb, var(--color-state-information) 12%, transparent);
-  color: var(--color-state-information);
 }
 
 /* Flagged Review Cards */

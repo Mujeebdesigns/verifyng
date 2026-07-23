@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
-import { ROUTES } from '../../utils/constants.js';
+import { ROUTES, MAX_BUSINESS_DESCRIPTION_LENGTH } from '../../utils/constants.js';
 import { Button } from '../Button/index.js';
 import { ErrorMessage } from '../ErrorMessage/index.js';
 import { Turnstile, type TurnstileHandle } from '../Turnstile/index.js';
@@ -11,7 +11,7 @@ import formStyles from './RegisterForm.module.css';
 import { EMPTY_FIELDS, type FieldName, type WizardFormApi } from './types.js';
 import { SIMPLE_FLAT_CSS } from './flatStyles.js';
 import { getPasswordPolicyError } from '../../utils/passwordPolicy.js';
-import { compressImage } from '../../utils/compressImage.js';
+import { useImageUpload } from '../../hooks/useImageUpload.js';
 import { PasswordRequirements } from '../PasswordRequirements/index.js';
 import { SuccessScreen } from './SuccessScreen.tsx';
 import { StepAccountFields } from './StepAccountFields.tsx';
@@ -49,7 +49,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
   const [fields, setFields] = useState(EMPTY_FIELDS);
 
   // Branding (step 3)
-  const [coverImage, setCoverImage] = useState('');
+  const { value: coverImage, error: coverImageError, handleChange: handleCoverChange } = useImageUpload({
+    maxDimension: 1600,
+    minWidth: 800,
+    minHeight: 600,
+  });
 
   // Checkbox states for terms & conditions
   const [agreedTerms, setAgreedTerms] = useState(false);
@@ -59,7 +63,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
   // Error & Status states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [coverImageError, setCoverImageError] = useState<string | null>(null);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [success, setSuccess] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -128,7 +131,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
       case 'description':
         if (!value) return 'Description is required';
         if (value.trim().length < 10) return 'Must be at least 10 characters';
-        if (value.trim().length > 500) return 'Must be under 500 characters';
+        if (value.trim().length > MAX_BUSINESS_DESCRIPTION_LENGTH) return `Must be under ${MAX_BUSINESS_DESCRIPTION_LENGTH} characters`;
         return '';
       default:
         return '';
@@ -150,32 +153,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
     setFields((p) => ({ ...p, [name]: value }));
     if (touched[name]) {
       setFieldErrors((p) => ({ ...p, [name]: getFieldError(name, value) }));
-    }
-  };
-
-  // Image Upload Handler — validates size/dimensions, then compresses so the
-  // stored/uploaded base64 stays small (raw multi-MB photos otherwise break the
-  // registration request; see compressImage).
-  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setCoverImageError(null);
-
-    if (file.size > 8 * 1024 * 1024) {
-      setCoverImageError('Image is too large. Maximum size is 8MB.');
-      return;
-    }
-
-    try {
-      const { dataUrl, width, height } = await compressImage(file, { maxDimension: 1600 });
-      if (width < 800 || height < 600) {
-        setCoverImageError(`Image is too small (${width}x${height}px). Minimum required is 800x600px.`);
-        return;
-      }
-      setCoverImage(dataUrl);
-    } catch (err) {
-      setCoverImageError(err instanceof Error ? err.message : 'Invalid image file.');
     }
   };
 

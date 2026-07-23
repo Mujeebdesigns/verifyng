@@ -20,6 +20,7 @@ export interface VendorSearchResult {
   scamFlag: boolean;
   moderationFlag: boolean;
   state: string | null;
+  city: string | null;
   category: string | null;
   claimStatus: ClaimStatus;
   featured: boolean;

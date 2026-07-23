@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../../components/Navbar/index.js';
 import { useAuth } from '../../hooks/useAuth.js';
-import { ROUTES } from '../../utils/constants.js';
+import { ROUTES, REVIEW_EDIT_WINDOW_HOURS } from '../../utils/constants.js';
 import styles from './Support.module.css';
 
 // SVG Icons
@@ -100,7 +100,7 @@ export const Support: React.FC = () => {
     {
       category: 'Reviews',
       question: 'Can I edit or delete my review?',
-      answer: 'You can edit or update your submitted reviews within a 48-hour window from your user dashboard. After 48 hours, reviews are permanently locked to preserve community review integrity.'
+      answer: `You can edit or update your submitted reviews within a ${REVIEW_EDIT_WINDOW_HOURS}-hour window from your user dashboard. After ${REVIEW_EDIT_WINDOW_HOURS} hours, reviews are permanently locked to preserve community review integrity.`
     },
     {
       category: 'AI Summaries',

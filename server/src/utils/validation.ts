@@ -10,6 +10,9 @@ const PASSWORD_MAX_LENGTH = 64;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
 const PASSWORD_POLICY_MESSAGE =
   'Password must be 8-64 characters and include an uppercase letter, a lowercase letter, a number, and a special character';
+// Matches the client's MAX_BUSINESS_DESCRIPTION_LENGTH in client/src/utils/constants.ts.
+const MAX_DESCRIPTION_LENGTH = 500;
+const MAX_REPLY_TEXT_LENGTH = 500;
 
 export interface RegistrationInput {
   email: string;
@@ -69,8 +72,8 @@ export function validateReviewText(text: string, res: ServerResponse): string | 
 
 export function validateReplyText(text: string, res: ServerResponse): string | null {
   const trimmed = text.trim();
-  if (trimmed.length < 10 || trimmed.length > 500) {
-    sendError(res, 400, 'Reply must be between 10 and 500 characters');
+  if (trimmed.length < 10 || trimmed.length > MAX_REPLY_TEXT_LENGTH) {
+    sendError(res, 400, `Reply must be between 10 and ${MAX_REPLY_TEXT_LENGTH} characters`);
     return null;
   }
   return trimmed;
@@ -188,8 +191,8 @@ export function validateVendorTextFields(body: {
   }
 
   if (body.description !== undefined) {
-    if (body.description.trim().length < 10 || body.description.length > 500) {
-      return 'Description must be between 10 and 500 characters';
+    if (body.description.trim().length < 10 || body.description.length > MAX_DESCRIPTION_LENGTH) {
+      return `Description must be between 10 and ${MAX_DESCRIPTION_LENGTH} characters`;
     }
   }
 

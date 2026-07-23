@@ -6,53 +6,6 @@
   padding-top: 4.25rem;
 }
 
-.nav {
-  height: 4.5rem;
-  background-color: var(--color-bg-white-0);
-  border-bottom: 0.0625rem solid var(--color-stroke-soft-200);
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--effect-regular-shadow-x-small);
-}
-
-.navContainer {
-  width: 100%;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logoImg {
-  height: 2.5rem;
-  width: auto;
-  display: block;
-}
-
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.navLink {
-  color: var(--color-text-sub-500);
-  text-decoration: none;
-  font-size: var(--font-label-small-font-size);
-  font-weight: 500;
-  transition: color 0.2s;
-  min-height: 2.75rem;
-  display: flex;
-  align-items: center;
-}
-
-.navLink:hover {
-  color: var(--color-primary-primary-base);
-}
-
 /* Sidebar Layout Container */
 .dashboardContainer {
   display: flex;
@@ -763,10 +716,6 @@
   font-size: 0.875rem;
   color: var(--color-text-soft-400);
   font-weight: normal;
-}
-
-.panelTitleSpaced {
-  margin-bottom: 1rem;
 }
 
 .emptyFeedNote {

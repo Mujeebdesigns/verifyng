@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { StarRating } from '../StarRating/index.js';
 import { useAuth } from '../../hooks/useAuth.js';
+import { REVIEW_EDIT_WINDOW_HOURS } from '../../utils/constants.js';
 import type { ReviewResponse } from '../../types/review.js';
 import styles from './ReviewCard.module.css';
 
@@ -35,12 +36,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     user: reviewUser,
   } = review;
 
-  // Determine if review is editable (user is author and within 48-hour window)
+  // Determine if review is editable (user is author and within the edit window)
   /* eslint-disable react-hooks/purity */
   const isEditable = useMemo(() => {
     if (!user || user.id !== review.userId) return false;
     const createdAtDate = new Date(createdAt).getTime();
-    return Date.now() - createdAtDate < 48 * 60 * 60 * 1000;
+    return Date.now() - createdAtDate < REVIEW_EDIT_WINDOW_HOURS * 60 * 60 * 1000;
   }, [user, review.userId, createdAt]);
   /* eslint-enable react-hooks/purity */
 

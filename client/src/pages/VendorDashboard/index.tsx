@@ -11,8 +11,8 @@ import { CustomSelect } from '../../components/CustomSelect/index.js';
 import { ReviewCard } from '../../components/ReviewCard/index.js';
 import type { VendorDetail, VendorSummaryResponse, VendorSummaryApiResponse } from '../../types/vendor.js';
 import type { ReviewResponse } from '../../types/review.js';
-import { ROUTES } from '../../utils/constants.js';
-import { compressImage } from '../../utils/compressImage.js';
+import { ROUTES, MAX_BUSINESS_DESCRIPTION_LENGTH } from '../../utils/constants.js';
+import { useImageUpload } from '../../hooks/useImageUpload.js';
 import styles from './VendorDashboard.module.css';
 
 const CATEGORIES = [
@@ -126,67 +126,31 @@ export const VendorDashboard: React.FC = () => {
   const [linkedin, setLinkedin] = useState('');
   
   // Onboarding Form (New Profile)
-  const [bizName, setBizName] = useState('');
+  const [businessName, setBusinessName] = useState('');
   const [phone, setPhone] = useState('');
 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  const [coverImage, setCoverImage] = useState('');
-  const [coverImageError, setCoverImageError] = useState<string | null>(null);
-  const [logoImage, setLogoImage] = useState('');
-  const [logoImageError, setLogoImageError] = useState<string | null>(null);
+  const {
+    value: coverImage,
+    setValue: setCoverImage,
+    error: coverImageError,
+    handleChange: handleImageChange,
+  } = useImageUpload({ maxDimension: 1600, minWidth: 800, minHeight: 600 });
+  const {
+    value: logoImage,
+    setValue: setLogoImage,
+    error: logoImageError,
+    handleChange: handleLogoChange,
+  } = useImageUpload({ maxDimension: 600, minWidth: 200, minHeight: 200 });
 
   // Review reply state
   const [replyingId, setReplyingId] = useState<string | null>(null);
   const [replyDraft, setReplyDraft] = useState('');
   const [replySaving, setReplySaving] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setCoverImageError(null);
-    if (file.size > 8 * 1024 * 1024) {
-      setCoverImageError('Image is too large. Maximum size is 8MB.');
-      return;
-    }
-
-    try {
-      const { dataUrl, width, height } = await compressImage(file, { maxDimension: 1600 });
-      if (width < 800 || height < 600) {
-        setCoverImageError(`Image is too small (${width}x${height}px). Minimum required is 800x600px.`);
-        return;
-      }
-      setCoverImage(dataUrl);
-    } catch (err) {
-      setCoverImageError(err instanceof Error ? err.message : 'Invalid image file.');
-    }
-  };
-
-  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setLogoImageError(null);
-    if (file.size > 8 * 1024 * 1024) {
-      setLogoImageError('Image is too large. Maximum size is 8MB.');
-      return;
-    }
-
-    try {
-      const { dataUrl, width, height } = await compressImage(file, { maxDimension: 600 });
-      if (width < 200 || height < 200) {
-        setLogoImageError(`Image is too small (${width}x${height}px). Minimum required is 200x200px.`);
-        return;
-      }
-      setLogoImage(dataUrl);
-    } catch (err) {
-      setLogoImageError(err instanceof Error ? err.message : 'Invalid image file.');
-    }
-  };
 
   const fetchProfileAndReviews = async () => {
     setLoading(true);
@@ -251,7 +215,7 @@ export const VendorDashboard: React.FC = () => {
     setError(null);
     setSaving(true);
 
-    if (!bizName || !category || !stateName || !cityName || !description) {
+    if (!businessName || !category || !stateName || !cityName || !description) {
       setError('Please fill in all required fields.');
       setSaving(false);
       return;
@@ -270,7 +234,7 @@ export const VendorDashboard: React.FC = () => {
     }
 
     const payload = {
-      businessName: bizName.trim(),
+      businessName: businessName.trim(),
       category,
       state: stateName,
       city: cityName.trim(),
@@ -464,14 +428,14 @@ export const VendorDashboard: React.FC = () => {
                 <form onSubmit={handleCreateProfile}>
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
-                      <label className={styles.formLabel} htmlFor="bizName">Business Name *</label>
+                      <label className={styles.formLabel} htmlFor="businessName">Business Name *</label>
                       <input
-                        id="bizName"
+                        id="businessName"
                         type="text"
                         required
                         placeholder="e.g. Trendy Fits"
-                        value={bizName}
-                        onChange={(e) => setBizName(e.target.value)}
+                        value={businessName}
+                        onChange={(e) => setBusinessName(e.target.value)}
                       />
                     </div>
                     <div className={styles.formGroup}>
@@ -527,8 +491,8 @@ export const VendorDashboard: React.FC = () => {
                       id="desc"
                       required
                       rows={4}
-                      maxLength={500}
-                      placeholder="Describe your business and services (max 500 characters)"
+                      maxLength={MAX_BUSINESS_DESCRIPTION_LENGTH}
+                      placeholder={`Describe your business and services (max ${MAX_BUSINESS_DESCRIPTION_LENGTH} characters)`}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                     />
@@ -837,13 +801,13 @@ export const VendorDashboard: React.FC = () => {
                       </div>
 
                       <div className={`${styles.formGroup} ${styles.formGroupTight}`}>
-                        <label className={styles.formLabel} htmlFor="editDesc">Business Description (max 500 characters)</label>
+                        <label className={styles.formLabel} htmlFor="editDesc">Business Description (max {MAX_BUSINESS_DESCRIPTION_LENGTH} characters)</label>
                         <textarea
                           id="editDesc"
                           className={styles.formTextarea}
                           required
                           rows={4}
-                          maxLength={500}
+                          maxLength={MAX_BUSINESS_DESCRIPTION_LENGTH}
                           value={description}
                           onChange={(e) => setDescription(e.target.value)}
                         />

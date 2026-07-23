@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import * as contactService from '../services/contact.service.js';
 import { sendJson, sendError } from '../utils/response.js';
 import { parseBody } from '../utils/parseBody.js';
-import { logger } from '../utils/logger.js';
+import { handleControllerError } from '../utils/controllerWrapper.js';
 import type { ContactMessagePayload } from '../types/contact.js';
 
 const EMAIL_REGEXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,7 +60,6 @@ export async function handleCreateContactMessage(req: IncomingMessage, res: Serv
       id: result.id,
     });
   } catch (error) {
-    logger.error('handleCreateContactMessage error', error);
-    sendError(res, 500, 'Internal server error');
+    handleControllerError(res, error, 'CreateContactMessage');
   }
 }

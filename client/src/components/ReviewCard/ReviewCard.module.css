@@ -166,24 +166,6 @@
   color: var(--color-primary-primary-base);
 }
 
-.deleteBtn {
-  background: none;
-  border: none;
-  font-size: var(--font-label-x-small-font-size);
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--color-text-sub-500);
-  padding: 0;
-  margin: 0;
-  transition: color 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-}
-
-.deleteBtn:hover {
-  color: var(--color-state-error);
-}
-
 .flaggedText {
   color: var(--color-state-error);
   font-style: italic;

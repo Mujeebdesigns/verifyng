@@ -1,5 +1,5 @@
 import React from 'react';
-import { CATEGORIES, STATES } from '../../utils/constants.js';
+import { CATEGORIES, STATES, MAX_BUSINESS_DESCRIPTION_LENGTH } from '../../utils/constants.js';
 import formStyles from './RegisterForm.module.css';
 import type { WizardFormApi } from './types.js';
 
@@ -153,8 +153,8 @@ export const StepBusinessFields: React.FC<StepBusinessFieldsProps> = ({ form }) 
           id="description"
           className={formStyles.textarea}
           rows={3}
-          maxLength={500}
-          placeholder="Tell customers what you sell, your delivery policies, etc. (max 500 chars)"
+          maxLength={MAX_BUSINESS_DESCRIPTION_LENGTH}
+          placeholder={`Tell customers what you sell, your delivery policies, etc. (max ${MAX_BUSINESS_DESCRIPTION_LENGTH} chars)`}
           value={fields.description}
           onChange={handleFieldChange('description')}
           onBlur={handleBlur('description')}

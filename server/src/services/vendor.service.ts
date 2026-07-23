@@ -43,7 +43,7 @@ export async function search(
   const vendors = await prisma.$queryRaw<VendorSearchResult[]>`
     SELECT id, "businessName", "instagramHandle", "phoneNumber",
            "trustScore", "trustLabel", "reviewCount", "scamFlag", "moderationFlag",
-           "state", "category", "claimStatus", "featured", "description", "coverImage", "logoImage"
+           "state", "city", "category", "claimStatus", "featured", "description", "coverImage", "logoImage"
     FROM "Vendor"
     WHERE LOWER("businessName") LIKE LOWER(${searchPattern})
        OR LOWER("instagramHandle") LIKE LOWER(${searchPattern})
@@ -285,6 +285,7 @@ const FEATURED_VENDOR_SELECT = {
   businessName: true,
   category: true,
   state: true,
+  city: true,
   trustScore: true,
   trustLabel: true,
   reviewCount: true,

@@ -45,6 +45,12 @@ export const DEFAULT_PAGE_LIMIT = 10 as const;
 export const REVIEW_EDIT_WINDOW_HOURS = 48 as const;
 export const REVIEW_UNDER_REVIEW_HOURS = 2 as const;
 
+/** Matches the server's business-description validation in validation.ts. */
+export const MAX_BUSINESS_DESCRIPTION_LENGTH = 500 as const;
+
+/** Client-side pre-check before compressImage() runs; the resulting file is always well under this. */
+export const MAX_IMAGE_FILE_SIZE_BYTES = 8 * 1024 * 1024;
+
 export const CATEGORIES = [
   'Fashion & Accessories',
   'Phones & Tablets',
