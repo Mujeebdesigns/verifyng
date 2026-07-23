@@ -92,7 +92,6 @@ model Vendor {
   businessName      String?
   instagramHandle   String?
   phoneNumber       String?
-  bankAccountLast4  String?             @db.VarChar(4)
   ownerId           String?
   claimStatus       ClaimStatus         @default(UNCLAIMED)
   claimedAt         DateTime?
@@ -121,7 +120,6 @@ model Vendor {
   @@index([businessName])
   @@index([instagramHandle])
   @@index([phoneNumber])
-  @@index([bankAccountLast4])
   @@index([state])
   @@index([category])
   @@index([claimStatus])
@@ -289,7 +287,6 @@ npx prisma studio
 | Model | Field | Constraint | Reason |
 |---|---|---|---|
 | User | role | `UserRole` enum default BUYER | Only BUYER, VENDOR, ADMIN allowed |
-| Vendor | bankAccountLast4 | `@db.VarChar(4)` | Enforces max 4 digits at database level |
 | Vendor | ownerId | `@relation("VendorOwner")` onDelete: SetNull | Vendor unclaimed if user deleted |
 | Vendor | claimStatus | `ClaimStatus` enum default UNCLAIMED | Tracks claim lifecycle |
 | Vendor | featured | `Boolean` default false | Admin toggles for directory visibility |

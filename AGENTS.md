@@ -115,7 +115,7 @@ verifyng/
 - id, userId, token, type (EMAIL_VERIFICATION | PASSWORD_RESET), expiresAt, createdAt
 
 ### Vendor
-- id, businessName, instagramHandle, phoneNumber, bankAccountLast4, ownerId (User reference), claimStatus (UNCLAIMED | PENDING_APPROVAL | CLAIMED), claimedAt, state, city, category, description, whatsappUrl, tiktokUrl, facebookUrl, linkedinUrl, featured, trustScore, trustLabel, reviewCount, scamFlag, moderationFlag, createdAt, updatedAt
+- id, businessName, instagramHandle, phoneNumber, ownerId (User reference), claimStatus (UNCLAIMED | PENDING_APPROVAL | CLAIMED), claimedAt, state, city, category, description, whatsappUrl, tiktokUrl, facebookUrl, linkedinUrl, featured, trustScore, trustLabel, reviewCount, scamFlag, moderationFlag, createdAt, updatedAt
 
 ### Review
 - id, vendorId, userId, rating, reviewText, transactionChannel, orderDate, verifiedBuyer, isFlagged, createdAt, updatedAt

@@ -128,44 +128,20 @@ export const StepBusinessFields: React.FC<StepBusinessFieldsProps> = ({ form }) 
         </div>
       </div>
 
-      <div className={formStyles.formGrid}>
-        <div style={inputGroupStyle}>
-          <label style={labelStyle} htmlFor="bankAccount">
-            Bank Acct (Last 4 Digits)
-          </label>
-          <div style={{ position: 'relative', width: '100%' }}>
-            <input
-              id="bankAccount"
-              className={formStyles.input}
-              type="text"
-              maxLength={4}
-              placeholder="e.g. 9876"
-              value={fields.bankAccountLast4}
-              onChange={handleFieldChange('bankAccountLast4')}
-              onBlur={handleBlur('bankAccountLast4')}
-              style={touched.bankAccountLast4 && fieldErrors.bankAccountLast4 ? { borderColor: 'var(--color-state-error) !important' } : undefined}
-            />
-          </div>
-          {touched.bankAccountLast4 && fieldErrors.bankAccountLast4 && (
-            <span style={errorStyle}>{fieldErrors.bankAccountLast4}</span>
-          )}
-        </div>
-
-        <div style={inputGroupStyle}>
-          <label style={labelStyle} htmlFor="instagram">
-            Instagram Handle
-          </label>
-          <div style={{ position: 'relative', width: '100%' }}>
-            <input
-              id="instagram"
-              className={formStyles.input}
-              type="text"
-              placeholder="e.g. trendy_fits"
-              value={fields.instagramHandle}
-              onChange={handleFieldChange('instagramHandle')}
-              onBlur={handleBlur('instagramHandle')}
-            />
-          </div>
+      <div style={inputGroupStyle}>
+        <label style={labelStyle} htmlFor="instagram">
+          Instagram Handle
+        </label>
+        <div style={{ position: 'relative', width: '100%' }}>
+          <input
+            id="instagram"
+            className={formStyles.input}
+            type="text"
+            placeholder="e.g. trendy_fits"
+            value={fields.instagramHandle}
+            onChange={handleFieldChange('instagramHandle')}
+            onBlur={handleBlur('instagramHandle')}
+          />
         </div>
       </div>
 

@@ -39,7 +39,6 @@ GET /api/vendors/search?q=chicfinds&page=1&limit=10
       "businessName": "ChicFinds NG",
       "instagramHandle": "chicfinds_ng",
       "phoneNumber": "08031234567",
-      "bankAccountLast4": "4821",
       "trustScore": 8.1,
       "trustLabel": "Mostly Reliable",
       "reviewCount": 42,
@@ -76,7 +75,6 @@ GET /api/vendors?category=Fashion&state=Lagos&claimStatus=CLAIMED&trustScoreMin=
       "businessName": "Lagos Wearhouse",
       "instagramHandle": "lagoswearhouse",
       "phoneNumber": "08012345678",
-      "bankAccountLast4": "9988",
       "trustScore": 8.7,
       "trustLabel": "Highly Trusted",
       "reviewCount": 14,
@@ -159,7 +157,6 @@ export async function search(rawQuery: string, page: number, limit: number) {
       "businessName",
       "instagramHandle",
       "phoneNumber",
-      "bankAccountLast4",
       "trustScore",
       "trustLabel",
       "reviewCount",
@@ -170,7 +167,6 @@ export async function search(rawQuery: string, page: number, limit: number) {
       LOWER("businessName") LIKE ${pattern}
       OR LOWER("instagramHandle") LIKE ${pattern}
       OR "phoneNumber" LIKE ${pattern}
-      OR "bankAccountLast4" = ${q}
     ORDER BY "reviewCount" DESC, "trustScore" DESC
     LIMIT ${limit}
     OFFSET ${skip}
@@ -183,7 +179,6 @@ export async function search(rawQuery: string, page: number, limit: number) {
       LOWER("businessName") LIKE ${pattern}
       OR LOWER("instagramHandle") LIKE ${pattern}
       OR "phoneNumber" LIKE ${pattern}
-      OR "bankAccountLast4" = ${q}
   `;
 
   const total = Number(countResult[0].count);
@@ -293,7 +288,6 @@ export interface VendorSearchResult {
   businessName: string | null;
   instagramHandle: string | null;
   phoneNumber: string | null;
-  bankAccountLast4: string | null;
   trustScore: number;
   trustLabel: string;
   reviewCount: number;
@@ -474,7 +468,6 @@ if (!vendor) {
       businessName: businessName ?? null,
       instagramHandle: instagramHandle ?? null,
       phoneNumber: phoneNumber ?? null,
-      bankAccountLast4: bankAccountLast4 ?? null,
       reviewCount: 0,
     },
   });

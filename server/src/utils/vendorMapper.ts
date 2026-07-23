@@ -7,7 +7,6 @@ export function toVendorSearchResult(vendor: Pick<
   | 'businessName'
   | 'instagramHandle'
   | 'phoneNumber'
-  | 'bankAccountLast4'
   | 'trustScore'
   | 'trustLabel'
   | 'reviewCount'
@@ -26,7 +25,6 @@ export function toVendorSearchResult(vendor: Pick<
     businessName: vendor.businessName,
     instagramHandle: vendor.instagramHandle,
     phoneNumber: vendor.phoneNumber,
-    bankAccountLast4: vendor.bankAccountLast4,
     trustScore: vendor.trustScore,
     trustLabel: vendor.trustLabel,
     reviewCount: vendor.reviewCount,
@@ -48,7 +46,6 @@ export function toVendorDetail(vendor: Vendor, viewerUserId: string | null = nul
     businessName: vendor.businessName,
     instagramHandle: vendor.instagramHandle,
     phoneNumber: vendor.phoneNumber,
-    bankAccountLast4: vendor.bankAccountLast4,
     // Never expose the raw ownerId on the public endpoint — only whether
     // the current viewer is the owner.
     isOwnedByViewer: viewerUserId !== null && vendor.ownerId === viewerUserId,

@@ -7,10 +7,8 @@ This file defines the security rules for VerifyNG. These are non-negotiable. App
 ## Sensitive Data Rules
 
 ### Bank Account Numbers
-- Only the **last 4 digits** of any bank account number may be stored in the database
-- Truncation happens at the **API input validation layer** — before any data reaches the service or Prisma
-- The `bankAccountLast4` field in the Prisma Vendor model is a `String` with a max length of 4 characters
-- Never log, return in API responses, or pass through the system a full bank account number under any circumstances
+- VerifyNG does not collect or store bank account numbers, in whole or in part — this was removed from the Vendor model and every vendor-facing form
+- If a future feature needs a bank-account identifier again, only the **last 4 digits** may ever be stored, truncated at the **API input validation layer** before any data reaches the service or Prisma — never log, return in API responses, or pass through the system a full bank account number
 
 ### Raw SQL (Full-Text Search)
 - Architecture.md permits raw SQL only where Prisma does not support the operation (e.g. full-text search)
@@ -115,7 +113,6 @@ const payload = {
 | `password` | Minimum 8 characters; at least 1 uppercase, 1 number |
 | `rating` | Integer between 1 and 5 inclusive |
 | `reviewText` | Minimum 30 characters; maximum 1000 characters; editable within 48 hours of submission only |
-| `bankAccountLast4` | Numeric string; exactly 4 characters after truncation |
 | `phoneNumber` | Valid Nigerian phone format (e.g. 080XXXXXXXX or +234XXXXXXXXXX) |
 | `instagramHandle` | Alphanumeric with underscores; strip @ before storing |
 
@@ -226,7 +223,7 @@ VerifyNG collects personal data and is subject to the Nigerian Data Protection R
 - A privacy policy must be linked from the app before launch
 - Users must explicitly consent to data collection during registration
 - Users have the right to request deletion of their account and associated reviews
-- Phone numbers and bank account details used for vendor search are search keys only — they are not linked to user accounts
+- Phone numbers used for vendor search are search keys only — they are not linked to user accounts
 - Do not share user data with third-party services beyond what is strictly necessary (email provider, AI provider)
 
 ---

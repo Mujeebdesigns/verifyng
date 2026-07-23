@@ -353,14 +353,12 @@ export async function reportVendor(
  * Uses findFirst (not upsert) due to non-unique lookups on handle/phone.
  */
 async function findOrCreateVendor(payload: CreateReviewPayload): Promise<string> {
-  const { businessName, instagramHandle, phoneNumber, bankAccountLast4 } = payload;
+  const { businessName, instagramHandle, phoneNumber } = payload;
 
-  if (!businessName && !instagramHandle && !phoneNumber && !bankAccountLast4) {
-    throw new AppError('At least one vendor identifier is required (vendorId, businessName, instagramHandle, phoneNumber, or bankAccountLast4)', 400);
+  if (!businessName && !instagramHandle && !phoneNumber) {
+    throw new AppError('At least one vendor identifier is required (vendorId, businessName, instagramHandle, or phoneNumber)', 400);
   }
 
-  // Truncate bank account to last 4 digits
-  const bankLast4 = bankAccountLast4 ? bankAccountLast4.slice(-4) : undefined;
   // Normalise once — buyers sometimes paste a full profile URL instead of a
   // bare username; this keeps both the lookup and auto-create in sync with
   // however the handle was originally stored on the vendor record.
@@ -382,31 +380,10 @@ async function findOrCreateVendor(payload: CreateReviewPayload): Promise<string>
     });
   }
 
-  // 3. Next, check Business Name. If bankLast4 is also provided, match BOTH to be safe
+  // 3. Next, check Business Name
   if (!existingVendor && businessName) {
-    if (bankLast4) {
-      existingVendor = await prisma.vendor.findFirst({
-        where: {
-          businessName: { equals: businessName, mode: 'insensitive' },
-          bankAccountLast4: bankLast4,
-        },
-      });
-    } else {
-      existingVendor = await prisma.vendor.findFirst({
-        where: { businessName: { equals: businessName, mode: 'insensitive' } },
-      });
-    }
-  }
-
-  // 4. Fallback: if only bankLast4 is provided, look up by it, but ensure other identifiers are null to prevent hijacking
-  if (!existingVendor && bankLast4 && !businessName && !instagramHandle && !phoneNumber) {
     existingVendor = await prisma.vendor.findFirst({
-      where: {
-        bankAccountLast4: bankLast4,
-        businessName: null,
-        instagramHandle: null,
-        phoneNumber: null,
-      },
+      where: { businessName: { equals: businessName, mode: 'insensitive' } },
     });
   }
 
@@ -420,7 +397,6 @@ async function findOrCreateVendor(payload: CreateReviewPayload): Promise<string>
       businessName: businessName ?? null,
       instagramHandle: normalizedHandle ?? null,
       phoneNumber: phoneNumber ?? null,
-      bankAccountLast4: bankLast4 ?? null,
     },
   });
 

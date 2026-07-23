@@ -74,7 +74,6 @@ model Vendor {
   businessName     String?
   instagramHandle  String?
   phoneNumber      String?
-  bankAccountLast4 String?     @db.VarChar(4)
   ownerId          String?
   claimStatus      ClaimStatus @default(UNCLAIMED)
   claimedAt        DateTime?
@@ -106,7 +105,6 @@ model Vendor {
   @@index([businessName])
   @@index([instagramHandle])
   @@index([phoneNumber])
-  @@index([bankAccountLast4])
   @@index([state])
   @@index([category])
   @@index([claimStatus])

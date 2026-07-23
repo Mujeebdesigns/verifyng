@@ -325,7 +325,7 @@ export const Home: React.FC = () => {
   const { query, setQuery, debouncedQuery, results, loading, error, page, setPage, totalPages } = useVendorSearch();
   const [searchParams] = useSearchParams();
   const [inputValue, setInputValue] = useState('');
-  const [searchPlaceholder, setSearchPlaceholder] = useState('Search by name, instagram, phone, or bank...');
+  const [searchPlaceholder, setSearchPlaceholder] = useState('Search by name, instagram, or phone...');
   const [featuredVendors, setFeaturedVendors] = useState<VendorSearchResult[]>([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const initialized = useRef(false);
@@ -336,7 +336,7 @@ export const Home: React.FC = () => {
       setSearchPlaceholder(
         window.innerWidth <= 768
           ? 'Search vendor...'
-          : 'Search by name, instagram, phone, or bank...'
+          : 'Search by name, instagram, or phone...'
       );
     };
     update();
@@ -434,7 +434,7 @@ export const Home: React.FC = () => {
         </h1>
 
         <p className={`${styles.heroSub} ${styles.heroSubDesktop}`}>
-          Verify online vendors before you pay. Search by name, Instagram, phone, or bank details to instantly see trust scores and scam alerts.
+          Verify online vendors before you pay. Search by name, Instagram, or phone to instantly see trust scores and scam alerts.
         </p>
         <p className={`${styles.heroSub} ${styles.heroSubMobile}`}>
           Search any vendor. See their trust score. Buy with confidence.
@@ -461,9 +461,9 @@ export const Home: React.FC = () => {
 
         <div className={styles.searchHints}>
           <span className={styles.searchHintLabel}>Try:</span>
-          {['@chicfinds_ng', '08031234567', 'QuickFinds Abuja', '4821'].map(hint => (
+          {['@chicfinds_ng', '08031234567', 'QuickFinds Abuja'].map(hint => (
             <button key={hint} className={styles.searchHint} onClick={() => fillHint(hint)}>
-              {hint === '4821' ? 'Bank last 4: 4821' : hint}
+              {hint}
             </button>
           ))}
         </div>
@@ -520,10 +520,10 @@ export const Home: React.FC = () => {
         <div className={styles.marqueeTrack}>
           {[
             'Community-Powered Trust', 'AI Review Summaries', 'Scam Pattern Detection',
-            'Search by Instagram Handle', 'Search by Phone Number', 'Search by Bank Account',
+            'Search by Instagram Handle', 'Search by Phone Number', 'Search by Business Name',
             'Built for Nigerian Buyers', 'NDPR Compliant', 'Verified Buyer Badges',
             'Community-Powered Trust', 'AI Review Summaries', 'Scam Pattern Detection',
-            'Search by Instagram Handle', 'Search by Phone Number', 'Search by Bank Account',
+            'Search by Instagram Handle', 'Search by Phone Number', 'Search by Business Name',
             'Built for Nigerian Buyers', 'NDPR Compliant', 'Verified Buyer Badges',
           ].map((item, i) => (
             <div key={i} className={styles.marqueeItem}>
@@ -648,7 +648,6 @@ export const Home: React.FC = () => {
                   <li><CheckIcon />Search by business name or store name</li>
                   <li><CheckIcon />Search by Instagram or TikTok handle</li>
                   <li><CheckIcon />Search by WhatsApp phone number</li>
-                  <li><CheckIcon />Search by last 4 digits of bank account</li>
                 </ul>
                 <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={styles.howLearnMore}>
                   Try a search <ArrowIcon />
@@ -749,7 +748,7 @@ export const Home: React.FC = () => {
             {[
               { score: '8.7', color: 'green', name: 'ChicStyles_NG',   meta: '@chicstyles_ng · 08031234567 · 142 reviews', badge: 'Highly Trusted', bc: 'green' },
               { score: '5.2', color: 'amber', name: 'QuickFinds Abuja', meta: '@quickfinds_abj · 18 reviews',               badge: 'Proceed with Caution', bc: 'amber' },
-              { score: '1.4', color: 'red',   name: 'FashionHub_NG',   meta: '@fashionhub_ng · Bank: ****4821 · 31 reviews', badge: 'High Risk', bc: 'red' },
+              { score: '1.4', color: 'red',   name: 'FashionHub_NG',   meta: '@fashionhub_ng · 08099998888 · 31 reviews', badge: 'High Risk', bc: 'red' },
             ].map(v => (
               <div key={v.name} className={styles.vendorRow}>
                 <div className={`${styles.vScore} ${styles[`vs_${v.color}`]}`}>
@@ -777,12 +776,12 @@ export const Home: React.FC = () => {
           </div>
           <div className={styles.featuresGrid}>
             {[
-              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>, title: 'Multi-identifier search', desc: 'Search by business name, Instagram handle, phone number, or bank last 4 digits. No vendor can hide behind a different name.' },
+              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>, title: 'Multi-identifier search', desc: 'Search by business name, Instagram handle, or phone number. No vendor can hide behind a different name.' },
               { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>, title: 'Weighted trust scores', desc: 'Scores factor in star ratings, verified buyers, and review recency — not just simple averages. A scam vendor can\'t game the system.' },
               { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>, title: 'AI review summaries', desc: 'AI reads all community reviews and generates a concise, honest summary covering delivery, satisfaction, and recurring complaints.' },
               { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>, title: 'Scam pattern detection', desc: 'Automatically flags vendors when patterns match known scam behaviour — non-delivery, blocking after payment, bait-and-switch.' },
               { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>, title: 'Community reviews', desc: 'Every review comes from a registered buyer. Verified buyer badges highlight confirmed transactions for the most trustworthy feedback.' },
-              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>, title: 'Privacy protected', desc: 'Only the last 4 digits of bank accounts are stored. Your personal data is never sold or shared. NDPR compliant from day one.' },
+              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>, title: 'Privacy protected', desc: 'We never collect bank or financial details. Your personal data is never sold or shared. NDPR compliant from day one.' },
             ].map(f => (
               <div key={f.title} className={styles.featureCard}>
                 <div className={styles.featureIcon}>{f.icon}</div>

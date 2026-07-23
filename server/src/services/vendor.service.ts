@@ -17,7 +17,7 @@ import type {
 import type { ReviewResponse } from '../types/review.js';
 
 /**
- * Search vendors by business name, Instagram handle, phone number, or bank account last 4.
+ * Search vendors by business name, Instagram handle, or phone number.
  * Uses parameterized ILIKE queries for flexible matching.
  *
  * Source: agents/skills/vendor-search/SKILL.md
@@ -41,14 +41,13 @@ export async function search(
 
   // Use parameterized raw query for ILIKE across multiple fields
   const vendors = await prisma.$queryRaw<VendorSearchResult[]>`
-    SELECT id, "businessName", "instagramHandle", "phoneNumber", "bankAccountLast4",
+    SELECT id, "businessName", "instagramHandle", "phoneNumber",
            "trustScore", "trustLabel", "reviewCount", "scamFlag", "moderationFlag",
            "state", "category", "claimStatus", "featured", "description", "coverImage", "logoImage"
     FROM "Vendor"
     WHERE LOWER("businessName") LIKE LOWER(${searchPattern})
        OR LOWER("instagramHandle") LIKE LOWER(${searchPattern})
        OR "phoneNumber" LIKE ${searchPattern}
-       OR "bankAccountLast4" LIKE ${searchPattern}
     ORDER BY "reviewCount" DESC, "trustScore" DESC
     LIMIT ${limit}
     OFFSET ${skip}
@@ -60,7 +59,6 @@ export async function search(
     WHERE LOWER("businessName") LIKE LOWER(${searchPattern})
        OR LOWER("instagramHandle") LIKE LOWER(${searchPattern})
        OR "phoneNumber" LIKE ${searchPattern}
-       OR "bankAccountLast4" LIKE ${searchPattern}
   `;
 
   const total = Number(countResult[0].count);
@@ -292,7 +290,6 @@ const FEATURED_VENDOR_SELECT = {
   reviewCount: true,
   instagramHandle: true,
   phoneNumber: true,
-  bankAccountLast4: true,
   scamFlag: true,
   moderationFlag: true,
   claimStatus: true,
@@ -334,10 +331,6 @@ export async function createVendorProfile(userId: string, payload: CreateVendorP
     throw new AppError('You already have a vendor profile', 409);
   }
 
-  const bankLast4 = payload.bankAccountLast4
-    ? payload.bankAccountLast4.replace(/[^0-9]/g, '').slice(-4)
-    : null;
-
   return prisma.vendor.create({
     data: {
       businessName: payload.businessName,
@@ -353,7 +346,6 @@ export async function createVendorProfile(userId: string, payload: CreateVendorP
       linkedinUrl: payload.linkedinUrl ?? null,
       coverImage: payload.coverImage ?? null,
       logoImage: payload.logoImage ?? null,
-      bankAccountLast4: bankLast4,
       ownerId: userId,
       claimStatus: 'PENDING_APPROVAL',
     },

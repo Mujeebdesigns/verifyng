@@ -76,11 +76,6 @@ export async function handleRegisterVendor(req: IncomingMessage, res: ServerResp
       return;
     }
 
-    if (body.bankAccountLast4 && body.bankAccountLast4.replace(/[^0-9]/g, '').length !== 4) {
-      sendError(res, 400, 'Bank account must be a 4-digit number');
-      return;
-    }
-
     const urlError = validateSocialUrls(body);
     if (urlError) {
       sendError(res, 400, urlError);

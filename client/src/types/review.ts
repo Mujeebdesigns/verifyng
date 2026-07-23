@@ -4,7 +4,6 @@ export interface CreateReviewPayload {
   businessName?: string;
   instagramHandle?: string;
   phoneNumber?: string;
-  bankAccountLast4?: string;
   rating: number;
   reviewText: string;
   transactionChannel?: string;

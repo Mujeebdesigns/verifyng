@@ -8,7 +8,6 @@ export type FieldName =
   | 'businessName'
   | 'instagramHandle'
   | 'phoneNumber'
-  | 'bankAccountLast4'
   | 'stateName'
   | 'cityName'
   | 'category'
@@ -25,7 +24,6 @@ export const EMPTY_FIELDS: FieldValues = {
   businessName: '',
   instagramHandle: '',
   phoneNumber: '',
-  bankAccountLast4: '',
   stateName: '',
   cityName: '',
   category: '',

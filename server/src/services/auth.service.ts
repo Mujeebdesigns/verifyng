@@ -101,7 +101,6 @@ export async function registerVendor(payload: RegisterVendorPayload): Promise<Au
     businessName,
     instagramHandle,
     phoneNumber,
-    bankAccountLast4,
     state,
     city,
     category,
@@ -124,10 +123,6 @@ export async function registerVendor(payload: RegisterVendorPayload): Promise<Au
   const rawVerificationToken = crypto.randomBytes(32).toString('hex');
   const hashedVerificationToken = crypto.createHash('sha256').update(rawVerificationToken).digest('hex');
   const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
-
-  const bankLast4 = bankAccountLast4
-    ? bankAccountLast4.replace(/[^0-9]/g, '').slice(-4)
-    : null;
 
   // Transaction: create user + verification token + vendor profile
   const user = await prisma.$transaction(async (tx) => {
@@ -154,7 +149,6 @@ export async function registerVendor(payload: RegisterVendorPayload): Promise<Au
         businessName,
         instagramHandle: instagramHandle ? normalizeInstagramHandle(instagramHandle) : null,
         phoneNumber: phoneNumber || null,
-        bankAccountLast4: bankLast4,
         ownerId: newUser.id,
         claimStatus: 'PENDING_APPROVAL',
         state: state || null,

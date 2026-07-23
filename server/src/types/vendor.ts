@@ -14,7 +14,6 @@ export interface VendorSearchResult {
   businessName: string | null;
   instagramHandle: string | null;
   phoneNumber: string | null;
-  bankAccountLast4: string | null;
   trustScore: number;
   trustLabel: string;
   reviewCount: number;
@@ -35,7 +34,6 @@ export interface VendorDetail {
   businessName: string | null;
   instagramHandle: string | null;
   phoneNumber: string | null;
-  bankAccountLast4: string | null;
   /** Whether the requesting user owns this vendor profile (false for anonymous viewers). */
   isOwnedByViewer: boolean;
   claimStatus: ClaimStatus;
@@ -74,7 +72,6 @@ export interface CreateVendorPayload {
   tiktokUrl?: string;
   facebookUrl?: string;
   linkedinUrl?: string;
-  bankAccountLast4?: string;
   coverImage?: string;
   logoImage?: string;
 }

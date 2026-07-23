@@ -127,7 +127,6 @@ export const VendorDashboard: React.FC = () => {
   
   // Onboarding Form (New Profile)
   const [bizName, setBizName] = useState('');
-  const [acctLast4, setAcctLast4] = useState('');
   const [phone, setPhone] = useState('');
 
   const [saving, setSaving] = useState(false);
@@ -282,7 +281,6 @@ export const VendorDashboard: React.FC = () => {
       tiktokUrl: tiktok || undefined,
       facebookUrl: facebook || undefined,
       linkedinUrl: linkedin || undefined,
-      bankAccountLast4: acctLast4 || undefined,
       coverImage: coverImage || undefined,
       logoImage: logoImage || undefined,
     };
@@ -512,28 +510,15 @@ export const VendorDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel} htmlFor="phone">Phone Number</label>
-                      <input
-                        id="phone"
-                        type="tel"
-                        placeholder="e.g. 08012345678"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel} htmlFor="acctLast4">Bank Account (Last 4 Digits)</label>
-                      <input
-                        id="acctLast4"
-                        type="text"
-                        maxLength={4}
-                        placeholder="e.g. 4321"
-                        value={acctLast4}
-                        onChange={(e) => setAcctLast4(e.target.value.replace(/[^0-9]/g, ''))}
-                      />
-                    </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel} htmlFor="phone">Phone Number</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="e.g. 08012345678"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
                   </div>
 
                   <div className={`${styles.formGroup} ${styles.formGroupTight}`}>

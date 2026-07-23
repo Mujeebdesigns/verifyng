@@ -130,9 +130,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
         if (value.trim().length < 10) return 'Must be at least 10 characters';
         if (value.trim().length > 500) return 'Must be under 500 characters';
         return '';
-      case 'bankAccountLast4':
-        if (value && !/^\d{4}$/.test(value.replace(/[^0-9]/g, ''))) return 'Must be exactly 4 digits';
-        return '';
       default:
         return '';
     }
@@ -195,7 +192,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
       }
     } else if (role === 'VENDOR' && s === 2) {
       stepFields = ['businessName', 'category', 'phoneNumber', 'stateName', 'cityName', 'description'];
-      if (fields.bankAccountLast4) stepFields.push('bankAccountLast4');
     } else if (role === 'BUYER') {
       stepFields = ['displayName', 'email', 'password'];
     }
@@ -222,7 +218,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role: initialRole, f
     businessName: fields.businessName.trim(),
     instagramHandle: fields.instagramHandle.trim() || undefined,
     phoneNumber: fields.phoneNumber.trim() || undefined,
-    bankAccountLast4: fields.bankAccountLast4.trim() || undefined,
     state: fields.stateName,
     city: fields.cityName.trim(),
     category: fields.category,

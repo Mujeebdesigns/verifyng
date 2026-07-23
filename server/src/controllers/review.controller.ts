@@ -69,25 +69,16 @@ export async function handleCreateReview(
       return;
     }
 
-    if (body.bankAccountLast4) {
-      const bankAcc = body.bankAccountLast4.trim();
-      if (!/^\d{4}$/.test(bankAcc)) {
-        sendError(res, 400, 'Bank account number must be exactly the last 4 digits for security');
-        return;
-      }
-    }
-
     if (
       !body.vendorId &&
       !body.businessName &&
       !body.instagramHandle &&
-      !body.phoneNumber &&
-      !body.bankAccountLast4
+      !body.phoneNumber
     ) {
       sendError(
         res,
         400,
-        'Vendor ID or at least one vendor identifier (businessName, instagramHandle, phoneNumber, bankAccountLast4) is required'
+        'Vendor ID or at least one vendor identifier (businessName, instagramHandle, phoneNumber) is required'
       );
       return;
     }

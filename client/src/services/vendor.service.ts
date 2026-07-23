@@ -11,7 +11,7 @@ import type { ReviewResponse } from '../types/review.js';
 
 export const vendorService = {
   /**
-   * Search for vendors by business name, handle, phone, or bank account.
+   * Search for vendors by business name, handle, or phone.
    */
   async search(
     query: string,

@@ -22,7 +22,6 @@ export interface RegisterVendorPayload extends RegisterPayload {
   businessName: string;
   instagramHandle?: string;
   phoneNumber?: string;
-  bankAccountLast4?: string;
   state?: string;
   city?: string;
   category?: string;

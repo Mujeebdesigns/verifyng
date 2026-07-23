@@ -62,7 +62,6 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const [businessName, setBusinessName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [bankAccountLast4, setBankAccountLast4] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -114,17 +113,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
       if (
         !businessName.trim() &&
         !instagramHandle.trim() &&
-        !phoneNumber.trim() &&
-        !bankAccountLast4.trim()
+        !phoneNumber.trim()
       ) {
         setValidationError(
-          'Please provide at least one vendor identifier (Business Name, Instagram, Phone, or Bank Last 4).'
+          'Please provide at least one vendor identifier (Business Name, Instagram, or Phone).'
         );
-        return;
-      }
-
-      if (bankAccountLast4.trim() && !/^\d{4}$/.test(bankAccountLast4.trim())) {
-        setValidationError('Bank account must be exactly the last 4 digits for security.');
         return;
       }
     }
@@ -152,7 +145,6 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
           payload.businessName = businessName.trim() || undefined;
           payload.instagramHandle = instagramHandle.trim() || undefined;
           payload.phoneNumber = phoneNumber.trim() || undefined;
-          payload.bankAccountLast4 = bankAccountLast4.trim() || undefined;
         }
 
         await onSubmit(payload);
@@ -206,29 +198,15 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
               />
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.group}>
-              <label className={styles.label} htmlFor="phoneNumber">Phone Number</label>
-              <input
-                id="phoneNumber"
-                type="tel"
-                placeholder="e.g. 08031234567"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
-            <div className={styles.group}>
-              <label className={styles.label} htmlFor="bankAccountLast4">Bank Account Last 4 Digits</label>
-              <input
-                id="bankAccountLast4"
-                type="text"
-                maxLength={4}
-                placeholder="e.g. 5678"
-                value={bankAccountLast4}
-                onChange={(e) => setBankAccountLast4(e.target.value)}
-              />
-              <span className={styles.helper}>For security, last 4 digits only.</span>
-            </div>
+          <div className={styles.group}>
+            <label className={styles.label} htmlFor="phoneNumber">Phone Number</label>
+            <input
+              id="phoneNumber"
+              type="tel"
+              placeholder="e.g. 08031234567"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
           </div>
         </>
       )}

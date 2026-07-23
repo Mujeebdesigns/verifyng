@@ -20,7 +20,7 @@ Users register with the optional `role` parameter set to `VENDOR`. A registered 
 5. On first login after verification, vendor is redirected to vendor onboarding wizard:
    a. Step 1: Business name, category, state, city
    b. Step 2: Social links (WhatsApp, Instagram, TikTok, Facebook, LinkedIn)
-   c. Step 3: Business description, bank last 4 (optional)
+   c. Step 3: Business description, cover image, logo
 6. POST /api/vendors (auto-creates Vendor record linked to user's id)
 7. Land on /vendor-dashboard with "Awaiting verification" badge
 8. Admin approves the profile (claimStatus → CLAIMED)
@@ -47,8 +47,7 @@ POST /api/vendors
   "whatsappUrl": "https://wa.me/2348012345678",
   "tiktokUrl": "",
   "facebookUrl": "",
-  "linkedinUrl": "",
-  "bankAccountLast4": "4821"
+  "linkedinUrl": ""
 }
 ```
 
